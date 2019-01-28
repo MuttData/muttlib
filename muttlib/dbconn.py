@@ -18,10 +18,8 @@ from sqlalchemy.types import VARCHAR
 
 
 import utils
-from constants import PARENT_LOGGER
 
-
-logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
+logger = logging.getLogger(f'dbconn.{__name__}') # NOQA
 
 try:
     import cx_Oracle
@@ -37,6 +35,12 @@ try:
     import pymongo
 except:
     logger.warning("No Mongo support.")
+
+
+try:
+    import ibis
+except:
+    logger.warning("No Ibis support.")
 
 
 def _parse_sql_statement_decorator(func):
@@ -539,4 +543,3 @@ connectors = {
 def get_client(creds):
     db_type = creds.pop('db_type')
     return db_type, connectors[db_type](**creds)
-

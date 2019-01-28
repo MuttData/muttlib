@@ -2,12 +2,13 @@
 import re
 import _string
 import subprocess
-import pandas as pd
-import numpy as np
 from hashlib import md5
 from functools import partial
 from pathlib import Path
 from string import Formatter
+
+import pandas as pd
+import numpy as np
 from tabulate import tabulate
 from typing import List
 from jinja2 import Undefined
@@ -16,9 +17,9 @@ from IPython.display import display
 import matplotlib
 # Special back-end set to have the ipynb **not** use tkinter
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # NOQA
 # For nice df prints that can be copy pasted to chat services
-import seaborn as sns
+import seaborn as sns # NOQA
 
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
