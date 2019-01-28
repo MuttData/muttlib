@@ -16,8 +16,7 @@ import pyarrow.parquet as pq
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
 
-
-import utils
+import muttlib.utils as utils
 
 logger = logging.getLogger(f'dbconn.{__name__}') # NOQA
 

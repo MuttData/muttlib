@@ -8,3 +8,35 @@ Current modules:
 - `utils`: A single version of miscellaneous functions needed every now and then.
 - `ipynb_const.py` and `ipynb_utils.py`: Utilities when for exploratory work.
 
+
+# Install
+Base lib:
+```
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+```
+
+IPython utils:
+```
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+```
+
+Misc DB suppoort for dbconn:
+```
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
+```
+
+
+Quick and dirty tests:
+```
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+python -c 'import muttlib'
+python -c 'from muttlib import dbconn, utils'
+
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+python -c 'from muttlib import ipynb_const, ipynb_utils'
+```

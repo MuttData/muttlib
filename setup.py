@@ -25,9 +25,9 @@ setuptools.setup(
         "pandas",
         "progressbar",
         "pyarrow",
+        "pyyaml",
         "sqlalchemy",
         "scipy",
-        "pyyaml",
     ],
     extras_require={
         'oracle': ["cx_Oracle"],
@@ -36,7 +36,7 @@ setuptools.setup(
         'sqlserver': ["pymssql"],
         'mongo': ["pymongo"],
         'ibis': ["ibis"],
-        'ipynb-helpers': [
+        'ipynb-utils': [
             "IPython",
             "jinja2",
             "jinjasql",
