@@ -30,11 +30,9 @@ pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 ```
 
-
-Quick and dirty tests:
+# Dirty Dry-run (done dirt cheap)
 ```
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
-python -c 'import muttlib'
 python -c 'from muttlib import dbconn, utils'
 
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
