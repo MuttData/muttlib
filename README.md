@@ -1,4 +1,4 @@
-# muttlib
+# muttlib 🐶📚
 
 Library with helper code to start a project.
 
