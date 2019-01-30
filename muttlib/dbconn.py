@@ -189,7 +189,7 @@ class OracleClient(BaseClient):
         if upper_case_cols:
             df.columns = [c.upper() for c in df.columns]
 
-        super().insert_from_frame(df, table, **kwargs)
+        super().insert_from_frame(df, table, dtypes=dtyp, **kwargs)
 
 
 
