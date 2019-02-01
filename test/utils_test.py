@@ -58,7 +58,9 @@ def test_query_yes_no(monkeypatch):
 
     utils.__builtins__["input"] = og
 
-
+def test_path_or_string():
+    assert 'True\n' == utils.path_or_string('test_files/path_or_string.txt')
+    assert 'True' == utils.path_or_string('True')
 
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
