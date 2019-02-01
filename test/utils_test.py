@@ -2,6 +2,8 @@ from muttlib import utils
 import datetime
 import pytest
 from collections import namedtuple
+import pandas as pd
+import numpy as np
 
 def test_str_to_datetime():
     assert utils.str_to_datetime('2019-10-25 18:35:22') == datetime.datetime(2019, 10, 25, 18, 35, 22)
@@ -24,3 +26,14 @@ def test_dict_to_namedtuple():
 
 def test_create_dict_id():
     assert '67fe8ab7b5' == utils.create_dict_id({'don_jose': 'paso por mi casa'})
+
+def test_make_dirs():
+    # Idk :(
+    pass
+
+def test_get_ordered_factor_levels():
+    data = {'B': [25, 94, 57, 62, 70]}
+    df = pd.DataFrame(data, columns = ['B'])
+    df2 = utils.get_ordered_factor_levels(df,'B')
+    assert np.array_equal(np.array([70, 94, 62, 25, 57]),df2[0])
+    assert 5 == df2[1] 
