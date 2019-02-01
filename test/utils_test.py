@@ -21,3 +21,6 @@ def test_dict_to_namedtuple():
     tuple_1 = namedtuple('pepe','don_jose') ('paso por mi casa') 
     tuple_2 = utils.dict_to_namedtuple('pepe',{'don_jose': 'paso por mi casa'})
     assert tuple_1 == tuple_2
+
+def test_create_dict_id():
+    assert '67fe8ab7b5' == utils.create_dict_id({'don_jose': 'paso por mi casa'})
