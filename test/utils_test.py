@@ -62,6 +62,9 @@ def test_path_or_string():
     assert 'True\n' == utils.path_or_string('test_files/path_or_string.txt')
     assert 'True' == utils.path_or_string('True')
 
+def test_hash_str():
+    assert '0c5024ed' == utils.hash_str("hit or miss")
+
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
     #Need to make a test folder
