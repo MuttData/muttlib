@@ -27,13 +27,49 @@ def test_dict_to_namedtuple():
 def test_create_dict_id():
     assert '67fe8ab7b5' == utils.create_dict_id({'don_jose': 'paso por mi casa'})
 
-def test_make_dirs():
-    # Idk :(
-    pass
-
 def test_get_ordered_factor_levels():
     data = {'B': [25, 94, 57, 62, 70]}
     df = pd.DataFrame(data, columns = ['B'])
     df2 = utils.get_ordered_factor_levels(df,'B')
     assert np.array_equal(np.array([70, 94, 62, 25, 57]),df2[0])
-    assert 5 == df2[1] 
+    assert 5 == df2[1]
+
+def test_query_yes_no(monkeypatch):
+    og = utils.__builtins__["input"]
+    with pytest.raises(ValueError):
+        utils.query_yes_no("hit or miss?", 's')
+    utils.__builtins__["input"] = lambda: ''
+    assert False == utils.query_yes_no("hit or miss?")
+    utils.__builtins__["input"] = lambda: ''
+    assert True == utils.query_yes_no("hit or miss?",'yes')
+    utils.__builtins__["input"] = lambda: 'yes'
+    assert True == utils.query_yes_no("hit or miss?")
+    utils.__builtins__["input"] = lambda: 'y'
+    assert True == utils.query_yes_no("hit or miss?")
+    utils.__builtins__["input"] = lambda: 'ye'
+    assert True == utils.query_yes_no("hit or miss?")
+    utils.__builtins__["input"] = lambda: 'no'
+    assert False == utils.query_yes_no("hit or miss?")
+    utils.__builtins__["input"] = lambda: 'n'
+    assert False == utils.query_yes_no("hit or miss?")
+
+    #[TODO]Validate the while. Need to rewrite this shit to rise an exception but idk shit
+    #utils.sys.stdout["write"] = raise Exception('shit happended')    
+
+    utils.__builtins__["input"] = og
+
+
+
+#[TODO] Need to make special shit for this ones
+def test_make_dirs():
+    #Need to make a test folder
+    pass
+def test_non_empty_dirs():
+    #Need to make a test folder
+    pass
+def test_read_yaml():
+    #Need to make a test yaml file
+    pass
+def test_template():
+    #Need to make test template n' shit
+    pass
