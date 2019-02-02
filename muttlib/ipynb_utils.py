@@ -21,6 +21,10 @@ import matplotlib.pyplot as plt # NOQA
 # For nice df prints that can be copy pasted to chat services
 import seaborn as sns # NOQA
 
+# Cleanear matplotlib dates as day in letters
+import matplotlib.dates as mdates
+# Cleanear matplotlib formatting
+from matplotlib import ticker
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -401,23 +405,113 @@ def plot_category2category_pie_charts(
             title=level,
         )
 
+def plot_timeseries(
+    df,
+    y_col,
+    fig_size=(10, 8),
+    non_index_col=None,
+    title_str="",
+    hourly_formatted=False,
+    fig_ax=None,
+    fmt='-o',
+    label=None,
+    color=None,
+    **kwargs,
+):
+    """
+    Create a special tseries plot from a df's index and y-col.
 
-# def plot_agg_time_series(
-#     data: pd.DataFrame,
-#     date_col: str='hour',
-#     plot_series: List=['impressions','clicks']):
-#     """Plot different line series on an already-aggregated df's category."""
-#     fig = plt.figure()
-#     data.set_index(date_col)[plot_series].plot(logy=True,
-#                                             figsize =(8, 6),
-#     #                                       colormap="GnBu",
-#                                             label ='right',
-#                                             ax=fig.gca()
-#                                            )
+    Various daily and hourly formats for xticks can be used.
+    Optionally one can pass a specific column to act as index.
 
-#     title_str = '{!s} - {!s} time series for every {}'.format(val,
-#                 category_col.capitalize(), time_frequency)
-#     plt.title(title_str, color='black')
+    Parameters
+    ----------
+    df : pd.DataFrame
+        At least one values column (y) andone date-kind index
+        or column with ordinality.
+    y_col : str
+        The key-name string of the values column.values
+    fig_size : int tuple, optional
+        The x,y size cm size for the figure.
+    non_index_col : str, optional
+        By default the plot will use the df index as the ordinal column,
+        yet if passed, this arg will be the key of the col to be used as
+        index (x-axis).
+    title_str : str, optional
+        Used as title for the figure
+    hourly_formatted : bool, optional
+        If major/minor xticks should be formatted for hourly-kind of data.
+        It may clutter the axis when using data with long time-ranges.
+    fig_ax : tuple, optional
+        A matplotlib (fig, ax) tuple that can be used as base for this
+        plot.
+    fmt : [matplotlib] str, optional
+        The series's format string.
+    label : [matplotlib] str, optional
+        The series's legend for this value series passed.
+    color : [matplotlib] str, optional
+        The series color.
+    kwargs: dict, optional
+        Additional matplotlib-kinf of arguments passed to the matplotlib
+        plotting functions.
+
+    Returns
+    -------
+    A matplotlib (figure, axis) tuple.
+    """
+    if not fig_ax:
+        fig, ax = plt.subplots()
+    else:
+        fig, ax = fig_ax
+    indext = df.index if not non_index_col else df[non_index_col]
+    ix_date_type = np.issubdtype(indext.dtype, np.datetime64)
+
+    median_y_val = df[y_col].quantile(0.5)
+    # Plot values on index
+    plot_method = ax.plot_date if ix_date_type else ax.plot
+    plot_method(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
+
+    if ix_date_type:
+
+        # Ticks formatting
+        monthly_format = mdates.DateFormatter('\n\n\n\n\n%b\n%Y')
+        daily_format = mdates.DateFormatter('\n\n%d\n%a')
+        hourly_format = mdates.DateFormatter('%Hhs\n%a')
+        # Ticks locations
+        hourly_locator = mdates.HourLocator(byhour=range(0, 24, 3), interval=5)
+        dow_locator = mdates.WeekdayLocator(byweekday=(0), interval=1)
+        month_locator = mdates.MonthLocator()
+
+        # set minor xaxis formatting
+        min_locator_obj = hourly_locator if hourly_formatted else dow_locator
+        min_format_obj = hourly_format if hourly_formatted else daily_format
+        ax.xaxis.set_minor_locator(min_locator_obj)
+        ax.xaxis.set_minor_formatter(min_format_obj)
+
+        # set major xaxis formatting
+        maj_locator_obj = dow_locator if hourly_formatted else month_locator
+        maj_format_obj = daily_format if hourly_formatted else monthly_format
+        ax.xaxis.set_major_locator(maj_locator_obj)
+        ax.xaxis.set_major_formatter(maj_format_obj)
+
+        # Add title and subtitle
+        min_date = indext.min().date()
+        max_date = indext.max().date()
+        metadata_str = f"Data from {min_date} thru {max_date}"
+        plt.title(metadata_str)
+
+    ax.xaxis.grid(True, which="minor")
+    ax.yaxis.grid()
+
+    if median_y_val > 1000:
+        # Add major y axis formatting for thousands
+        ax.yaxis.set_major_formatter(
+            ticker.FuncFormatter(lambda x, p: format(int(x), ','))
+        )
+    fig.set_size_inches(fig_size)
+    plt.suptitle(wrap(title_str))
+    ax.set_ylabel(y_col)
+    return fig, ax
 
 
 def category_reductor(df, categorical_col, n_levels=8,
