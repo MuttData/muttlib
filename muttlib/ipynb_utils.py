@@ -427,10 +427,10 @@ def plot_timeseries(
     Parameters
     ----------
     df : pd.DataFrame
-        At least one values column (y) andone date-kind index
+        At least one values column (y) and one date-kind index
         or column with ordinality.
     y_col : str
-        The key-name string of the values column.values
+        The name of the colum with the values.
     fig_size : int tuple, optional
         The x,y size cm size for the figure.
     non_index_col : str, optional
@@ -438,7 +438,7 @@ def plot_timeseries(
         yet if passed, this arg will be the key of the col to be used as
         index (x-axis).
     title_str : str, optional
-        Used as title for the figure
+        Used as title for the figure.
     hourly_formatted : bool, optional
         If major/minor xticks should be formatted for hourly-kind of data.
         It may clutter the axis when using data with long time-ranges.
@@ -448,11 +448,11 @@ def plot_timeseries(
     fmt : [matplotlib] str, optional
         The series's format string.
     label : [matplotlib] str, optional
-        The series's legend for this value series passed.
+        The series's legend name.
     color : [matplotlib] str, optional
         The series color.
     kwargs: dict, optional
-        Additional matplotlib-kinf of arguments passed to the matplotlib
+        Additional matplotlib-kind of arguments passed to the matplotlib
         plotting functions.
 
     Returns
