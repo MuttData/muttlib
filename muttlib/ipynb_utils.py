@@ -312,11 +312,7 @@ def sum_count_time_series(
 
 
 def plot_agg_bar_charts(
-    agg_df,
-    agg_ops,
-    group_cols,
-    series_col: str = 'impressions',
-    perc_filter: float = 0.03,
+    agg_df, agg_ops, group_cols, series_col: str, perc_filter: float = 0.03
 ):
     """Plot bar charts on an aggregated dataframe."""
     perc_cols = ['_'.join([series_col, aggr, 'perc']) for aggr in agg_ops]
