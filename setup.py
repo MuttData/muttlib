@@ -1,4 +1,3 @@
-
 import setuptools
 import muttlib
 
@@ -45,6 +44,7 @@ setuptools.setup(
             "pandas",
             "seaborn",
             "tabulate",
+            "textwrap",
         ],
-    }
+    },
 )

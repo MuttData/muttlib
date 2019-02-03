@@ -14,17 +14,21 @@ from typing import List
 from jinja2 import Undefined
 from jinjasql import JinjaSql
 from IPython.display import display
+from textwrap import wrap
 import matplotlib
+
 # Special back-end set to have the ipynb **not** use tkinter
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt # NOQA
+import matplotlib.pyplot as plt  # NOQA
+
 # For nice df prints that can be copy pasted to chat services
-import seaborn as sns # NOQA
+import seaborn as sns  # NOQA
 
 # Cleanear matplotlib dates as day in letters
-import matplotlib.dates as mdates
+import matplotlib.dates as mdates  # NOQA
+
 # Cleanear matplotlib formatting
-from matplotlib import ticker
+from matplotlib import ticker  # NOQA
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -41,23 +45,24 @@ def tabulated_df(df: pd.DataFrame):
     print(tabulate(df, headers='keys', tablefmt='psql'))
 
 
-def list_to_sql_tuple(l: List)->str:
+def list_to_sql_tuple(l: List) -> str:
     """Create an sql-string synthax-valid tuple from python list."""
     assert len(l) > 0
     placeholders = ', '.join(str(element) for element in l)
     return f'({placeholders:s})'
 
 
-def describe_table(table_name: str, db_connector)->pd.DataFrame:
+def describe_table(table_name: str, db_connector) -> pd.DataFrame:
     """Describe table sql template."""
     desc = db_connector.execute(f'describe {table_name}')
     return desc
 
 
-def write_to_clipboard(output)->None:
+def write_to_clipboard(output) -> None:
     """Write str to clipboard using UTF-8 encoding."""
     process = subprocess.Popen(
-        'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
+        'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE
+    )
     process.communicate(output.encode('utf-8'))
 
 
@@ -76,7 +81,7 @@ def ab_split(id, salt, control_group_size: float):
     test_id_digest = md5(test_id.encode('ascii')).hexdigest()
     test_id_first_digits = test_id_digest[:6]
     test_id_last_int = int(test_id_first_digits, 16)
-    ab_split = (test_id_last_int/0xFFFFFF)
+    ab_split = test_id_last_int / 0xFFFFFF
     return ab_split > control_group_size
 
 
@@ -90,8 +95,9 @@ def get_ordered_category_levels(df, cat_col, top_n=None):
     return rv, len(rv)
 
 
-def col_sample_display(df: pd.DataFrame, col: str,
-                       quantile: float=None, top_val: float=None):
+def col_sample_display(
+    df: pd.DataFrame, col: str, quantile: float = None, top_val: float = None
+):
     """Fast printing/visualization of sample data for given column.
 
     Also shows 10 unique specific values from the column and has
@@ -100,10 +106,10 @@ def col_sample_display(df: pd.DataFrame, col: str,
     """
     unique_vals = df[col].unique()
     null_count = df[col].isnull().sum()
-    null_pct = null_count/df.shape[0]
+    null_pct = null_count / df.shape[0]
     print(f'\nCol is {col}\n')
     print(f'Null count is {null_count}, Null percentage is: {null_pct:.2%}')
-    print(len(unique_vals), unique_vals[0:10],)
+    print(len(unique_vals), unique_vals[0:10])
     display(df[col].describe())
     display(df[col].sample(10))
 
@@ -111,7 +117,7 @@ def col_sample_display(df: pd.DataFrame, col: str,
     if not np.issubdtype(df[col].dtype, np.number):
 
         val_counts = df[col].value_counts().to_frame()
-        val_counts['percentage'] = 100*val_counts[col]/val_counts[col].sum()
+        val_counts['percentage'] = 100 * val_counts[col] / val_counts[col].sum()
         display(val_counts.head(10))
     else:
 
@@ -130,12 +136,13 @@ def col_sample_display(df: pd.DataFrame, col: str,
 
 
 def top_categorical_vs_kdeplot(
-        df: pd.DataFrame,
-        categorical_col: str,
-        numerical_col: str,
-        quantile: float=None,
-        upper_bound_val: float = None,
-        num_category_levels: int=2):
+    df: pd.DataFrame,
+    categorical_col: str,
+    numerical_col: str,
+    quantile: float = None,
+    upper_bound_val: float = None,
+    num_category_levels: int = 2,
+):
     """
     Plot multiple kdeplots for each category level.
 
@@ -145,9 +152,9 @@ def top_categorical_vs_kdeplot(
     """
     # Get enough colors for our test
     palette = sns.color_palette("husl", num_category_levels)
-    top_values, _ = get_ordered_category_levels(df,
-                                                categorical_col,
-                                                num_category_levels)
+    top_values, _ = get_ordered_category_levels(
+        df, categorical_col, num_category_levels
+    )
 
     # Default query to filter data
     query_str = f'{numerical_col}=={numerical_col}'
@@ -164,16 +171,13 @@ def top_categorical_vs_kdeplot(
     view = df.query(query_str)
     i = 0
     # Create grouping condition on top category values
-    gr_condition = (view[categorical_col]
-                    .where(view[categorical_col].isin(top_values))
-                    )
+    gr_condition = view[categorical_col].where(view[categorical_col].isin(top_values))
 
     # Group and plot for each category level
     iterator = view.groupby(gr_condition)[numerical_col]
     for name, grp in iterator:
-        sns.kdeplot(grp, shade=True, alpha=.4,
-                    label=f'{name}', color=palette[i])
-        i = i+1
+        sns.kdeplot(grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i])
+        i = i + 1
     title_str = f"Feature {numerical_col} distributions across "
     title_str += f"different {categorical_col}"
     plt.title(title_str, fontsize=15)
@@ -185,9 +189,10 @@ def top_categorical_vs_kdeplot(
 def top_categorical_vs_heatmap(
     df: pd.DataFrame,
     dependent_col: str,
-    ind_col: str, quantile: float=None,
+    ind_col: str,
+    quantile: float = None,
     top_val: float = None,
-    with_log: bool=False
+    with_log: bool = False,
 ):
     """
     Plot heatmap from two variables which are categorical.
@@ -209,16 +214,19 @@ def top_categorical_vs_heatmap(
     view = df.query(query_str)
 
     # Create pivot with top category values
-    agg_fun = (lambda x: np.log(x+1)) if with_log else (lambda x: x)
+    agg_fun = (lambda x: np.log(x + 1)) if with_log else (lambda x: x)
     gr_cols = [dependent_col, ind_col]
-    pivot_grid = (view[gr_cols].groupby(gr_cols).size().apply(agg_fun)
-                  .reset_index()
-                  .pivot(index=ind_col,
-                         columns=dependent_col,
-                         values=0))
+    pivot_grid = (
+        view[gr_cols]
+        .groupby(gr_cols)
+        .size()
+        .apply(agg_fun)
+        .reset_index()
+        .pivot(index=ind_col, columns=dependent_col, values=0)
+    )
     # Normalize vals per column
-    max_min_range = pivot_grid.max()-pivot_grid.min()
-    pivot_grid = (pivot_grid-pivot_grid.min()) / max_min_range
+    max_min_range = pivot_grid.max() - pivot_grid.min()
+    pivot_grid = (pivot_grid - pivot_grid.min()) / max_min_range
     sns.heatmap(pivot_grid)
 
     title_str = f'Heatmap of  {ind_col} level percentages across '
@@ -229,11 +237,7 @@ def top_categorical_vs_heatmap(
     plt.show()
 
 
-def get_one_to_one_relationship(
-    df: pd.DataFrame,
-    factor_id: str,
-    factor_name: str
-):
+def get_one_to_one_relationship(df: pd.DataFrame, factor_id: str, factor_name: str):
     """Do for a given factor, which we understand as a categorical column.
 
     Of different category levels. We would like to know if there is a
@@ -250,8 +254,8 @@ def get_one_to_one_relationship(
 def sum_count_aggregation(
     df: pd.DataFrame,
     group_cols: List,
-    aggregation_operations: List=['sum', 'count'],
-    numerical_cols: List=['PONDERACION_RIESGO_PAYMENT', 'Q_RECARGA']
+    aggregation_operations: List = ['sum', 'count'],
+    numerical_cols: List = ['PONDERACION_RIESGO_PAYMENT', 'Q_RECARGA'],
 ):
     """Aggregate data by a gruop of columns into sum and count."""
     # Create aggregating dictionary
@@ -267,7 +271,7 @@ def sum_count_aggregation(
         for aggr in aggregation_operations:
             perc_col = '_'.join([col, aggr, 'perc'])
             aggr_col = '_'.join([col, aggr])
-            counts[perc_col] = counts[aggr_col]/counts[aggr_col].sum()
+            counts[perc_col] = counts[aggr_col] / counts[aggr_col].sum()
 
     # Chose one column to sort for [first column]
     sort_col = [col for col in counts.columns if 'count' in col][0]
@@ -278,10 +282,10 @@ def sum_count_aggregation(
 def sum_count_time_series(
     df: pd.DataFrame,
     date_col: str,
-    resample_frequency: str='D',
-    aggregation_operations: List=['sum', 'count'],
-    numerical_series: List=['PONDERACION_RIESGO_PAYMENT', 'Q_RECARGA'],
-    filter_query: str=None  # to select a subset of the whole database only
+    resample_frequency: str = 'D',
+    aggregation_operations: List = ['sum', 'count'],
+    numerical_series: List = ['PONDERACION_RIESGO_PAYMENT', 'Q_RECARGA'],
+    filter_query: str = None,  # to select a subset of the whole database only
 ):
     """Get time series grouping by a certain time-window.
 
@@ -293,16 +297,14 @@ def sum_count_time_series(
     agg_dict = {col: aggregation_operations for col in numerical_series}
 
     # Count the amount of events in this time frequency
-    time_series = (df.query(filter_query).resample(
-        resample_frequency,
-        on=date_col)[numerical_series].agg(agg_dict)
-        )
+    time_series = (
+        df.query(filter_query)
+        .resample(resample_frequency, on=date_col)[numerical_series]
+        .agg(agg_dict)
+    )
 
     # Flatten multi-hierarchy index
-    time_series.columns = [
-        '_'.join(col).strip()
-        for col in time_series.columns.values
-    ]
+    time_series.columns = ['_'.join(col).strip() for col in time_series.columns.values]
     # Reset index and sort by oldest event date first
     time_series = time_series.reset_index().sort_values(date_col)
 
@@ -313,19 +315,24 @@ def plot_agg_bar_charts(
     agg_df,
     agg_ops,
     group_cols,
-    series_col: str='impressions',
-    perc_filter: float=0.03
+    series_col: str = 'impressions',
+    perc_filter: float = 0.03,
 ):
     """Plot bar charts on an aggregated dataframe."""
     perc_cols = ['_'.join([series_col, aggr, 'perc']) for aggr in agg_ops]
 
     fig = plt.figure()
     # Remove small levels in perc.
-    (agg_df.query(f'{perc_cols[0]}>@perc_filter')[perc_cols].T.plot
-        .bar(
-            stacked=True, figsize=(8, 6),
-            colormap="GnBu", label='right',
-            ax=fig.gca(), rot=0))
+    (
+        agg_df.query(f'{perc_cols[0]}>@perc_filter')[perc_cols].T.plot.bar(
+            stacked=True,
+            figsize=(8, 6),
+            colormap="GnBu",
+            label='right',
+            ax=fig.gca(),
+            rot=0,
+        )
+    )
 
     title_str = f'Grouped by:{group_cols!s}, aggregated by: {agg_ops!s}, '
     title_str += f'filter at least {perc_filter} perc'
@@ -335,14 +342,14 @@ def plot_agg_bar_charts(
 
 
 def plot_category2category_pie_charts(
-        df,
-        cat_col,
-        cat2_col,
-        max_category_levels=4,
-        n_rows=1,
-        figsize=(16, 6),
-        autopct='%.1f',
-        sample_frac=0.1,
+    df,
+    cat_col,
+    cat2_col,
+    max_category_levels=4,
+    n_rows=1,
+    figsize=(16, 6),
+    autopct='%.1f',
+    sample_frac=0.1,
 ):
     """
     Plot a single pie-chart per 1st catcol. Display % sizes of 2nd catcol.
@@ -355,15 +362,13 @@ def plot_category2category_pie_charts(
 
     if max_category_levels < len(unique_levels):
         col_name = f'reduced_{cat_col}'
-        df[col_name] = category_reductor(
-            df, cat_col, n_levels=max_category_levels)
+        df[col_name] = category_reductor(df, cat_col, n_levels=max_category_levels)
         cat_col = col_name  # update new category col
         unique_levels, n_cols = get_ordered_category_levels(df, cat_col)
 
     if max_category_levels < len(unique2_levels):
         col_name = f'reduced_{cat2_col}'
-        df[col_name] = category_reductor(
-            df, cat2_col, n_levels=max_category_levels)
+        df[col_name] = category_reductor(df, cat2_col, n_levels=max_category_levels)
         cat2_col = col_name  # update new category col
         unique2_levels, _ = get_ordered_category_levels(df, cat2_col)
 
@@ -379,7 +384,8 @@ def plot_category2category_pie_charts(
         left=False,
         right=False,
         labelleft=False,
-        labelbottom=False)
+        labelbottom=False,
+    )
 
     for i, level in enumerate(unique_levels):
         subplot_num = n_rows * 100 + n_cols * 10 + i + 1
@@ -387,9 +393,10 @@ def plot_category2category_pie_charts(
         ax.set_title(level)
         ax.axis('off')  # remove unnecessary figure axis
         v = df.query(f'{cat_col} == @level')
-        ratio_percentage = v[cat2_col].dropna().sample(
-            frac=sample_frac).value_counts(
-            normalize=True) * 100
+        ratio_percentage = (
+            v[cat2_col].dropna().sample(frac=sample_frac).value_counts(normalize=True)
+            * 100
+        )
 
         # Save first df to mantain same color order for all subplots
         if i == 0:
@@ -398,12 +405,8 @@ def plot_category2category_pie_charts(
             ratio_percentage = ratio_percentage.reindex(first_ix).dropna()
 
         # Subplot pie
-        ratio_percentage.plot.pie(
-            autopct=autopct,
-            legend=True,
-            ax=ax,
-            title=level,
-        )
+        ratio_percentage.plot.pie(autopct=autopct, legend=True, ax=ax, title=level)
+
 
 def plot_timeseries(
     df,
@@ -482,7 +485,7 @@ def plot_timeseries(
         dow_locator = mdates.WeekdayLocator(byweekday=(0), interval=1)
         month_locator = mdates.MonthLocator()
 
-        # set minor xaxis formatting
+        # Set minor xaxis formatting
         min_locator_obj = hourly_locator if hourly_formatted else dow_locator
         min_format_obj = hourly_format if hourly_formatted else daily_format
         ax.xaxis.set_minor_locator(min_locator_obj)
@@ -514,15 +517,13 @@ def plot_timeseries(
     return fig, ax
 
 
-def category_reductor(df, categorical_col, n_levels=8,
-                      default_level='Other'):
+def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
     """Reduce a categorical col's levels.
 
     This outputs a new cat col with reduced levels.
     It will not modify any null values in original category.
     """
-    top_levels, _ = get_ordered_category_levels(df, categorical_col,
-                                                n_levels - 1)
+    top_levels, _ = get_ordered_category_levels(df, categorical_col, n_levels - 1)
 
     def sub_categorize(x):
         """Reduce category series levels."""
@@ -533,7 +534,8 @@ def category_reductor(df, categorical_col, n_levels=8,
 
     # Modify only non-null values
     rv = df[categorical_col].apply(
-        lambda x: sub_categorize(x) if (pd.notnull(x)) else x)
+        lambda x: sub_categorize(x) if (pd.notnull(x)) else x
+    )
 
     return rv
 
@@ -552,18 +554,18 @@ def clean_numeric_col(df, numeric_col, **kwds):
 def optimize_numeric_types(df):
     """Cast numeric columns to more memory friendly types."""
     # Check which types best.
-    new_ftypes = {
-        c: 'float32'
-        for c in df.dtypes[df.dtypes == 'float64'].index
-    }
+    new_ftypes = {c: 'float32' for c in df.dtypes[df.dtypes == 'float64'].index}
     df = df.astype(new_ftypes, copy=False)
     return df
 
 
 def get_string_named_placeholders(s):
     """Output list of placeholders in a formatted string."""
-    rv = [_string.formatter_field_name_split(fn)[0] for _, fn, _, _
-          in Formatter().parse(s) if fn is not None]
+    rv = [
+        _string.formatter_field_name_split(fn)[0]
+        for _, fn, _, _ in Formatter().parse(s)
+        if fn is not None
+    ]
     return rv
 
 
@@ -577,14 +579,12 @@ def load_sql_query(sql, query_context_params=None):
 
     if query_context_params:
         j = JinjaSql(param_style='pyformat')
-        binded_sql, bind_params = j.prepare_query(sql,
-                                                  query_context_params)
-        missing_placeholders = [
-            k for k, v in bind_params.items() if Undefined() == v
-        ]
+        binded_sql, bind_params = j.prepare_query(sql, query_context_params)
+        missing_placeholders = [k for k, v in bind_params.items() if Undefined() == v]
 
-        assert len(missing_placeholders) == 0, (
-            f"Missing placeholders are: {missing_placeholders}")
+        assert (
+            len(missing_placeholders) == 0
+        ), f"Missing placeholders are: {missing_placeholders}"
 
         try:
             sql = binded_sql % bind_params
@@ -595,8 +595,9 @@ def load_sql_query(sql, query_context_params=None):
     return sql
 
 
-def get_sql_stats_aggr(input_expression, as_name=None, with_std=False,
-                       with_ndv=False, with_count=False):
+def get_sql_stats_aggr(
+    input_expression, as_name=None, with_std=False, with_ndv=False, with_count=False
+):
     """Get Cloudera-valid battery of statistical aggregations clause."""
     rv = f"""
     SUM({input_expression}) as sum_{as_name},
@@ -615,10 +616,9 @@ def get_sql_stats_aggr(input_expression, as_name=None, with_std=False,
     return rv
 
 
-def get_null_count_aggr(columns_list,
-                        as_name="null_count_",
-                        no_ending_comma=False,
-                        empty_string_null=False):
+def get_null_count_aggr(
+    columns_list, as_name="null_count_", no_ending_comma=False, empty_string_null=False
+):
     """Get Cloudera-valid expression counting nulls for columns."""
     rv = ""
     pre_clause = NULL_COUNT_CLAUSE
@@ -635,9 +635,7 @@ def get_null_count_aggr(columns_list,
     return rv
 
 
-def get_include_exclude_columns(
-    cols, include_regexes=None, exclude_regexes=None
-):
+def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
     """Filter list by inclusion and exclusion regexes."""
     if include_regexes is None:
         ret = cols
@@ -656,7 +654,7 @@ def get_matching_columns(cols, regex_list):
         regex = re.compile(regex)
         ret += filter(regex.search, cols)
     return ret
-    
+
 
 def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     """Get SQL Server-valid synthax for hashed-sampling an id clause.on
@@ -665,9 +663,10 @@ def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     assert 0 < sample_pct < 1, f"{sample_pct} should be a float  in (0,1)"
     int_pct = int(sample_pct * 100)
     rv = f"""
-    AND ABS(CAST(HASHBYTES('SHA1', 
+    AND ABS(CAST(HASHBYTES('SHA1',
         {id_clause}) AS BIGINT)) % 100 <= {int_pct}"""
     return rv
+
 
 def wrap_list_values_quotes(lis):
     """Wraps all values in a list with single quotes."""
