@@ -254,8 +254,8 @@ def get_one_to_one_relationship(df: pd.DataFrame, factor_id: str, factor_name: s
 def sum_count_aggregation(
     df: pd.DataFrame,
     group_cols: List,
+    numerical_cols: List,
     aggregation_operations: List = ['sum', 'count'],
-    numerical_cols: List = ['PONDERACION_RIESGO_PAYMENT', 'Q_RECARGA'],
 ):
     """Aggregate data by a gruop of columns into sum and count."""
     # Create aggregating dictionary
@@ -282,17 +282,17 @@ def sum_count_aggregation(
 def sum_count_time_series(
     df: pd.DataFrame,
     date_col: str,
+    numerical_series: List,
     resample_frequency: str = 'D',
     aggregation_operations: List = ['sum', 'count'],
-    numerical_series: List = ['PONDERACION_RIESGO_PAYMENT', 'Q_RECARGA'],
     filter_query: str = None,  # to select a subset of the whole database only
 ):
-    """Get time series grouping by a certain time-window.
+    """Get a time series grouping in a a certain time-window.
 
     Only for a view of the original df.
     """
     if not filter_query:
-        filter_query = 'advertiser_name == advertiser_name'
+        filter_query = f'{date_col} == {date_col}'
     # generate aggregating dictionary
     agg_dict = {col: aggregation_operations for col in numerical_series}
 
@@ -352,9 +352,9 @@ def plot_category2category_pie_charts(
     sample_frac=0.1,
 ):
     """
-    Plot a single pie-chart per 1st catcol. Display % sizes of 2nd catcol.
+    Plot a single pie-chart per 1st catcol. Display % sizes by 2nd catcol.
 
-    The maximum category levels will filter out both categorical's col "tail"
+    The maximum category levels will filter out both categorical cols' "tail"
     levels.
     """
     unique_levels, n_cols = get_ordered_category_levels(df, cat_col)
