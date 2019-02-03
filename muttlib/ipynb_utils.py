@@ -416,6 +416,7 @@ def plot_timeseries(
     title_str="",
     hourly_formatted=False,
     fig_ax=None,
+    y_thousands_fmt=1000,
     fmt='-o',
     label=None,
     color=None,
@@ -448,6 +449,9 @@ def plot_timeseries(
     fig_ax : tuple, optional
         A matplotlib (fig, ax) tuple that can be used as base for this
         plot.
+    y_thousands_fmt : numeric, optional
+        Format y-axis with thousand-ticks, activated when y-col median is over
+        this numerical threshold.
     fmt : [matplotlib] str, optional
         The series's format string.
     label : [matplotlib] str, optional
@@ -469,7 +473,6 @@ def plot_timeseries(
     indext = df.index if not non_index_col else df[non_index_col]
     ix_date_type = np.issubdtype(indext.dtype, np.datetime64)
 
-    median_y_val = df[y_col].quantile(0.5)
     # Plot values on index
     plot_method = ax.plot_date if ix_date_type else ax.plot
     plot_method(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
@@ -506,7 +509,7 @@ def plot_timeseries(
     ax.xaxis.grid(True, which="minor")
     ax.yaxis.grid()
 
-    if median_y_val > 1000:
+    if df[y_col].median() > y_thousands_fmt:
         # Add major y axis formatting for thousands
         ax.yaxis.set_major_formatter(
             ticker.FuncFormatter(lambda x, p: format(int(x), ','))
