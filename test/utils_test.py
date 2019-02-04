@@ -99,6 +99,19 @@ def test_deque_to_geo_hierarchy_dict():
                         ('Local', {'select_clause': ("REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(localidad), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y')AS locality_name,",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})])
     assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
 
+def test_read_yaml():
+    #generate a tmp file for this test
+    lst_test = ['meme', 'clap', 'review', 'clap']
+    with tempfile.NamedTemporaryFile() as fp:
+        fp.write(b"""
+                - meme
+                - clap
+                - review
+                - clap
+             """)
+        fp.seek(0)
+        assert lst_test == utils.read_yaml(fp.name)
+    pass
 
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
@@ -106,9 +119,6 @@ def test_make_dirs():
     pass
 def test_non_empty_dirs():
     #Need to make a test folder
-    pass
-def test_read_yaml():
-    #Need to make a test yaml file
     pass
 def test_template():
     #Need to make test template n' shit
