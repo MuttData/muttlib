@@ -1,11 +1,12 @@
 from muttlib import utils
 import datetime
 import pytest
-from collections import namedtuple
+from collections import OrderedDict, namedtuple, deque
 import pandas as pd
 import numpy as np
 
 def test_str_to_datetime():
+    #Testing all posible datetime formats and the exception for wrong format
     assert utils.str_to_datetime('2019-10-25 18:35:22') == datetime.datetime(2019, 10, 25, 18, 35, 22)
     assert utils.str_to_datetime('2019-10-25') == datetime.datetime(2019, 10, 25, 0, 0)
     assert utils.str_to_datetime('2019-10-25 18:35:22.000333') == datetime.datetime(2019, 10, 25, 18, 35, 22, 333)
@@ -35,6 +36,7 @@ def test_get_ordered_factor_levels():
     assert 5 == df2[1]
 
 def test_query_yes_no(monkeypatch):
+    #Testing the possible defaults and rewriting the input for the valid or invalid inputs
     og = utils.__builtins__["input"]
     with pytest.raises(ValueError):
         utils.query_yes_no("hit or miss?", 's')
@@ -65,6 +67,34 @@ def test_path_or_string():
 def test_hash_str():
     assert '0c5024ed' == utils.hash_str("hit or miss")
 
+def test_deque_to_geo_hierarchy_dict():
+    #Testing the creation of the orderedDict for the 4 levels
+    lst = [{'level': 'National', 'select_clause': '', 'group_clause': ''}, 
+           {'level': 'Provincial', 'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'},
+           {'level': 'Departamental', 'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(departamento), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y') AS departament_name,", 'post_join_select': 'departament_name,', 'group_clause': '2,'},
+           {'level': 'Local', 'select_clause': ("REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(localidad), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y')AS locality_name,",), 'post_join_select': 'locality_name,', 'group_clause': '3,'},
+          ]
+    deque_lst = deque(lst)
+    
+    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''})])
+    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'National')
+
+    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
+                 ('Provincial', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'})])
+    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Provincial')
+
+    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
+                        ('Provincial', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
+                        ('Departamental', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(departamento), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y') AS departament_name,", 'post_join_select': 'departament_name,', 'group_clause': '2,'})])
+    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
+
+    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
+                        ('Provincial', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
+                        ('Departamental', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(departamento), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y') AS departament_name,", 'post_join_select': 'departament_name,', 'group_clause': '2,'}), 
+                        ('Local', {'select_clause': ("REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(localidad), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y')AS locality_name,",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})])
+    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
+
+
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
     #Need to make a test folder
@@ -77,4 +107,7 @@ def test_read_yaml():
     pass
 def test_template():
     #Need to make test template n' shit
+    pass
+def test_render_jinja_template():
+    #utils.render_jinja_template()
     pass
