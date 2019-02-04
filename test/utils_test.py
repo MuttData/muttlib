@@ -4,6 +4,7 @@ import pytest
 from collections import OrderedDict, namedtuple, deque
 import pandas as pd
 import numpy as np
+import tempfile
 
 def test_str_to_datetime():
     #Testing all posible datetime formats and the exception for wrong format
@@ -61,7 +62,11 @@ def test_query_yes_no(monkeypatch):
     utils.__builtins__["input"] = og
 
 def test_path_or_string():
-    assert 'True\n' == utils.path_or_string('test_files/path_or_string.txt')
+    #generate a tmp file for this test
+    with tempfile.NamedTemporaryFile() as fp:
+        fp.write(b'True')
+        fp.seek(0)
+        assert 'True' == utils.path_or_string(fp.name)
     assert 'True' == utils.path_or_string('True')
 
 def test_hash_str():
