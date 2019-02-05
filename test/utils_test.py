@@ -5,6 +5,7 @@ from collections import OrderedDict, namedtuple, deque
 import pandas as pd
 import numpy as np
 import tempfile
+import pandas as pd
 
 def test_str_to_datetime():
     #Testing all posible datetime formats and the exception for wrong format
@@ -112,6 +113,13 @@ def test_read_yaml():
         fp.seek(0)
         assert lst_test == utils.read_yaml(fp.name)
     pass
+
+def test_get_fathers_mothers_kids_day():
+    dates = (pd.Timestamp('2019-06-16', freq='W-SUN'),
+             pd.Timestamp('2019-10-20', freq='W-SUN'),
+             pd.Timestamp('2019-08-18', freq='W-SUN'),
+            )
+    assert dates == utils.get_fathers_mothers_kids_day(2019)
 
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
