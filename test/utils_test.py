@@ -75,9 +75,9 @@ def test_hash_str():
 def test_deque_to_geo_hierarchy_dict():
     #Testing the creation of the orderedDict for the 4 levels
     lst = [{'level': 'National', 'select_clause': '', 'group_clause': ''}, 
-           {'level': 'Provincial', 'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'},
-           {'level': 'Departamental', 'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(departamento), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y') AS departament_name,", 'post_join_select': 'departament_name,', 'group_clause': '2,'},
-           {'level': 'Local', 'select_clause': ("REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(localidad), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y')AS locality_name,",), 'post_join_select': 'locality_name,', 'group_clause': '3,'},
+           {'level': 'Provincial', 'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'},
+           {'level': 'Departamental', 'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'},
+           {'level': 'Local', 'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'},
           ]
     deque_lst = deque(lst)
     
@@ -85,18 +85,18 @@ def test_deque_to_geo_hierarchy_dict():
     assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'National')
 
     orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
-                 ('Provincial', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'})])
+                 ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'})])
     assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Provincial')
 
     orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
-                        ('Provincial', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
-                        ('Departamental', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(departamento), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y') AS departament_name,", 'post_join_select': 'departament_name,', 'group_clause': '2,'})])
+                        ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
+                        ('Departamental', {'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'})])
     assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
 
     orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
-                        ('Provincial', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(provincia), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y'), '^ciudad autonoma de buenos aires$|^buenos aires autonomous city$|^capital federal$', 'caba'), '^provincia de buenos aires$', 'buenos aires') AS province_name,", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
-                        ('Departamental', {'select_clause': "REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(departamento), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y') AS departament_name,", 'post_join_select': 'departament_name,', 'group_clause': '2,'}), 
-                        ('Local', {'select_clause': ("REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(localidad), 'ä|â|á|à|Á', 'a'), 'ç', 'c'), 'ë|è|é|ê|É', 'e'), 'ì|Í|í|ï|î', 'i'), 'õ|ò|Ó|ð|ö|ô|ó', 'o'), 'ü|û|ù|ú', 'u'), 'ÿ|ý', 'y')AS locality_name,",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})])
+                        ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
+                        ('Departamental', {'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'}), 
+                        ('Local', {'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})])
     assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
 
 def test_read_yaml():
