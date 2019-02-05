@@ -12,22 +12,22 @@ Current modules:
 # Install
 Base lib:
 ```
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 ```
 
 IPython utils:
 ```
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
 ```
 
-Misc DB suppoort for dbconn:
+Misc DB support for dbconn:
 ```
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 ```
 
 # Dirty Dry-run (done dirt cheap)
