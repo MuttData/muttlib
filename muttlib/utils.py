@@ -499,7 +499,7 @@ def template(path_or_str, **kwargs):
         lstrip_blocks=kwargs.pop('lstrip_blocks', True),
         **kwargs,
     )
-    environment.filters.FILTERS['inclause'] = format_in_clause
+    environment.filters['inclause'] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))
 
 
