@@ -121,6 +121,49 @@ def test_get_fathers_mothers_kids_day():
             )
     assert dates == utils.get_fathers_mothers_kids_day(2019)
 
+def test_is_special_day():
+    # Testing ds as date and string.
+    ds = datetime.datetime(2018, 1, 18)
+    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
+
+    res = utils.is_special_day(ds,
+                               timestamps_inclause = timestamps_inclause)
+    
+    assert 0 == res
+
+    ds = datetime.datetime(2018, 6, 17)
+    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
+
+    res = utils.is_special_day(ds,
+                               timestamps_inclause = timestamps_inclause)
+    
+    assert 1 == res
+    # Testing if is in 'feriadous' lst or not
+    # Testing ds as date and string.
+    ds = "2018-01-18"
+    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
+
+    res = utils.is_special_day(ds,
+                               timestamps_inclause = timestamps_inclause)
+    
+    assert 0 == res
+
+    ds = "2018-06-17"
+    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
+                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
+
+    res = utils.is_special_day(ds,
+                               timestamps_inclause = timestamps_inclause)
+    
+    assert 1 == res
+
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
     #Need to make a test folder
