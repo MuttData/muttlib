@@ -168,6 +168,14 @@ def test_get_friends_day():
     # just pass a year(int) and gives you the "amigos's day
     assert datetime.datetime(2018, 7, 20) == utils.get_friends_day(2018)
 
+def test_get_semi_month_pay_days():
+    dates = [pd.Timestamp('2018-02-16 00:00:00'), 
+             pd.Timestamp('2018-03-02 00:00:00'), 
+             pd.Timestamp('2018-03-16 00:00:00'), 
+             pd.Timestamp('2018-03-30 00:00:00')]
+
+    assert dates == utils.get_semi_month_pay_days('2018-01-01','2018-02-28')
+
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
     #Need to make a test folder
