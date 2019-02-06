@@ -4,7 +4,7 @@ import pytest
 from collections import OrderedDict, namedtuple, deque
 import pandas as pd
 import numpy as np
-import tempfile
+import tempfile # Remember to delete this
 import pandas as pd
 
 timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
@@ -69,13 +69,11 @@ def test_query_yes_no(monkeypatch):
 
     utils.__builtins__["input"] = og
 
-def test_path_or_string():
+def test_path_or_string(tmpdir):
     #generate a tmp file for this test
-    with tempfile.NamedTemporaryFile() as fp:
-        fp.write(b'True')
-        fp.seek(0)
-        assert 'True' == utils.path_or_string(fp.name)
-    assert 'True' == utils.path_or_string('True')
+    p = tmpdir.mkdir("sub").join("test.txt")
+    p.write("True")
+    assert 'True' == utils.path_or_string(p)
 
 def test_hash_str():
     assert '0c5024ed' == utils.hash_str("hit or miss")
