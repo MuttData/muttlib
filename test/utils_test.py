@@ -83,18 +83,18 @@ def test_deque_to_geo_hierarchy_dict():
     lst = [{'level': 'National', 'select_clause': '', 'group_clause': ''}, 
            {'level': 'Provincial', 'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'},
            {'level': 'Departamental', 'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'},
-           {'level': 'Local', 'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'},
+           {'level': 'Local', 'select_clause':"existence is pain", 'post_join_select': 'locality_name,', 'group_clause': '3,'},
           ]
     deque_lst = deque(lst)
     cont_lst = [('National', {'select_clause': '', 'group_clause': ''}), 
                 ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
                 ('Departamental', {'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'}), 
-                ('Local', {'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})]
+                ('Local', {'select_clause': "existence is pain", 'post_join_select': 'locality_name,', 'group_clause': '3,'})]
     
-    assert OrderedDict([cont_lst[0]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'National')
-    assert OrderedDict([cont_lst[0],cont_lst[1]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Provincial')
-    assert OrderedDict([cont_lst[0],cont_lst[1],cont_lst[2]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
-    assert OrderedDict([cont_lst[0],cont_lst[1],cont_lst[2],cont_lst[3]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
+    assert OrderedDict(cont_lst[:1]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'National')
+    assert OrderedDict(cont_lst[:2]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Provincial')
+    assert OrderedDict(cont_lst[:3]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
+    assert OrderedDict(cont_lst[:]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
 
 def test_read_yaml(tmpdir):
     #generate a tmp file for this test
@@ -110,9 +110,9 @@ def test_read_yaml(tmpdir):
     assert lst_test == utils.read_yaml(p)
 
 def test_get_fathers_mothers_kids_day():
-    dates = (pd.Timestamp('2019-06-16', freq='W-SUN'),
-             pd.Timestamp('2019-10-20', freq='W-SUN'),
-             pd.Timestamp('2019-08-18', freq='W-SUN'),
+    dates = (pd.Timestamp('2019-06-16'),
+             pd.Timestamp('2019-10-20'),
+             pd.Timestamp('2019-08-18'),
             )
     assert dates == utils.get_fathers_mothers_kids_day(2019)
 
