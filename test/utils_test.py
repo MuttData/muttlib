@@ -164,6 +164,10 @@ def test_is_special_day():
     
     assert 1 == res
 
+def test_get_friends_day():
+    # just pass a year(int) and gives you the "amigos's day
+    assert datetime.datetime(2018, 7, 20) == utils.get_friends_day(2018)
+
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
     #Need to make a test folder
