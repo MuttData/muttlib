@@ -22,7 +22,7 @@ setuptools.setup(
     install_requires=[
         "jinja2",
         "pandas",
-        "progressbar",
+        "progressbar2",
         "pyarrow",
         "pyyaml",
         "sqlalchemy",
