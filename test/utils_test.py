@@ -7,32 +7,39 @@ import numpy as np
 import tempfile
 import pandas as pd
 
-def test_str_to_datetime():
+timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
+                       pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
+                       pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
+
+@pytest.mark.parametrize("test_input,expected", [
+    ("utils.str_to_datetime('2019-10-25 18:35:22')", datetime.datetime(2019, 10, 25, 18, 35, 22)),
+    ("utils.str_to_datetime('2019-10-25')", datetime.datetime(2019, 10, 25, 0, 0)),
+    ("utils.str_to_datetime('2019-10-25 18:35:22.000333')", datetime.datetime(2019, 10, 25, 18, 35, 22, 333)),
+    ("utils.str_to_datetime('18:35:22.000333')", datetime.datetime(1900, 1, 1, 18, 35, 22, 333)),
+    ("utils.str_to_datetime('18:35:22')", datetime.datetime(1900, 1, 1, 18, 35, 22)),
+    ("utils.str_to_datetime('20191025T18:35:22')", datetime.datetime(2019, 10, 25, 18, 35, 22)),
+    ("utils.str_to_datetime('2019-10-25T18:35:22')", datetime.datetime(2019, 10, 25, 18, 35, 22)),
+    ("utils.str_to_datetime('20191025')", datetime.datetime(2019, 10, 25, 0, 0)),
+    ("utils.str_to_datetime('2019-10-25T18')", datetime.datetime(2019, 10, 25, 18, 0)),
+    ("utils.str_to_datetime('201910')", datetime.datetime(2019, 10, 1, 0, 0))
+])
+def test_str_to_datetime(test_input, expected):
     #Testing all posible datetime formats and the exception for wrong format
-    assert utils.str_to_datetime('2019-10-25 18:35:22') == datetime.datetime(2019, 10, 25, 18, 35, 22)
-    assert utils.str_to_datetime('2019-10-25') == datetime.datetime(2019, 10, 25, 0, 0)
-    assert utils.str_to_datetime('2019-10-25 18:35:22.000333') == datetime.datetime(2019, 10, 25, 18, 35, 22, 333)
-    assert utils.str_to_datetime('18:35:22.000333') == datetime.datetime(1900, 1, 1, 18, 35, 22, 333)
-    assert utils.str_to_datetime('18:35:22') == datetime.datetime(1900, 1, 1, 18, 35, 22)
-    assert utils.str_to_datetime('20191025T18:35:22') == datetime.datetime(2019, 10, 25, 18, 35, 22)
-    assert utils.str_to_datetime('2019-10-25T18:35:22') == datetime.datetime(2019, 10, 25, 18, 35, 22)
-    assert utils.str_to_datetime('20191025') == datetime.datetime(2019, 10, 25, 0, 0)
-    assert utils.str_to_datetime('2019-10-25T18') == datetime.datetime(2019, 10, 25, 18, 0)
-    assert utils.str_to_datetime('201910') == datetime.datetime(2019, 10, 1, 0, 0)
+    assert eval(test_input) == expected 
     with pytest.raises(ValueError):
         utils.str_to_datetime("25/10/2019")
 
-def test_dict_to_namedtuple():
-    tuple_1 = namedtuple('pepe','don_jose') ('paso por mi casa') 
-    tuple_2 = utils.dict_to_namedtuple('pepe',{'don_jose': 'paso por mi casa'})
-    assert tuple_1 == tuple_2
+@pytest.mark.parametrize("test_input,expected", [
+    ("namedtuple('mr','meeseeks') ('look at me')", utils.dict_to_namedtuple('mr',{'meeseeks': 'look at me'}))
+])
+def test_dict_to_namedtuple(test_input, expected):
+    assert eval(test_input) == expected 
 
 def test_create_dict_id():
     assert '67fe8ab7b5' == utils.create_dict_id({'don_jose': 'paso por mi casa'})
 
 def test_get_ordered_factor_levels():
-    data = {'B': [25, 94, 57, 62, 70]}
-    df = pd.DataFrame(data, columns = ['B'])
+    df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
     df2 = utils.get_ordered_factor_levels(df,'B')
     assert np.array_equal(np.array([70, 94, 62, 25, 57]),df2[0])
     assert 5 == df2[1]
@@ -81,24 +88,15 @@ def test_deque_to_geo_hierarchy_dict():
            {'level': 'Local', 'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'},
           ]
     deque_lst = deque(lst)
+    cont_lst = [('National', {'select_clause': '', 'group_clause': ''}), 
+                ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
+                ('Departamental', {'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'}), 
+                ('Local', {'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})]
     
-    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''})])
-    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'National')
-
-    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
-                 ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'})])
-    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Provincial')
-
-    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
-                        ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
-                        ('Departamental', {'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'})])
-    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
-
-    orde = OrderedDict([('National', {'select_clause': '', 'group_clause': ''}), 
-                        ('Provincial', {'select_clause': "existence is pain", 'post_join_select': 'province_name,', 'group_clause': '1,'}), 
-                        ('Departamental', {'select_clause': "existence is pain", 'post_join_select': 'departament_name,', 'group_clause': '2,'}), 
-                        ('Local', {'select_clause': ("existence is pain",), 'post_join_select': 'locality_name,', 'group_clause': '3,'})])
-    assert orde == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
+    assert OrderedDict([cont_lst[0]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'National')
+    assert OrderedDict([cont_lst[0],cont_lst[1]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Provincial')
+    assert OrderedDict([cont_lst[0],cont_lst[1],cont_lst[2]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
+    assert OrderedDict([cont_lst[0],cont_lst[1],cont_lst[2],cont_lst[3]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
 
 def test_read_yaml():
     #generate a tmp file for this test
@@ -121,48 +119,14 @@ def test_get_fathers_mothers_kids_day():
             )
     assert dates == utils.get_fathers_mothers_kids_day(2019)
 
-def test_is_special_day():
-    # Testing ds as date and string.
-    ds = datetime.datetime(2018, 1, 18)
-    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
-
-    res = utils.is_special_day(ds,
-                               timestamps_inclause = timestamps_inclause)
-    
-    assert 0 == res
-
-    ds = datetime.datetime(2018, 6, 17)
-    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
-
-    res = utils.is_special_day(ds,
-                               timestamps_inclause = timestamps_inclause)
-    
-    assert 1 == res
-    # Testing if is in 'feriadous' lst or not
-    # Testing ds as date and string.
-    ds = "2018-01-18"
-    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
-
-    res = utils.is_special_day(ds,
-                               timestamps_inclause = timestamps_inclause)
-    
-    assert 0 == res
-
-    ds = "2018-06-17"
-    timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
-                           pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
-
-    res = utils.is_special_day(ds,
-                               timestamps_inclause = timestamps_inclause)
-    
-    assert 1 == res
+@pytest.mark.parametrize("test_input,expected", [
+    ("utils.is_special_day(datetime.datetime(2018,1,18),timestamps_inclause)",0),
+    ("utils.is_special_day(datetime.datetime(2018,6,17),timestamps_inclause)",1),
+    ("utils.is_special_day('2018-01-18',timestamps_inclause)",0),
+    ("utils.is_special_day('2018-06-17',timestamps_inclause)",1),
+])
+def test_is_special_day(test_input, expected):
+    assert eval(test_input) == expected 
 
 def test_get_friends_day():
     # just pass a year(int) and gives you the "amigos's day
