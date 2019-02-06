@@ -7,9 +7,9 @@ import numpy as np
 import tempfile # Remember to delete this
 import pandas as pd
 
-timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00', freq='W-SUN'), 
-                       pd.Timestamp('2018-10-21 00:00:00', freq='W-SUN'), 
-                       pd.Timestamp('2018-08-19 00:00:00', freq='W-SUN'))
+timestamps_inclause = (pd.Timestamp('2018-06-17 00:00:00'), 
+                       pd.Timestamp('2018-10-21 00:00:00'), 
+                       pd.Timestamp('2018-08-19 00:00:00'))
 
 @pytest.mark.parametrize("test_input,expected", [
     ("utils.str_to_datetime('2019-10-25 18:35:22')", datetime.datetime(2019, 10, 25, 18, 35, 22)),
@@ -36,7 +36,7 @@ def test_dict_to_namedtuple(test_input, expected):
     assert eval(test_input) == expected 
 
 def test_create_dict_id():
-    assert '67fe8ab7b5' == utils.create_dict_id({'don_jose': 'paso por mi casa'})
+    assert '96107c8ce8' == utils.create_dict_id({'meeseeks': 'look at me'})
 
 def test_get_ordered_factor_levels():
     df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
@@ -96,19 +96,18 @@ def test_deque_to_geo_hierarchy_dict():
     assert OrderedDict([cont_lst[0],cont_lst[1],cont_lst[2]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Departamental')
     assert OrderedDict([cont_lst[0],cont_lst[1],cont_lst[2],cont_lst[3]]) == utils.deque_to_geo_hierarchy_dict(deque_lst,'Local')
 
-def test_read_yaml():
+def test_read_yaml(tmpdir):
     #generate a tmp file for this test
     lst_test = ['meme', 'clap', 'review', 'clap']
-    with tempfile.NamedTemporaryFile() as fp:
-        fp.write(b"""
-                - meme
-                - clap
-                - review
-                - clap
-             """)
-        fp.seek(0)
-        assert lst_test == utils.read_yaml(fp.name)
-    pass
+
+    p = tmpdir.mkdir("sub").join("yaml_test.yaml")
+    p.write("""
+               - meme
+               - clap
+               - review
+               - clap
+            """)
+    assert lst_test == utils.read_yaml(p)
 
 def test_get_fathers_mothers_kids_day():
     dates = (pd.Timestamp('2019-06-16', freq='W-SUN'),
@@ -138,13 +137,23 @@ def test_get_semi_month_pay_days():
 
     assert dates == utils.get_semi_month_pay_days('2018-01-01','2018-02-28')
 
+# WIP
+def test_df_info_to_str():
+    # df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
+    # print(type(utils.df_info_to_str(df)))
+    # assert 0
+    pass
+
+def test_local_df_cache():
+    pass
+
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
-    #Need to make a test folder
     pass
+
 def test_non_empty_dirs():
-    #Need to make a test folder
     pass
+
 def test_template():
     #Need to make test template n' shit
     pass
