@@ -389,10 +389,11 @@ def get_ordered_factor_levels(df, col, top_n=None, min_counts=None):
         rv = rv[:top_n]
     return rv.index.values, len(rv)
 
-    def normalize_arr(arr):
-        """Normalize a numpy array to sum 1."""
-        arr_sum = pd.np.sum(arr, axis=0)
-        return 1.0 * arr / arr_sum if arr_sum != 0 else arr
+
+def normalize_arr(arr):
+    """Normalize a numpy array to sum 1."""
+    arr_sum = pd.np.sum(arr, axis=0)
+    return 1.0 * arr / arr_sum if arr_sum != 0 else arr
 
 
 def apply_time_bounds(df, sd, ed, ds_col):
