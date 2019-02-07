@@ -149,7 +149,6 @@ def test_get_semi_month_pay_days():
 
     assert dates == utils.get_semi_month_pay_days('2018-01-01','2018-02-28')
 
-# WIP
 def test_df_info_to_str():
     df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
     str_cmp = """<class 'pandas.core.frame.DataFrame'>
@@ -161,6 +160,16 @@ memory usage: 120.0 bytes
 """
     assert str_cmp == utils.df_info_to_str(df)
 
+def test_template(tmpdir):
+    tmp_template = "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
+    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
+
+    p = tmpdir.mkdir("sub").join("template_test.html")
+    p.write(tmp_template)
+
+    assert str_template == utils.template(p).render(name="Inigo Montoya", daddy="father", acction ="die")
+
+# WIP
 def test_local_df_cache():
     pass
 
@@ -171,9 +180,6 @@ def test_make_dirs():
 def test_non_empty_dirs():
     pass
 
-def test_template():
-    #Need to make test template n' shit
-    pass
 def test_render_jinja_template():
     #utils.render_jinja_template()
     pass
