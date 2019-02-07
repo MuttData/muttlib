@@ -670,3 +670,17 @@ def df_encode_categorical_dummies(
     df = pd.get_dummies(df, columns=cat_cols, drop_first=False)
     dummy_cols = list(set(df.columns.tolist()) - set(pre_dummy_cols))
     return df, dummy_cols
+
+
+def df_drop_single_factor_level(df):
+    """Drop categorical columns with null or 1 level."""
+    cat_cols = df_get_typed_cols(df, col_type='cat')
+    cols_to_drop = []
+    for c in cat_cols:
+        val_count = df[c].value_counts(dropna=False)
+        vals = val_count.index.tolist()
+        if len(vals) == 2 and '' in vals or len(vals) == 1:
+            cols_to_drop.append(c)
+            
+    df.drop(cols_to_drop, axis=1, inplace=True)
+    return df
