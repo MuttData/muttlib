@@ -39,13 +39,25 @@ def test_create_dict_id():
     assert '96107c8ce8' == utils.create_dict_id({'meeseeks': 'look at me'})
 
 def test_get_ordered_factor_levels():
-    df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
-    df2 = utils.get_ordered_factor_levels(df,'B')
-    assert np.array_equal(np.array([70, 94, 62, 25, 57]),df2[0])
-    assert 5 == df2[1]
+    lst = ['cat', 'dog', 'cat', 'dog', 'cat', 'dog', 'horse', 'dog', 'horse',]
+    df = pd.DataFrame({'olmcdonald': lst}, columns=['olmcdonald'])
+    df2 = utils.get_ordered_factor_levels(df,'olmcdonald')
+
+    assert np.array_equal(np.array(['dog', 'cat', 'horse']),df2[0])
+    assert 3 == df2[1]
+    # Testing the other params
+    df2 = utils.get_ordered_factor_levels(df,'olmcdonald',2)
+
+    assert np.array_equal(np.array(['dog', 'cat']),df2[0])
+    assert 2 == df2[1]
+
+    df2 = utils.get_ordered_factor_levels(df,'olmcdonald',2,3)
+
+    assert np.array_equal(np.array(['dog']),df2[0])
+    assert 2 == df2[1]
 
 def test_query_yes_no(monkeypatch):
-    #Testing the possible defaults and rewriting the input for the valid or invalid inputs
+    # Testing the possible defaults and rewriting the input for the valid or invalid inputs
     og = utils.__builtins__["input"]
     with pytest.raises(ValueError):
         utils.query_yes_no("hit or miss?", 's')
