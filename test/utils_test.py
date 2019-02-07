@@ -1,6 +1,7 @@
 from muttlib import utils
 import datetime
 import pytest
+from pathlib import Path
 from collections import OrderedDict, namedtuple, deque
 import pandas as pd
 import numpy as np
@@ -169,17 +170,28 @@ def test_template(tmpdir):
 
     assert str_template == utils.template(p).render(name="Inigo Montoya", daddy="father", acction ="die")
 
-# WIP
+def test_non_empty_dirs(tmpdir):
+    p = tmpdir.mkdir("sub").join("test.test")
+    p.write("the sins of the father")
+    assert [str(Path(p).parent)] == utils.non_empty_dirs(Path(p).parent)
+
+# WIP    
+
+def test_render_jinja_template():
+    # tmp_template = "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
+    # params = {'name': 'Inigo Montoya', 'daddy': 'father', 'acction': 'die'}
+    # str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
+
+    # p = tmpdir.mkdir("sub").join("template_test.html")
+    # p.write(tmp_template)
+
+    # print(render_jinja_template(tmp_template,params))
+    # assert 0
+    pass
+
 def test_local_df_cache():
     pass
 
 #[TODO] Need to make special shit for this ones
 def test_make_dirs():
-    pass
-
-def test_non_empty_dirs():
-    pass
-
-def test_render_jinja_template():
-    #utils.render_jinja_template()
     pass
