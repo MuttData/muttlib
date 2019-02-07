@@ -51,10 +51,10 @@ def test_get_ordered_factor_levels():
     assert np.array_equal(np.array(['dog', 'cat']),df2[0])
     assert 2 == df2[1]
 
-    df2 = utils.get_ordered_factor_levels(df,'olmcdonald',2,3)
-
+    df2 = utils.get_ordered_factor_levels(df,'olmcdonald',2,4)
+    
     assert np.array_equal(np.array(['dog']),df2[0])
-    assert 2 == df2[1]
+    assert 1 == df2[1]
 
 def test_query_yes_no(monkeypatch):
     # Testing the possible defaults and rewriting the input for the valid or invalid inputs
@@ -151,10 +151,15 @@ def test_get_semi_month_pay_days():
 
 # WIP
 def test_df_info_to_str():
-    # df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
-    # print(type(utils.df_info_to_str(df)))
-    # assert 0
-    pass
+    df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns = ['B'])
+    str_cmp = """<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5 entries, 0 to 4
+Data columns (total 1 columns):
+B    5 non-null int64
+dtypes: int64(1)
+memory usage: 120.0 bytes
+"""
+    assert str_cmp == utils.df_info_to_str(df)
 
 def test_local_df_cache():
     pass
