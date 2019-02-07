@@ -626,3 +626,12 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     null_cols = null_mask[~null_mask].index.tolist()
     df = df.loc[:, null_mask]
     return df
+
+
+def _drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
+    std_values = df.std()
+    low_variance_cols = std_values < min_std_dev
+    low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
+    low_variance_cols = [c for c in low_variance_cols if c not in protected_cols]
+    df.drop(low_variance_cols, axis=1, inplace=True)
+    return df
