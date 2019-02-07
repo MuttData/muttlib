@@ -619,7 +619,7 @@ def df_replace_empty_strs_null(df):
 def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     """Drop null columns in df, for null share over a certain threshold."""
     # Note: Pandas treats string columns as `object` data types
-    df = _df_replace_empty_strs_null(df)
+    df = df_replace_empty_strs_null(df)
     null_means = df.isnull().mean()
     null_mask = null_means < max_null_prop
     null_mask[[c for c in df.columns if c in protected_cols]] = True
