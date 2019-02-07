@@ -76,9 +76,8 @@ def test_query_yes_no(monkeypatch):
     assert False == utils.query_yes_no("hit or miss?")
     utils.__builtins__["input"] = lambda: 'n'
     assert False == utils.query_yes_no("hit or miss?")
-
-    #[TODO]Validate the while. Need to rewrite this shit to rise an exception but idk shit
-    #utils.sys.stdout["write"] = raise Exception('shit happended')    
+    utils.__builtins__["input"] = ['y', 'miss', 'miss'].pop
+    assert True == utils.query_yes_no("hit or miss?")
 
     utils.__builtins__["input"] = og
 
@@ -161,7 +160,7 @@ memory usage: 120.0 bytes
 """
     assert str_cmp == utils.df_info_to_str(df)
 
-def test_template(tmpdir):
+def test_template_basic(tmpdir):
     tmp_template = "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
     str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
 
@@ -170,6 +169,18 @@ def test_template(tmpdir):
 
     assert str_template == utils.template(p).render(name="Inigo Montoya", daddy="father", acction ="die")
 
+def test_template_macros(tmpdir):
+    p = tmpdir.mkdir("sub").join("macros_test.html")
+    # testing macros
+    macro = ("{% macro test_macro(name) %}"
+            "Hello lil {{ name }}"
+            "{% endmacro %}"
+            )
+    p.write(macro)
+
+    out = utils.template(p).module.test_macro("John")
+    assert 'Hello lil John' == out
+
 def test_non_empty_dirs(tmpdir):
     p = tmpdir.mkdir("sub").join("test.test")
     p.write("the sins of the father")
@@ -177,21 +188,22 @@ def test_non_empty_dirs(tmpdir):
 
 # WIP    
 
-def test_render_jinja_template():
-    # tmp_template = "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
-    # params = {'name': 'Inigo Montoya', 'daddy': 'father', 'acction': 'die'}
-    # str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
+def test_render_jinja_template(tmpdir):
+    tmp_template = "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
+    params = {'name': 'Inigo Montoya', 'daddy': 'father', 'acction': 'die'}
+    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
 
-    # p = tmpdir.mkdir("sub").join("template_test.html")
-    # p.write(tmp_template)
+    p = tmpdir.mkdir("sub").join("template_test.html")
+    p.write(tmp_template)
 
-    # print(render_jinja_template(tmp_template,params))
-    # assert 0
-    pass
-
-def test_local_df_cache():
-    pass
+    assert str_template == utils.render_jinja_template(tmp_template,params)
 
 #[TODO] Need to make special shit for this ones
-def test_make_dirs():
-    pass
+def test_make_dirs(tmpdir):
+    p = tmpdir.mkdir("sub")
+    
+    assert str(p) == utils.make_dirs(p)
+
+# [WONT DO]
+# def test_local_df_cache():
+#     pass
