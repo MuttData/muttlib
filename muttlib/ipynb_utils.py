@@ -105,21 +105,26 @@ def col_sample_display(
     showing top_value counts for non-numeric columns.
     """
     unique_vals = df[col].unique()
+    num_unique_vals = len(unique_vals)
     null_count = df[col].isnull().sum()
     null_pct = null_count / df.shape[0]
     print(f'\nCol is {col}\n')
     print(f'Null count is {null_count}, Null percentage is: {null_pct:.2%}')
-    print(len(unique_vals), unique_vals[0:10])
+    print(num_unique_vals, unique_vals[0:10])
     display(df[col].describe())
     display(df[col].sample(10))
 
     # check either numerical or not
-    if not np.issubdtype(df[col].dtype, np.number):
+    is_numeric_type = np.issubdtype(df[col].dtype, np.number)
+    if is_numeric_type or num_unique_vals < 15:
 
         val_counts = df[col].value_counts().to_frame()
-        val_counts['percentage'] = 100 * val_counts[col] / val_counts[col].sum()
+        val_counts.index.name = col
+        val_counts.rename(columns={col: 'count'}, inplace=True)
+        val_counts['percentage'] = 100 * \
+            val_counts['count'] / val_counts['count'].sum()
         display(val_counts.head(10))
-    else:
+    if is_numeric_type:
 
         query_str = f'{col}== {col}'
         if quantile is not None:
