@@ -601,8 +601,28 @@ def str_normalize_pandas(data, str_replace_kws=None):
     return data
 
 
-def _optimize_float_types(df):
+def df_optimize_float_types(df):
     """Cast dataframe columns to more memory friendly types."""
     new_dtypes = {c: "float32" for c in df.dtypes[df.dtypes == "float64"].index}
     df = df.astype(new_dtypes, copy=False)
+    return df
+
+
+def df_replace_empty_strs_null(df):
+    """Replace whitespace or empty strs with nan values."""
+    str_cols = df.dtypes[df.dtypes == "object"].index.tolist()
+    if str_cols:
+        df[str_cols].replace(r"^\s*$", pd.np.nan, regex=True, inplace=True)
+    return df
+
+
+def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
+    """Drop null columns in df, for null share over a certain threshold."""
+    # Note: Pandas treats string columns as `object` data types
+    df = _df_replace_empty_strs_null(df)
+    null_means = df.isnull().mean()
+    null_mask = null_means < max_null_prop
+    null_mask[[c for c in df.columns if c in protected_cols]] = True
+    null_cols = null_mask[~null_mask].index.tolist()
+    df = df.loc[:, null_mask]
     return df
