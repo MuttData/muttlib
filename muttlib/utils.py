@@ -20,12 +20,12 @@ import yaml
 from pandas.tseries import offsets
 from scipy.stats import iqr
 
-logger = logging.getLogger(f'utils.{__name__}')
+logger = logging.getLogger(f"utils.{__name__}")
 
 
 def read_yaml(f):
     """Read a yaml file."""
-    with open(f, 'r') as file:
+    with open(f, "r") as file:
         return yaml.safe_load(file.read())
 
 
@@ -37,7 +37,7 @@ def make_dirs(dir_path):
 
 def non_empty_dirs(path):
     """List all non-empty directories for a given path."""
-    return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
+    return list({str(p.parent) for p in path.rglob("*") if p.is_file()})
 
 
 def path_or_string(str_or_path):
@@ -45,7 +45,7 @@ def path_or_string(str_or_path):
     file_path = Path(str_or_path)
     try:
         if file_path.is_file():
-            with file_path.open('r') as f:
+            with file_path.open("r") as f:
                 return f.read()
     except OSError:
         pass
@@ -57,9 +57,9 @@ def local_df_cache(
     # pylint: disable=unused-argument
     use_cache=False,
     refresh_cache=False,
-    cache_fn='cache_file',
-    cache_dir='/tmp/',
-    cache_format='pickle',
+    cache_fn="cache_file",
+    cache_dir="/tmp/",
+    cache_format="pickle",
     cache_hit_msg="Reading cached data from file: ",
     cache_miss_msg="Cache missing for file: ",
     cache_put_msg="Saving data to file: ",
@@ -107,17 +107,17 @@ def local_df_cache(
         @wraps(func)
         def wrapped_f(*args, **kwargs):
             """Do dummy docstring."""
-            cache_opts_arg = kwargs.pop('cache_opts').copy()
+            cache_opts_arg = kwargs.pop("cache_opts").copy()
             cache_opts = orig_cache_opts.copy()
             cache_opts.update(cache_opts_arg)
-            use_cache = cache_opts['use_cache']
-            refresh_cache = cache_opts['refresh_cache']
-            cache_fn = cache_opts['cache_fn']
-            cache_dir = cache_opts['cache_dir']
-            cache_format = cache_opts['cache_format']
-            cache_hit_msg = cache_opts['cache_hit_msg']
-            cache_miss_msg = cache_opts['cache_miss_msg']
-            cache_put_msg = cache_opts['cache_put_msg']
+            use_cache = cache_opts["use_cache"]
+            refresh_cache = cache_opts["refresh_cache"]
+            cache_fn = cache_opts["cache_fn"]
+            cache_dir = cache_opts["cache_dir"]
+            cache_format = cache_opts["cache_format"]
+            cache_hit_msg = cache_opts["cache_hit_msg"]
+            cache_miss_msg = cache_opts["cache_miss_msg"]
+            cache_put_msg = cache_opts["cache_put_msg"]
 
             # Clear cache args from kwargs
             for k in orig_cache_opts:
@@ -129,14 +129,14 @@ def local_df_cache(
             else:
                 cache_fn = cache_fn
 
-            base_fn = f'{cache_fn}.{cache_format}'
+            base_fn = f"{cache_fn}.{cache_format}"
             cache_fn = os.path.join(cache_dir, base_fn)
             if use_cache:
                 if os.access(cache_fn, os.R_OK):
-                    logger.debug(f'{cache_hit_msg}{cache_fn}')
+                    logger.debug(f"{cache_hit_msg}{cache_fn}")
                     return df_read_multi(cache_fn)
                 else:
-                    logger.debug(f'{cache_miss_msg}{cache_fn}')
+                    logger.debug(f"{cache_miss_msg}{cache_fn}")
 
             rv = func(*args, **kwargs)
 
@@ -163,20 +163,20 @@ def local_df_cache(
 def df_read_multi(fn, index_col=False, quoting=0):
     """Read multiple table disk-formats into a pandas DataFrame."""
     ext = Path(fn).suffix[1:]
-    if ext == 'csv':
+    if ext == "csv":
         df = pd.read_csv(fn, index_col=index_col, quoting=quoting)
 
         def clean_quotes(s):
             """Clean start and ending quotes."""
-            if s[0] in '"\'' and s[-1] in '"\'':
+            if s[0] in "\"'" and s[-1] in "\"'":
                 return s[1:-1]
             return s
 
         df.columns = list(map(clean_quotes, df.columns))
         return df
-    elif ext == 'feather':
+    elif ext == "feather":
         return pd.read_feather(fn)
-    elif ext in ['pickle', 'pkl']:
+    elif ext in ["pickle", "pkl"]:
         return pd.read_pickle(fn)
     else:
         raise ValueError(f"File format '{ext}' not supported!")
@@ -185,11 +185,11 @@ def df_read_multi(fn, index_col=False, quoting=0):
 def df_to_multi(df, fn, index=False, quoting=csv.QUOTE_NONNUMERIC):
     """Convert a DF to multiple disk-formats table."""
     ext = Path(fn).suffix[1:]
-    if ext == 'csv':
+    if ext == "csv":
         return df.to_csv(fn, index=index, quoting=quoting)
-    elif ext == 'feather':
+    elif ext == "feather":
         return df.to_feather(fn)
-    elif ext in ['pickle', 'pkl']:
+    elif ext in ["pickle", "pkl"]:
         return df.to_pickle(fn)
     else:
         raise ValueError(f"File format '{ext}' not supported!")
@@ -197,8 +197,8 @@ def df_to_multi(df, fn, index=False, quoting=csv.QUOTE_NONNUMERIC):
 
 def convert_to_snake_case(name: str):
     """Convert string to snake_case."""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
 def dict_to_namedtuple(name, d):
@@ -212,7 +212,7 @@ def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
     d = deepcopy(double_linked_list)
     while len(d) > 0:
         elem = d.popleft()
-        level = elem.pop('level')
+        level = elem.pop("level")
         orde[level] = elem
         if target_level == level:
             return orde
@@ -226,16 +226,16 @@ def wrap_list_values_quotes(lis):
 def str_to_datetime(datetime_str):
     """Convert possible date-like string to datetime object."""
     formats = (
-        '%Y-%m-%d %H:%M:%S',
-        '%Y-%m-%d',
-        '%Y-%m-%d %H:%M:%S.%f',
-        '%H:%M:%S.%f',
-        '%H:%M:%S',
-        '%Y%m%dT%H:%M:%S',
-        '%Y-%m-%dT%H:%M:%S',
-        '%Y%m%d',
-        '%Y-%m-%dT%H',
-        '%Y%m',
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d",
+        "%Y-%m-%d %H:%M:%S.%f",
+        "%H:%M:%S.%f",
+        "%H:%M:%S",
+        "%Y%m%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y%m%d",
+        "%Y-%m-%dT%H",
+        "%Y%m",
     )
     for format in formats:
         try:
@@ -256,22 +256,22 @@ def range_datetime(datetime_start, datetime_end, timeskip=None):
 
 def get_fathers_mothers_kids_day(year: int):
     """Get three dates for a given year input."""
-    august_first = str_to_datetime(f'{year}-08-01')
+    august_first = str_to_datetime(f"{year}-08-01")
     kids_dow_iteration = 3  # third sunday each August
     KIDS_DAY = pd.date_range(
-        start=august_first, end=august_first + offsets.Day(21), freq='W-SUN'
+        start=august_first, end=august_first + offsets.Day(21), freq="W-SUN"
     )[kids_dow_iteration - 1]
 
     october_first = august_first + offsets.MonthBegin(2)
     mother_dow_iteration = 3  # third sunday each October
     MOTHERS_DAY = pd.date_range(
-        start=october_first, end=october_first + offsets.Day(21), freq='W-SUN'
+        start=october_first, end=october_first + offsets.Day(21), freq="W-SUN"
     )[mother_dow_iteration - 1]
 
     june_first = august_first - offsets.MonthBegin(2)
     father_dow_iteration = 3  # third sunday each June
     FATHERS_DAY = pd.date_range(
-        start=june_first, end=june_first + offsets.Day(21), freq='W-SUN'
+        start=june_first, end=june_first + offsets.Day(21), freq="W-SUN"
     )[father_dow_iteration - 1]
 
     return FATHERS_DAY, MOTHERS_DAY, KIDS_DAY
@@ -279,7 +279,7 @@ def get_fathers_mothers_kids_day(year: int):
 
 def get_friends_day(year: int):
     """Get arg-style friends date."""
-    return str_to_datetime(f'{year}-07-20')
+    return str_to_datetime(f"{year}-07-20")
 
 
 def is_special_day(ds, timestamps_inclause):
@@ -305,10 +305,8 @@ def is_special_day(ds, timestamps_inclause):
 def get_semi_month_pay_days(start_date, end_date):
     """Get half and end of month friday pay-days for salary workers."""
     first_monthly_fridays = pd.date_range(
-        start=start_date, end=end_date, freq='BM'
-    ) + offsets.Week(
-        weekday=4
-    )  # move to end of month
+        start=start_date, end=end_date, freq="BM"
+    ) + offsets.Week(weekday=4)  # move to end of month
     # Beware fridays that are too faraway from middle/end of month
     first_semimonth_pay_days = [
         ts + offsets.Day(14) if ts.day <= 4 else ts + offsets.Day(7)
@@ -317,8 +315,7 @@ def get_semi_month_pay_days(start_date, end_date):
     second_semimonth_pay_days = [
         ts + offsets.Day(14) for ts in first_semimonth_pay_days
     ]
-    SEMIMONTH_PAY_DAYS = first_semimonth_pay_days + second_semimonth_pay_days
-    SEMIMONTH_PAY_DAYS.sort()
+    SEMIMONTH_PAY_DAYS = sorted(first_semimonth_pay_days + second_semimonth_pay_days)
     return SEMIMONTH_PAY_DAYS
 
 
@@ -338,7 +335,7 @@ def create_dict_id(d, length=10):
         length: number of characters to return in the hash
     """
     shake = hashlib.shake_256()
-    shake.update(repr(d).encode('utf-8'))
+    shake.update(repr(d).encode("utf-8"))
     return shake.hexdigest(int(length / 2))
 
 
@@ -367,7 +364,7 @@ def query_yes_no(question, default="no"):
     while True:
         sys.stdout.write(question + prompt)
         choice = input().lower()
-        if default is not None and choice == '':
+        if default is not None and choice == "":
             return valid[default]
         elif choice in valid:
             return valid[choice]
@@ -398,7 +395,7 @@ def get_ordered_factor_levels(df, col, top_n=None, min_counts=None):
 def apply_time_bounds(df, sd, ed, ds_col):
     """Filter time dates in a datetime-type column or index."""
     if ds_col:
-        rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
+        rv = df.query(f"{ds_col} >= @sd and {ds_col} <= @ed")
     else:
         rv = df.loc[sd:ed]
     return rv
@@ -409,7 +406,7 @@ def normalize_ds_index(df, ds_col):
     if ds_col in df.columns:
         return df
     elif ds_col == df.index.name:
-        df = df.reset_index().rename(columns={'index': ds_col})
+        df = df.reset_index().rename(columns={"index": ds_col})
     else:
         raise ValueError(f"No column or index found as '{ds_col}'.")
     return df
@@ -440,12 +437,12 @@ def none_or_empty_pandas(obj):
 
 def hash_str(s, length=8):
     """Hash a string."""
-    return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
+    return hashlib.sha256(s.encode("utf8")).hexdigest()[:length]
 
 
-def setup_logging(log_config, logger_name='root', level='INFO'):
+def setup_logging(log_config, logger_name="root", level="INFO"):
     """Setup logging config."""
-    log_config['loggers'][logger_name]['level'] = level
+    log_config["loggers"][logger_name]["level"] = level
     logging.config.dictConfig(log_config)
 
 
@@ -494,12 +491,12 @@ def format_in_clause(iterable):
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
-        line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
-        trim_blocks=kwargs.pop('trim_blocks', True),
-        lstrip_blocks=kwargs.pop('lstrip_blocks', True),
+        line_statement_prefix=kwargs.pop("line_statement_prefix", "%"),
+        trim_blocks=kwargs.pop("trim_blocks", True),
+        lstrip_blocks=kwargs.pop("lstrip_blocks", True),
         **kwargs,
     )
-    environment.filters['inclause'] = format_in_clause
+    environment.filters["inclause"] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))
 
 
@@ -536,7 +533,7 @@ def get_cloudera_sql_stats_aggr(
     if with_ndv:
         rv_l.append(f"NDV({input_expression}) AS unique")
     if with_count:
-        rv_l.append(f'COUNT({input_expression}) AS count_rows')
+        rv_l.append(f"COUNT({input_expression}) AS count_rows")
     rv = ",\n".join([f"{i}_{as_name}" for i in rv_l]) + ","
     if not ends_comma:
         rv = rv[:-1]
@@ -583,9 +580,9 @@ def str_normalize_pandas(data, str_replace_kws=None):
             data[col] = (
                 data[col]
                 .str.lower()
-                .str.normalize('NFKD')
-                .str.encode('ascii', errors='ignore')
-                .str.decode('utf-8')
+                .str.normalize("NFKD")
+                .str.encode("ascii", errors="ignore")
+                .str.decode("utf-8")
             )
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
@@ -594,10 +591,17 @@ def str_normalize_pandas(data, str_replace_kws=None):
         data = (
             data.str.lower()
             .str.lower()
-            .str.normalize('NFKD')
-            .str.encode('ascii', errors='ignore')
-            .str.decode('utf-8')
+            .str.normalize("NFKD")
+            .str.encode("ascii", errors="ignore")
+            .str.decode("utf-8")
         )
         if str_replace_kws:
             data = data.str.replace(**str_replace_kws)
     return data
+
+
+def _optimize_float_types(df):
+    """Cast dataframe columns to more memory friendly types."""
+    new_dtypes = {c: "float32" for c in df.dtypes[df.dtypes == "float64"].index}
+    df = df.astype(new_dtypes, copy=False)
+    return df
