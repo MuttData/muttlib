@@ -635,3 +635,38 @@ def _drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     low_variance_cols = [c for c in low_variance_cols if c not in protected_cols]
     df.drop(low_variance_cols, axis=1, inplace=True)
     return df
+
+
+def df_get_typed_cols(df, col_type="cat", protected_cols=[]):
+    """Get typed columns, excluding protected cols if passed."""
+    assert col_type in ("cat", "num", "date", "bool", "timedelta")
+    if col_type == "cat":  # Work in cases, else dont define include var
+        include = ["object", "cateogry"]
+    elif col_type == "num":
+        include = [pd.np.number]
+    elif col_type == "date":
+        include = ["datetime"]
+    elif col_type in ("bool", "timedelta"):
+        include = [col_type]
+    typed_cols = [
+        c for c in df.select_dtypes(include=include).columns if c not in protected_cols
+    ]
+    return typed_cols
+
+
+def df_encode_categorical_dummies(
+    df, cat_cols=[], skip_cols=[], top=25, other_val="OTHER"
+):
+    """Encode categorical columns into dummies."""
+    pre_dummy_cols = df.columns.tolist()
+    cat_cols = df_get_typed_cols(
+        df, col_type="cat") if cat_cols == [] else cat_cols
+    cat_cols = [c for c in cat_cols if c not in skip_cols]
+
+    for c in cat_cols:
+        top_categories = df[c].value_counts().index.values[0:top]
+        df[c] = df[c].where(df[c].isin(top_categories), other=other_val)
+
+    df = pd.get_dummies(df, columns=cat_cols, drop_first=False)
+    dummy_cols = list(set(df.columns.tolist()) - set(pre_dummy_cols))
+    return df, dummy_cols
