@@ -628,7 +628,7 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     return df
 
 
-def _drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
+def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
@@ -659,8 +659,7 @@ def df_encode_categorical_dummies(
 ):
     """Encode categorical columns into dummies."""
     pre_dummy_cols = df.columns.tolist()
-    cat_cols = df_get_typed_cols(
-        df, col_type="cat") if cat_cols == [] else cat_cols
+    cat_cols = df_get_typed_cols(df, col_type="cat") if cat_cols == [] else cat_cols
     cat_cols = [c for c in cat_cols if c not in skip_cols]
 
     for c in cat_cols:
@@ -674,13 +673,13 @@ def df_encode_categorical_dummies(
 
 def df_drop_single_factor_level(df):
     """Drop categorical columns with null or 1 level."""
-    cat_cols = df_get_typed_cols(df, col_type='cat')
+    cat_cols = df_get_typed_cols(df, col_type="cat")
     cols_to_drop = []
     for c in cat_cols:
         val_count = df[c].value_counts(dropna=False)
         vals = val_count.index.tolist()
-        if len(vals) == 2 and '' in vals or len(vals) == 1:
+        if len(vals) == 2 and "" in vals or len(vals) == 1:
             cols_to_drop.append(c)
-            
+
     df.drop(cols_to_drop, axis=1, inplace=True)
     return df
