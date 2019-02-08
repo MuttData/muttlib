@@ -18,7 +18,7 @@ from textwrap import wrap
 import matplotlib
 
 # Special back-end set to have the ipynb **not** use tkinter
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
@@ -36,34 +36,34 @@ NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
 
 def convert_to_snake_case(name: str):
     """Convert string to snake_case."""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
 def tabulated_df(df: pd.DataFrame):
     """Pretty print, ready-to-clipboard dataframes in ipynbs."""
-    print(tabulate(df, headers='keys', tablefmt='psql'))
+    print(tabulate(df, headers="keys", tablefmt="psql"))
 
 
 def list_to_sql_tuple(l: List) -> str:
     """Create an sql-string synthax-valid tuple from python list."""
     assert len(l) > 0
-    placeholders = ', '.join(str(element) for element in l)
-    return f'({placeholders:s})'
+    placeholders = ", ".join(str(element) for element in l)
+    return f"({placeholders:s})"
 
 
 def describe_table(table_name: str, db_connector) -> pd.DataFrame:
     """Describe table sql template."""
-    desc = db_connector.execute(f'describe {table_name}')
+    desc = db_connector.execute(f"describe {table_name}")
     return desc
 
 
 def write_to_clipboard(output) -> None:
     """Write str to clipboard using UTF-8 encoding."""
     process = subprocess.Popen(
-        'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE
+        "pbcopy", env={"LANG": "en_US.UTF-8"}, stdin=subprocess.PIPE
     )
-    process.communicate(output.encode('utf-8'))
+    process.communicate(output.encode("utf-8"))
 
 
 def list_vals_contains_str(in_list, val: str):
@@ -77,8 +77,8 @@ def ab_split(id, salt, control_group_size: float):
     Logic is based on the ID string and salt.. The control_group_size number
     is between 0 and 1. This sets how big the control group is in perc.
     """
-    test_id = str(id) + '-' + str(salt)
-    test_id_digest = md5(test_id.encode('ascii')).hexdigest()
+    test_id = str(id) + "-" + str(salt)
+    test_id_digest = md5(test_id.encode("ascii")).hexdigest()
     test_id_first_digits = test_id_digest[:6]
     test_id_last_int = int(test_id_first_digits, 16)
     ab_split = test_id_last_int / 0xFFFFFF
@@ -109,8 +109,8 @@ def col_sample_display(
     num_unique_vals = len(unique_vals)
     null_count = df[col].isnull().sum()
     null_pct = null_count / df.shape[0]
-    print(f'\nCol is {col}\n')
-    print(f'Null count is {null_count}, Null percentage is: {null_pct:.2%}')
+    print(f"\nCol is {col}\n")
+    print(f"Null count is {null_count}, Null percentage is: {null_pct:.2%}")
     print(num_unique_vals, unique_vals[0:10])
     display(df[col].describe())
     display(df[col].sample(10))
@@ -129,23 +129,22 @@ def col_sample_display(
 
         val_counts = df[col].value_counts().to_frame()
         val_counts.index.name = col
-        val_counts.rename(columns={col: 'count'}, inplace=True)
-        val_counts['percentage'] = 100 * \
-            val_counts['count'] / val_counts['count'].sum()
+        val_counts.rename(columns={col: "count"}, inplace=True)
+        val_counts["percentage"] = 100 * val_counts["count"] / val_counts["count"].sum()
         display(val_counts.head(10))
 
     if is_numeric_type:
 
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-        query_str = f'{col}== {col}'
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        query_str = f"{col} == {col}"
         if quantile is not None:
             top_perc = df[col].quantile(q=quantile)
             # this +100 is a safety net for when top_perc results
             # are equal to the lower limit of the filter.
-            query_str = f'{col}>=0 and {col}<= {top_perc+100}'
+            query_str = f"{col}>=0 and {col}<= {top_perc+100}"
 
         elif top_val is not None:
-            query_str = f'{col}<= {top_val}'
+            query_str = f"{col}<= {top_val}"
 
         df.query(query_str)[col].hist(bins=60)
         plt.title(query_str)
@@ -173,15 +172,15 @@ def top_categorical_vs_kdeplot(
     )
 
     # Default query to filter data
-    query_str = f'{numerical_col}=={numerical_col}'
+    query_str = f"{numerical_col}=={numerical_col}"
     if quantile is not None:
         top_perc = df[numerical_col].quantile(q=quantile)
         # This +10 is a safety net for when top_perc results
         # Are equal to the lower limit of the filter.
-        query_str = f'{numerical_col}>=0 and {numerical_col}<= {top_perc}'
+        query_str = f"{numerical_col}>=0 and {numerical_col}<= {top_perc}"
 
     elif upper_bound_val is not None:
-        query_str = f'{numerical_col}<= {upper_bound_val}'
+        query_str = f"{numerical_col}<= {upper_bound_val}"
 
     # Filter data
     view = df.query(query_str)
@@ -192,13 +191,13 @@ def top_categorical_vs_kdeplot(
     # Group and plot for each category level
     iterator = view.groupby(gr_condition)[numerical_col]
     for name, grp in iterator:
-        sns.kdeplot(grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i])
+        sns.kdeplot(grp, shade=True, alpha=0.4, label=f"{name}", color=palette[i])
         i = i + 1
     title_str = f"Feature {numerical_col} distributions across "
     title_str += f"different {categorical_col}"
     plt.title(title_str, fontsize=15)
-    plt.xlabel(f'{numerical_col} value')
-    plt.ylabel('Probability')
+    plt.xlabel(f"{numerical_col} value")
+    plt.ylabel("Probability")
     plt.show()
 
 
@@ -218,13 +217,13 @@ def top_categorical_vs_heatmap(
     We generate a plot for all values/levels of the index.
     """
     # Default query to filter data
-    query_str = f'{dependent_col}== {dependent_col}'
+    query_str = f"{dependent_col}== {dependent_col}"
     if quantile is not None:
         top_perc = df[ind_col].quantile(q=quantile)
-        query_str = f'{ind_col}<= {top_perc}'
+        query_str = f"{ind_col}<= {top_perc}"
 
     elif top_val is not None:
-        query_str = f'{ind_col}<= {top_val}'
+        query_str = f"{ind_col}<= {top_val}"
 
     # Filter data
     view = df.query(query_str)
@@ -245,11 +244,11 @@ def top_categorical_vs_heatmap(
     pivot_grid = (pivot_grid - pivot_grid.min()) / max_min_range
     sns.heatmap(pivot_grid)
 
-    title_str = f'Heatmap of  {ind_col} level percentages across '
-    title_str += f'different {dependent_col}'
+    title_str = f"Heatmap of  {ind_col} level percentages across "
+    title_str += f"different {dependent_col}"
     plt.title(title_str, fontsize=15)
-    plt.xlabel(f'{dependent_col} value')
-    plt.ylabel(f'{ind_col} level')
+    plt.xlabel(f"{dependent_col} value")
+    plt.ylabel(f"{ind_col} level")
     plt.show()
 
 
@@ -271,7 +270,7 @@ def sum_count_aggregation(
     df: pd.DataFrame,
     group_cols: List,
     numerical_cols: List,
-    aggregation_operations: List = ['sum', 'count'],
+    aggregation_operations: List = ["sum", "count"],
 ):
     """Aggregate data by a gruop of columns into sum and count."""
     # Create aggregating dictionary
@@ -281,16 +280,16 @@ def sum_count_aggregation(
     counts = df.groupby(group_cols).agg(agg_dict)
 
     # Flatten multi-hierarchy index
-    counts.columns = ['_'.join(col).strip() for col in counts.columns.values]
+    counts.columns = ["_".join(col).strip() for col in counts.columns.values]
 
     for col in numerical_cols:
         for aggr in aggregation_operations:
-            perc_col = '_'.join([col, aggr, 'perc'])
-            aggr_col = '_'.join([col, aggr])
+            perc_col = "_".join([col, aggr, "perc"])
+            aggr_col = "_".join([col, aggr])
             counts[perc_col] = counts[aggr_col] / counts[aggr_col].sum()
 
     # Chose one column to sort for [first column]
-    sort_col = [col for col in counts.columns if 'count' in col][0]
+    sort_col = [col for col in counts.columns if "count" in col][0]
     counts.sort_values(by=sort_col, ascending=False)
     return counts
 
@@ -299,8 +298,8 @@ def sum_count_time_series(
     df: pd.DataFrame,
     date_col: str,
     numerical_series: List,
-    resample_frequency: str = 'D',
-    aggregation_operations: List = ['sum', 'count'],
+    resample_frequency: str = "D",
+    aggregation_operations: List = ["sum", "count"],
     filter_query: str = None,  # to select a subset of the whole database only
 ):
     """Get a time series grouping in a a certain time-window.
@@ -308,7 +307,7 @@ def sum_count_time_series(
     Only for a view of the original df.
     """
     if not filter_query:
-        filter_query = f'{date_col} == {date_col}'
+        filter_query = f"{date_col} == {date_col}"
     # generate aggregating dictionary
     agg_dict = {col: aggregation_operations for col in numerical_series}
 
@@ -320,7 +319,7 @@ def sum_count_time_series(
     )
 
     # Flatten multi-hierarchy index
-    time_series.columns = ['_'.join(col).strip() for col in time_series.columns.values]
+    time_series.columns = ["_".join(col).strip() for col in time_series.columns.values]
     # Reset index and sort by oldest event date first
     time_series = time_series.reset_index().sort_values(date_col)
 
@@ -331,25 +330,25 @@ def plot_agg_bar_charts(
     agg_df, agg_ops, group_cols, series_col: str, perc_filter: float = 0.03
 ):
     """Plot bar charts on an aggregated dataframe."""
-    perc_cols = ['_'.join([series_col, aggr, 'perc']) for aggr in agg_ops]
+    perc_cols = ["_".join([series_col, aggr, "perc"]) for aggr in agg_ops]
 
     fig = plt.figure()
     # Remove small levels in perc.
     (
-        agg_df.query(f'{perc_cols[0]}>@perc_filter')[perc_cols].T.plot.bar(
+        agg_df.query(f"{perc_cols[0]}>@perc_filter")[perc_cols].T.plot.bar(
             stacked=True,
             figsize=(8, 6),
             colormap="GnBu",
-            label='right',
+            label="right",
             ax=fig.gca(),
             rot=0,
         )
     )
 
-    title_str = f'Grouped by:{group_cols!s}, aggregated by: {agg_ops!s}, '
-    title_str += f'filter at least {perc_filter} perc'
-    plt.title(title_str, color='black')
-    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    title_str = f"Grouped by:{group_cols!s}, aggregated by: {agg_ops!s}, "
+    title_str += f"filter at least {perc_filter} perc"
+    plt.title(title_str, color="black")
+    plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
     plt.show()
 
 
@@ -360,7 +359,7 @@ def plot_category2category_pie_charts(
     max_category_levels=4,
     n_rows=1,
     figsize=(16, 6),
-    autopct='%.1f',
+    autopct="%.1f",
     sample_frac=0.1,
 ):
     """
@@ -373,13 +372,13 @@ def plot_category2category_pie_charts(
     unique2_levels, _ = get_ordered_category_levels(df, cat2_col)
 
     if max_category_levels < len(unique_levels):
-        col_name = f'reduced_{cat_col}'
+        col_name = f"reduced_{cat_col}"
         df[col_name] = category_reductor(df, cat_col, n_levels=max_category_levels)
         cat_col = col_name  # update new category col
         unique_levels, n_cols = get_ordered_category_levels(df, cat_col)
 
     if max_category_levels < len(unique2_levels):
-        col_name = f'reduced_{cat2_col}'
+        col_name = f"reduced_{cat2_col}"
         df[col_name] = category_reductor(df, cat2_col, n_levels=max_category_levels)
         cat2_col = col_name  # update new category col
         unique2_levels, _ = get_ordered_category_levels(df, cat2_col)
@@ -403,8 +402,8 @@ def plot_category2category_pie_charts(
         subplot_num = n_rows * 100 + n_cols * 10 + i + 1
         ax = fig.add_subplot(subplot_num)
         ax.set_title(level)
-        ax.axis('off')  # remove unnecessary figure axis
-        v = df.query(f'{cat_col} == @level')
+        ax.axis("off")  # remove unnecessary figure axis
+        v = df.query(f"{cat_col} == @level")
         ratio_percentage = (
             v[cat2_col].dropna().sample(frac=sample_frac).value_counts(normalize=True)
             * 100
@@ -429,7 +428,7 @@ def plot_timeseries(
     hourly_formatted=False,
     fig_ax=None,
     y_thousands_fmt=1000,
-    fmt='-o',
+    fmt="-o",
     label=None,
     color=None,
     **kwargs,
@@ -492,9 +491,9 @@ def plot_timeseries(
     if ix_date_type:
 
         # Ticks formatting
-        monthly_format = mdates.DateFormatter('\n\n\n\n\n%b\n%Y')
-        daily_format = mdates.DateFormatter('\n\n%d\n%a')
-        hourly_format = mdates.DateFormatter('%Hhs\n%a')
+        monthly_format = mdates.DateFormatter("\n\n\n\n\n%b\n%Y")
+        daily_format = mdates.DateFormatter("\n\n%d\n%a")
+        hourly_format = mdates.DateFormatter("%Hhs\n%a")
         # Ticks locations
         hourly_locator = mdates.HourLocator(byhour=range(0, 24, 3), interval=5)
         dow_locator = mdates.WeekdayLocator(byweekday=(0), interval=1)
@@ -524,7 +523,7 @@ def plot_timeseries(
     if df[y_col].median() > y_thousands_fmt:
         # Add major y axis formatting for thousands
         ax.yaxis.set_major_formatter(
-            ticker.FuncFormatter(lambda x, p: format(int(x), ','))
+            ticker.FuncFormatter(lambda x, p: format(int(x), ","))
         )
     fig.set_size_inches(fig_size)
     plt.suptitle(wrap(title_str))
@@ -532,7 +531,7 @@ def plot_timeseries(
     return fig, ax
 
 
-def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
+def category_reductor(df, categorical_col, n_levels=8, default_level="Other"):
     """Reduce a categorical col's levels.
 
     This outputs a new cat col with reduced levels.
@@ -561,15 +560,15 @@ def clean_numeric_col(df, numeric_col, **kwds):
     This outputs a new series with numeric or null values.
     """
     # Remove emtpy whitespace
-    df[numeric_col] = df[numeric_col].str.replace(' ', '').replace('', np.nan)
+    df[numeric_col] = df[numeric_col].str.replace(" ", "").replace("", np.nan)
     # Convert to float. Defauls pushing errors as nulls
-    return partial(pd.to_numeric, errors='raise')(df[numeric_col], **kwds)
+    return partial(pd.to_numeric, errors="raise")(df[numeric_col], **kwds)
 
 
 def optimize_numeric_types(df):
     """Cast numeric columns to more memory friendly types."""
     # Check which types best.
-    new_ftypes = {c: 'float32' for c in df.dtypes[df.dtypes == 'float64'].index}
+    new_ftypes = {c: "float32" for c in df.dtypes[df.dtypes == "float64"].index}
     df = df.astype(new_ftypes, copy=False)
     return df
 
@@ -589,11 +588,11 @@ def load_sql_query(sql, query_context_params=None):
     pat = Path(sql).expanduser()
     # This `pat.is_file()` breaks for long enough
     if np.DataSource().exists(pat.as_posix()):
-        with open(pat, 'r') as f:
+        with open(pat, "r") as f:
             sql = f.read()
 
     if query_context_params:
-        j = JinjaSql(param_style='pyformat')
+        j = JinjaSql(param_style="pyformat")
         binded_sql, bind_params = j.prepare_query(sql, query_context_params)
         missing_placeholders = [k for k, v in bind_params.items() if Undefined() == v]
 
@@ -626,7 +625,7 @@ def get_sql_stats_aggr(
     if with_ndv:
         rv += f"\n NDV({input_expression}) as unique_{as_name},"
     if with_count:
-        rv += f'\n COUNT(1) as count_{as_name},'
+        rv += f"\n COUNT(1) as count_{as_name},"
 
     return rv
 
@@ -639,13 +638,13 @@ def get_null_count_aggr(
     pre_clause = NULL_COUNT_CLAUSE
     if empty_string_null:
 
-        pre_clause = pre_clause.replace('IS NULL', "= ''")
+        pre_clause = pre_clause.replace("IS NULL", "= ''")
     for col in columns_list:
 
         rv += pre_clause.format(col=col, as_col=as_name + col) + ",\n"
     if no_ending_comma:
 
-        rv = rv.rsplit(',', 1)[0]
+        rv = rv.rsplit(",", 1)[0]
 
     return rv
 
