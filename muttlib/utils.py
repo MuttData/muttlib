@@ -646,7 +646,6 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
 
     logger.debug(f'Dropping the following {len(drop_cols)} columns:\n {drop_cols}')
     df.drop(drop_cols, axis=1, inplace=True)
-    df = df.loc[:, null_mask]
     return df
 
 
@@ -657,10 +656,26 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
     low_variance_cols = [c for c in low_variance_cols if c not in protected_cols]
     logger.debug(
-        f'Dropping the following {len(low_variance_cols)} columns:\n '
-        f'{low_variance_cols}'
+        f'Dropping the following {len(low_variance_cols)} columns '
+        f'due to low variance:\n {low_variance_cols}'
     )
     df.drop(low_variance_cols, axis=1, inplace=True)
+    return df
+
+
+def df_drop_corr(df, target_col, max_corr=0.3, protected_cols=[]):
+    """Drop high correlated to-target cols."""
+    assert target_col in df.columns
+    corr_df = df.sample(frac=0.2).corr()
+    high_corr_cols = (abs(corr_df[target_col]) > max_corr)
+    high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
+    high_corr_cols = [
+        c for c in high_corr_cols if c not in protected_cols]
+    logger.debug(
+        f'Dropping the following {len(high_corr_cols)} columns due to high correlation '
+        f'with target:\n {high_corr_cols}'
+    )
+    df.drop(high_corr_cols, axis=1, inplace=True)
     return df
 
 
