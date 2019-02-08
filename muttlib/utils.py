@@ -20,12 +20,12 @@ import yaml
 from pandas.tseries import offsets
 from scipy.stats import iqr
 
-logger = logging.getLogger(f"utils.{__name__}")
+logger = logging.getLogger(f'utils.{__name__}')
 
 
 def read_yaml(f):
     """Read a yaml file."""
-    with open(f, "r") as file:
+    with open(f, 'r') as file:
         return yaml.safe_load(file.read())
 
 
@@ -37,7 +37,7 @@ def make_dirs(dir_path):
 
 def non_empty_dirs(path):
     """List all non-empty directories for a given path."""
-    return list({str(p.parent) for p in path.rglob("*") if p.is_file()})
+    return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
 
 
 def path_or_string(str_or_path):
@@ -45,7 +45,7 @@ def path_or_string(str_or_path):
     file_path = Path(str_or_path)
     try:
         if file_path.is_file():
-            with file_path.open("r") as f:
+            with file_path.open('r') as f:
                 return f.read()
     except OSError:
         pass
@@ -57,12 +57,12 @@ def local_df_cache(
     # pylint: disable=unused-argument
     use_cache=False,
     refresh_cache=False,
-    cache_fn="cache_file",
-    cache_dir="/tmp/",
-    cache_format="pickle",
-    cache_hit_msg="Reading cached data from file: ",
-    cache_miss_msg="Cache missing for file: ",
-    cache_put_msg="Saving data to file: ",
+    cache_fn='cache_file',
+    cache_dir='/tmp/',
+    cache_format='pickle',
+    cache_hit_msg='Reading cached data from file: ',
+    cache_miss_msg='Cache missing for file: ',
+    cache_put_msg='Saving data to file: ',
 ):
     """Decorate the target function to cache ouputed DataFrames.
 
@@ -107,17 +107,17 @@ def local_df_cache(
         @wraps(func)
         def wrapped_f(*args, **kwargs):
             """Do dummy docstring."""
-            cache_opts_arg = kwargs.pop("cache_opts").copy()
+            cache_opts_arg = kwargs.pop('cache_opts').copy()
             cache_opts = orig_cache_opts.copy()
             cache_opts.update(cache_opts_arg)
-            use_cache = cache_opts["use_cache"]
-            refresh_cache = cache_opts["refresh_cache"]
-            cache_fn = cache_opts["cache_fn"]
-            cache_dir = cache_opts["cache_dir"]
-            cache_format = cache_opts["cache_format"]
-            cache_hit_msg = cache_opts["cache_hit_msg"]
-            cache_miss_msg = cache_opts["cache_miss_msg"]
-            cache_put_msg = cache_opts["cache_put_msg"]
+            use_cache = cache_opts['use_cache']
+            refresh_cache = cache_opts['refresh_cache']
+            cache_fn = cache_opts['cache_fn']
+            cache_dir = cache_opts['cache_dir']
+            cache_format = cache_opts['cache_format']
+            cache_hit_msg = cache_opts['cache_hit_msg']
+            cache_miss_msg = cache_opts['cache_miss_msg']
+            cache_put_msg = cache_opts['cache_put_msg']
 
             # Clear cache args from kwargs
             for k in orig_cache_opts:
@@ -163,7 +163,7 @@ def local_df_cache(
 def df_read_multi(fn, index_col=False, quoting=0):
     """Read multiple table disk-formats into a pandas DataFrame."""
     ext = Path(fn).suffix[1:]
-    if ext == "csv":
+    if ext == 'csv':
         df = pd.read_csv(fn, index_col=index_col, quoting=quoting)
 
         def clean_quotes(s):
@@ -174,9 +174,9 @@ def df_read_multi(fn, index_col=False, quoting=0):
 
         df.columns = list(map(clean_quotes, df.columns))
         return df
-    elif ext == "feather":
+    elif ext == 'feather':
         return pd.read_feather(fn)
-    elif ext in ["pickle", "pkl"]:
+    elif ext in ['pickle', 'pkl']:
         return pd.read_pickle(fn)
     else:
         raise ValueError(f"File format '{ext}' not supported!")
@@ -185,11 +185,11 @@ def df_read_multi(fn, index_col=False, quoting=0):
 def df_to_multi(df, fn, index=False, quoting=csv.QUOTE_NONNUMERIC):
     """Convert a DF to multiple disk-formats table."""
     ext = Path(fn).suffix[1:]
-    if ext == "csv":
+    if ext == 'csv':
         return df.to_csv(fn, index=index, quoting=quoting)
-    elif ext == "feather":
+    elif ext == 'feather':
         return df.to_feather(fn)
-    elif ext in ["pickle", "pkl"]:
+    elif ext in ['pickle', 'pkl']:
         return df.to_pickle(fn)
     else:
         raise ValueError(f"File format '{ext}' not supported!")
@@ -212,7 +212,7 @@ def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
     d = deepcopy(double_linked_list)
     while len(d) > 0:
         elem = d.popleft()
-        level = elem.pop("level")
+        level = elem.pop('level')
         orde[level] = elem
         if target_level == level:
             return orde
@@ -226,16 +226,16 @@ def wrap_list_values_quotes(lis):
 def str_to_datetime(datetime_str):
     """Convert possible date-like string to datetime object."""
     formats = (
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d",
-        "%Y-%m-%d %H:%M:%S.%f",
-        "%H:%M:%S.%f",
-        "%H:%M:%S",
-        "%Y%m%dT%H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y%m%d",
-        "%Y-%m-%dT%H",
-        "%Y%m",
+        '%Y-%m-%d %H:%M:%S',
+        '%Y-%m-%d',
+        '%Y-%m-%d %H:%M:%S.%f',
+        '%H:%M:%S.%f',
+        '%H:%M:%S',
+        '%Y%m%dT%H:%M:%S',
+        '%Y-%m-%dT%H:%M:%S',
+        '%Y%m%d',
+        '%Y-%m-%dT%H',
+        '%Y%m',
     )
     for format in formats:
         try:
@@ -256,22 +256,22 @@ def range_datetime(datetime_start, datetime_end, timeskip=None):
 
 def get_fathers_mothers_kids_day(year: int):
     """Get three dates for a given year input."""
-    august_first = str_to_datetime(f"{year}-08-01")
+    august_first = str_to_datetime(f'{year}-08-01')
     kids_dow_iteration = 3  # third sunday each August
     KIDS_DAY = pd.date_range(
-        start=august_first, end=august_first + offsets.Day(21), freq="W-SUN"
+        start=august_first, end=august_first + offsets.Day(21), freq='W-SUN'
     )[kids_dow_iteration - 1]
 
     october_first = august_first + offsets.MonthBegin(2)
     mother_dow_iteration = 3  # third sunday each October
     MOTHERS_DAY = pd.date_range(
-        start=october_first, end=october_first + offsets.Day(21), freq="W-SUN"
+        start=october_first, end=october_first + offsets.Day(21), freq='W-SUN'
     )[mother_dow_iteration - 1]
 
     june_first = august_first - offsets.MonthBegin(2)
     father_dow_iteration = 3  # third sunday each June
     FATHERS_DAY = pd.date_range(
-        start=june_first, end=june_first + offsets.Day(21), freq="W-SUN"
+        start=june_first, end=june_first + offsets.Day(21), freq='W-SUN'
     )[father_dow_iteration - 1]
 
     return FATHERS_DAY, MOTHERS_DAY, KIDS_DAY
@@ -279,7 +279,7 @@ def get_fathers_mothers_kids_day(year: int):
 
 def get_friends_day(year: int):
     """Get arg-style friends date."""
-    return str_to_datetime(f"{year}-07-20")
+    return str_to_datetime(f'{year}-07-20')
 
 
 def is_special_day(ds, timestamps_inclause):
@@ -305,7 +305,7 @@ def is_special_day(ds, timestamps_inclause):
 def get_semi_month_pay_days(start_date, end_date):
     """Get half and end of month friday pay-days for salary workers."""
     first_monthly_fridays = pd.date_range(
-        start=start_date, end=end_date, freq="BM"
+        start=start_date, end=end_date, freq='BM'
     ) + offsets.Week(weekday=4)  # move to end of month
     # Beware fridays that are too faraway from middle/end of month
     first_semimonth_pay_days = [
@@ -335,11 +335,11 @@ def create_dict_id(d, length=10):
         length: number of characters to return in the hash
     """
     shake = hashlib.shake_256()
-    shake.update(repr(d).encode("utf-8"))
+    shake.update(repr(d).encode('utf-8'))
     return shake.hexdigest(int(length / 2))
 
 
-def query_yes_no(question, default="no"):
+def query_yes_no(question, default='no'):
     """Ask a yes/no question via input() and return their answer.
 
     "question" is a string that is presented to the user.
@@ -351,20 +351,20 @@ def query_yes_no(question, default="no"):
 
     https://stackoverflow.com/questions/3041986/apt-command-line-interface-like-yes-no-input
     """
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    valid = {'yes': True, 'y': True, 'ye': True, 'no': False, 'n': False}
     if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
+        prompt = ' [y/n] '
+    elif default == 'yes':
+        prompt = ' [Y/n] '
+    elif default == 'no':
+        prompt = ' [y/N] '
     else:
         raise ValueError("invalid default answer: '%s'" % default)
 
     while True:
         sys.stdout.write(question + prompt)
         choice = input().lower()
-        if default is not None and choice == "":
+        if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
             return valid[choice]
@@ -396,7 +396,7 @@ def normalize_arr(arr):
 def apply_time_bounds(df, sd, ed, ds_col):
     """Filter time dates in a datetime-type column or index."""
     if ds_col:
-        rv = df.query(f"{ds_col} >= @sd and {ds_col} <= @ed")
+        rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
     else:
         rv = df.loc[sd:ed]
     return rv
@@ -407,7 +407,7 @@ def normalize_ds_index(df, ds_col):
     if ds_col in df.columns:
         return df
     elif ds_col == df.index.name:
-        df = df.reset_index().rename(columns={"index": ds_col})
+        df = df.reset_index().rename(columns={'index': ds_col})
     else:
         raise ValueError(f"No column or index found as '{ds_col}'.")
     return df
@@ -438,10 +438,10 @@ def none_or_empty_pandas(obj):
 
 def hash_str(s, length=8):
     """Hash a string."""
-    return hashlib.sha256(s.encode("utf8")).hexdigest()[:length]
+    return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
 
 
-def setup_logging(log_config, logger_name="root", level="INFO"):
+def setup_logging(log_config, logger_name='root', level='INFO'):
     """Setup logging config."""
     log_config["loggers"][logger_name]["level"] = level
     logging.config.dictConfig(log_config)
@@ -492,12 +492,12 @@ def format_in_clause(iterable):
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
-        line_statement_prefix=kwargs.pop("line_statement_prefix", "%"),
-        trim_blocks=kwargs.pop("trim_blocks", True),
-        lstrip_blocks=kwargs.pop("lstrip_blocks", True),
+        line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
+        trim_blocks=kwargs.pop('trim_blocks', True),
+        lstrip_blocks=kwargs.pop('lstrip_blocks', True),
         **kwargs,
     )
-    environment.filters["inclause"] = format_in_clause
+    environment.filters['inclause'] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))
 
 
@@ -506,7 +506,7 @@ def render_jinja_template(path_or_str, jparams={}):
     # Standarize to pathlib object, supports str objects
     pat = Path(path_or_str).expanduser().resolve().as_posix()
     if pd.np.DataSource().exists(pat):
-        logger.debug(f"Loading jinja template from {pat}.")
+        logger.debug(f'Loading jinja template from {pat}.')
     return template(path_or_str).render(**jparams)
 
 
@@ -521,21 +521,21 @@ def get_cloudera_sql_stats_aggr(
 ):
     """Get Cloudera-valid battery of statistical aggregations clause."""
     rv_l = [
-        f"SUM({input_expression}) AS sum",
-        f"AVG({input_expression}) AS mean",
-        f"APPX_MEDIAN({input_expression}) AS median",
+        f'SUM({input_expression}) AS sum',
+        f'AVG({input_expression}) AS mean',
+        f'APPX_MEDIAN({input_expression}) AS median',
     ]
 
     if with_minmax:
-        rv_l.append(f"MIN({input_expression}) AS min")
-        rv_l.append(f"MAX({input_expression}) AS max")
+        rv_l.append(f'MIN({input_expression}) AS min')
+        rv_l.append(f'MAX({input_expression}) AS max')
     if with_std:
-        rv_l.append(f"STDDEV({input_expression}) AS std")
+        rv_l.append(f'STDDEV({input_expression}) AS std')
     if with_ndv:
-        rv_l.append(f"NDV({input_expression}) AS unique")
+        rv_l.append(f'NDV({input_expression}) AS unique')
     if with_count:
-        rv_l.append(f"COUNT({input_expression}) AS count_rows")
-    rv = ",\n".join([f"{i}_{as_name}" for i in rv_l]) + ","
+        rv_l.append(f'COUNT({input_expression}) AS count_rows')
+    rv = ',\n'.join([f'{i}_{as_name}' for i in rv_l]) + ','
     if not ends_comma:
         rv = rv[:-1]
     return rv
@@ -557,10 +557,10 @@ def get_cloudera_hashed_sample_clause(col_or_exp, sample_pct):
     This will work on an id col or on a given expression that outputs
     a valid column. It takes a sample_pct number between 0 and 1.
     """
-    assert 0 < sample_pct < 1, f"{sample_pct} should be a float  in (0,1)"
+    assert 0 < sample_pct < 1, f'{sample_pct} should be a float  in (0,1)'
 
     threshold_int = get_cloudera_sample_cut(sample_lines_ratio=sample_pct)
-    rv = f"AND abs(fnv_hash(CAST({col_or_exp} AS bigint))) <= {threshold_int}"
+    rv = f'AND abs(fnv_hash(CAST({col_or_exp} AS bigint))) <= {threshold_int}'
 
     return rv
 
@@ -581,9 +581,9 @@ def str_normalize_pandas(data, str_replace_kws=None):
             data[col] = (
                 data[col]
                 .str.lower()
-                .str.normalize("NFKD")
-                .str.encode("ascii", errors="ignore")
-                .str.decode("utf-8")
+                .str.normalize('NFKD')
+                .str.encode('ascii', errors='ignore')
+                .str.decode('utf-8')
             )
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
@@ -592,9 +592,9 @@ def str_normalize_pandas(data, str_replace_kws=None):
         data = (
             data.str.lower()
             .str.lower()
-            .str.normalize("NFKD")
-            .str.encode("ascii", errors="ignore")
-            .str.decode("utf-8")
+            .str.normalize('NFKD')
+            .str.encode('ascii', errors='ignore')
+            .str.decode('utf-8')
         )
         if str_replace_kws:
             data = data.str.replace(**str_replace_kws)
@@ -613,9 +613,9 @@ def df_replace_empty_strs_null(df):
     str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
         logger.debug(
-            f"Replacing whitespace in these object cols: {str_cols}..."
+            f'Replacing whitespace in these object cols: {str_cols}...'
         )
-        df[str_cols].replace(r"^\s*$", pd.np.nan, regex=True, inplace=True)
+        df[str_cols].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
     return df
 
 
@@ -623,7 +623,7 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     """Drop null columns in df, for null share over a certain threshold."""
     # Note: Pandas treats string columns as `object` data types
     logger.debug(
-        f"Dropping columns with null ratio greater than {max_null_prop:.2%}..."
+        f'Dropping columns with null ratio greater than {max_null_prop:.2%}...'
     )
     df = df_replace_empty_strs_null(df)
     null_means = df.isnull().mean()
@@ -631,12 +631,12 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     null_mask[[c for c in df.columns if c in protected_cols]] = True
     drop_cols = null_mask[~null_mask].index.tolist()
     logger.debug(
-        f"{t} null proportions:\n"
-        f"{null_means.loc[drop_cols].sort_values(ascending=False)}"
+        f'{t} null proportions:\n'
+        f'{null_means.loc[drop_cols].sort_values(ascending=False)}'
     )
 
     logger.debug(
-        f"Dropping the following {len(drop_cols)} columns:\n {drop_cols}"
+        f'Dropping the following {len(drop_cols)} columns:\n {drop_cols}'
     )
     df.drop(drop_cols, axis=1, inplace=True)
     df = df.loc[:, null_mask]
@@ -651,23 +651,23 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     low_variance_cols = [
         c for c in low_variance_cols if c not in protected_cols]
     logger.debug(
-        f"Dropping the following {len(low_variance_cols)} columns:\n "
-        f"{low_variance_cols}"
+        f'Dropping the following {len(low_variance_cols)} columns:\n '
+        f'{low_variance_cols}'
     )
     df.drop(low_variance_cols, axis=1, inplace=True)
     return df
 
 
-def df_get_typed_cols(df, col_type="cat", protected_cols=[]):
+def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
     """Get typed columns, excluding protected cols if passed."""
-    assert col_type in ("cat", "num", "date", "bool", "timedelta")
-    if col_type == "cat":  # Work in cases, else dont define include var
-        include = ["object", "cateogry"]
-    elif col_type == "num":
+    assert col_type in ('cat', 'num', 'date', 'bool', 'timedelta')
+    if col_type == 'cat':  # Work in cases, else dont define include var
+        include = ['object', 'cateogry']
+    elif col_type == 'num':
         include = [pd.np.number]
-    elif col_type == "date":
-        include = ["datetime"]
-    elif col_type in ("bool", "timedelta"):
+    elif col_type == 'date':
+        include = ['datetime']
+    elif col_type in ('bool', 'timedelta'):
         include = [col_type]
     typed_cols = [
         c for c in df.select_dtypes(include=include).columns if c not in protected_cols
@@ -676,11 +676,11 @@ def df_get_typed_cols(df, col_type="cat", protected_cols=[]):
 
 
 def df_encode_categorical_dummies(
-    df, cat_cols=[], skip_cols=[], top=25, other_val="OTHER"
+    df, cat_cols=[], skip_cols=[], top=25, other_val='OTHER'
 ):
     """Encode categorical columns into dummies."""
     pre_dummy_cols = df.columns.tolist()
-    cat_cols = df_get_typed_cols(df, col_type="cat") if cat_cols == [] else cat_cols
+    cat_cols = df_get_typed_cols(df, col_type='cat') if cat_cols == [] else cat_cols
     cat_cols = [c for c in cat_cols if c not in skip_cols]
 
     for c in cat_cols:
@@ -691,23 +691,24 @@ def df_encode_categorical_dummies(
     df = pd.get_dummies(df, columns=cat_cols, drop_first=False)
     dummy_cols = list(set(df.columns.tolist()) - set(pre_dummy_cols))
     logger.debug(
-        f"{len(df.columns)} columns after dummies:\n {sorted(df.columns.tolist())}"
+        f'{len(df.columns)} columns after dummies:\n {sorted(df.columns.tolist())}'
     )
     return df, dummy_cols
 
 
 def df_drop_single_factor_level(df):
     """Drop categorical columns with null or 1 level."""
-    cat_cols = df_get_typed_cols(df, col_type="cat")
+    cat_cols = df_get_typed_cols(df, col_type='cat')
     cols_to_drop = []
     for c in cat_cols:
         val_count = df[c].value_counts(dropna=False)
         vals = val_count.index.tolist()
-        if len(vals) == 2 and "" in vals or len(vals) == 1:
+        if len(vals) == 2 and '' in vals or len(vals) == 1:
             cols_to_drop.append(c)
     logger.debug(
-        f"Dropping the following {len(cols_to_drop)} columns with low factor levels:"
-        f"\n {cols_to_drop}."
+        f'Dropping the following {len(cols_to_drop)} columns with low factor levels:'
+        f'\n {cols_to_drop}.'
     )
     df.drop(cols_to_drop, axis=1, inplace=True)
     return df
+    
