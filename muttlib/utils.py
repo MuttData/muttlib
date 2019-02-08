@@ -644,10 +644,16 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
 
 
 def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
+    """Drop low variance cols."""
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
-    low_variance_cols = [c for c in low_variance_cols if c not in protected_cols]
+    low_variance_cols = [
+        c for c in low_variance_cols if c not in protected_cols]
+    logger.debug(
+        f"Dropping the following {len(low_variance_cols)} columns:\n "
+        f"{low_variance_cols}"
+    )
     df.drop(low_variance_cols, axis=1, inplace=True)
     return df
 
