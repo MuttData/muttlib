@@ -104,6 +104,7 @@ def col_sample_display(
     modifiers for either showing a histogram for numeric data, or
     showing top_value counts for non-numeric columns.
     """
+    len_col = df[col].shape[0]
     unique_vals = df[col].unique()
     num_unique_vals = len(unique_vals)
     null_count = df[col].isnull().sum()
@@ -114,8 +115,16 @@ def col_sample_display(
     display(df[col].describe())
     display(df[col].sample(10))
 
-    # check either numerical or not
-    is_numeric_type = np.issubdtype(df[col].dtype, np.number)
+    # Check either numerical or not
+    num_sample = 300
+    if len_col < num_sample:
+        num_sample = len_col
+    try:
+        pd.to_numeric(df[col].sample(num_sample))
+        is_numeric_type = True
+    except Exception as e:
+        is_numeric_type = False
+
     if is_numeric_type or num_unique_vals < 15:
 
         val_counts = df[col].value_counts().to_frame()
@@ -124,8 +133,10 @@ def col_sample_display(
         val_counts['percentage'] = 100 * \
             val_counts['count'] / val_counts['count'].sum()
         display(val_counts.head(10))
+
     if is_numeric_type:
 
+        df[col] = pd.to_numeric(df[col], errors='coerce')
         query_str = f'{col}== {col}'
         if quantile is not None:
             top_perc = df[col].quantile(q=quantile)
