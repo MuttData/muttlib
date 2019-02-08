@@ -601,9 +601,19 @@ def str_normalize_pandas(data, str_replace_kws=None):
     return data
 
 
-def df_optimize_float_types(df):
-    """Cast dataframe columns to more memory friendly types."""
-    new_dtypes = {c: "float32" for c in df.dtypes[df.dtypes == "float64"].index}
+def df_optimize_float_types(df, type_mappings={"float64": "float16", "float32": "float16"}):
+    """Cast dataframe columns to more memory friendly types.
+
+    WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
+    Eg:
+    >>> n = 2**128
+    >>> np.float64(n), np.float32(n)
+    (3.402823669209385e+38, inf)
+    """
+    new_dtypes = {
+        c: type_mappings.get(t.name, t)
+        for c, t in df.dtypes.iteritems()
+    }
     df = df.astype(new_dtypes, copy=False)
     return df
 
