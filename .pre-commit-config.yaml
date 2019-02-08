@@ -1,0 +1,22 @@
+repos:
+-   repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+    - id: black
+      language_version: python3.7
+
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.5
+    hooks:
+    -   id: flake8
+    additional_dependencies: [flake8-docstrings, flake8-bugbear]
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 55201b4da58d5ec5d934bbc3b32f8a2814f57fb6
+    hooks:
+    -   id: mypy
+
+-   repo: https://github.com/pre-commit/mirrors-pylint
+    rev: b6148ca8a12dcbd6e200b32291ae449532cad814
+    hooks:
+    -   id: pylint
