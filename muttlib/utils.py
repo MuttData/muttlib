@@ -168,7 +168,7 @@ def df_read_multi(fn, index_col=False, quoting=0):
 
         def clean_quotes(s):
             """Clean start and ending quotes."""
-            if s[0] in "\"'" and s[-1] in "\"'":
+            if s[0] in '"\'' and s[-1] in '"\'':
                 return s[1:-1]
             return s
 
@@ -197,8 +197,8 @@ def df_to_multi(df, fn, index=False, quoting=csv.QUOTE_NONNUMERIC):
 
 def convert_to_snake_case(name: str):
     """Convert string to snake_case."""
-    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
-    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
 def dict_to_namedtuple(name, d):
@@ -443,7 +443,7 @@ def hash_str(s, length=8):
 
 def setup_logging(log_config, logger_name='root', level='INFO'):
     """Setup logging config."""
-    log_config["loggers"][logger_name]["level"] = level
+    log_config['loggers'][logger_name]['level'] = level
     logging.config.dictConfig(log_config)
 
 
