@@ -610,8 +610,11 @@ def df_optimize_float_types(df):
 
 def df_replace_empty_strs_null(df):
     """Replace whitespace or empty strs with nan values."""
-    str_cols = df.dtypes[df.dtypes == "object"].index.tolist()
+    str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
+        logger.debug(
+            f"Replacing whitespace in these object cols: {str_cols}..."
+        )
         df[str_cols].replace(r"^\s*$", pd.np.nan, regex=True, inplace=True)
     return df
 
