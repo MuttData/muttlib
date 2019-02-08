@@ -705,6 +705,9 @@ def df_drop_single_factor_level(df):
         vals = val_count.index.tolist()
         if len(vals) == 2 and "" in vals or len(vals) == 1:
             cols_to_drop.append(c)
-
+    logger.debug(
+        f"Dropping the following {len(cols_to_drop)} columns with low factor levels:"
+        f"\n {cols_to_drop}."
+    )
     df.drop(cols_to_drop, axis=1, inplace=True)
     return df
