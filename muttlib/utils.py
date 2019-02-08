@@ -640,7 +640,7 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     null_mask[[c for c in df.columns if c in protected_cols]] = True
     drop_cols = null_mask[~null_mask].index.tolist()
     logger.debug(
-        f'{t} null proportions:\n'
+        f'Null proportions:\n'
         f'{null_means.loc[drop_cols].sort_values(ascending=False)}'
     )
 
@@ -668,7 +668,7 @@ def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
     """Get typed columns, excluding protected cols if passed."""
     assert col_type in ('cat', 'num', 'date', 'bool', 'timedelta')
     if col_type == 'cat':  # Work in cases, else dont define include var
-        include = ['object', 'cateogry']
+        include = ['object', 'category']
     elif col_type == 'num':
         include = [pd.np.number]
     elif col_type == 'date':
