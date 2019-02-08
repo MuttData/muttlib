@@ -156,6 +156,7 @@ def top_categorical_vs_kdeplot(
     quantile: float = None,
     upper_bound_val: float = None,
     num_category_levels: int = 2,
+    **kde_kwargs
 ):
     """
     Plot multiple kdeplots for each category level.
@@ -190,7 +191,8 @@ def top_categorical_vs_kdeplot(
     # Group and plot for each category level
     iterator = view.groupby(gr_condition)[numerical_col]
     for name, grp in iterator:
-        sns.kdeplot(grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i])
+        sns.kdeplot(grp, shade=True, alpha=0.4,
+                    label=f'{name}', color=palette[i], **kde_kwargs)
         i = i + 1
     title_str = f'Feature {numerical_col} distributions across '
     title_str += f'different {categorical_col}'
