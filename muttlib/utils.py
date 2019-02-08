@@ -306,7 +306,9 @@ def get_semi_month_pay_days(start_date, end_date):
     """Get half and end of month friday pay-days for salary workers."""
     first_monthly_fridays = pd.date_range(
         start=start_date, end=end_date, freq='BM'
-    ) + offsets.Week(weekday=4)  # move to end of month
+    ) + offsets.Week(
+        weekday=4
+    )  # move to end of month
     # Beware fridays that are too faraway from middle/end of month
     first_semimonth_pay_days = [
         ts + offsets.Day(14) if ts.day <= 4 else ts + offsets.Day(7)
@@ -601,7 +603,9 @@ def str_normalize_pandas(data, str_replace_kws=None):
     return data
 
 
-def df_optimize_float_types(df, type_mappings={"float64": "float16", "float32": "float16"}):
+def df_optimize_float_types(
+    df, type_mappings={"float64": "float16", "float32": "float16"}
+):
     """Cast dataframe columns to more memory friendly types.
 
     WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
@@ -610,10 +614,7 @@ def df_optimize_float_types(df, type_mappings={"float64": "float16", "float32": 
     >>> np.float64(n), np.float32(n)
     (3.402823669209385e+38, inf)
     """
-    new_dtypes = {
-        c: type_mappings.get(t.name, t)
-        for c, t in df.dtypes.iteritems()
-    }
+    new_dtypes = {c: type_mappings.get(t.name, t) for c, t in df.dtypes.iteritems()}
     df = df.astype(new_dtypes, copy=False)
     return df
 
@@ -622,9 +623,7 @@ def df_replace_empty_strs_null(df):
     """Replace whitespace or empty strs with nan values."""
     str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
-        logger.debug(
-            f'Replacing whitespace in these object cols: {str_cols}...'
-        )
+        logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
         df[str_cols].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
     return df
 
@@ -645,9 +644,7 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
         f'{null_means.loc[drop_cols].sort_values(ascending=False)}'
     )
 
-    logger.debug(
-        f'Dropping the following {len(drop_cols)} columns:\n {drop_cols}'
-    )
+    logger.debug(f'Dropping the following {len(drop_cols)} columns:\n {drop_cols}')
     df.drop(drop_cols, axis=1, inplace=True)
     df = df.loc[:, null_mask]
     return df
@@ -658,8 +655,7 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
-    low_variance_cols = [
-        c for c in low_variance_cols if c not in protected_cols]
+    low_variance_cols = [c for c in low_variance_cols if c not in protected_cols]
     logger.debug(
         f'Dropping the following {len(low_variance_cols)} columns:\n '
         f'{low_variance_cols}'
@@ -721,4 +717,3 @@ def df_drop_single_factor_level(df):
     )
     df.drop(cols_to_drop, axis=1, inplace=True)
     return df
-    

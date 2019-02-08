@@ -96,7 +96,11 @@ def get_ordered_category_levels(df, cat_col, top_n=None):
 
 
 def col_sample_display(
-    df: pd.DataFrame, col: str, quantile: float = None, top_val: float = None, num_sample:float=300
+    df: pd.DataFrame,
+    col: str,
+    quantile: float = None,
+    top_val: float = None,
+    num_sample: float = 300,
 ):
     """Fast printing/visualization of sample data for given column.
 
@@ -156,7 +160,7 @@ def top_categorical_vs_kdeplot(
     quantile: float = None,
     upper_bound_val: float = None,
     num_category_levels: int = 2,
-    **kde_kwargs
+    **kde_kwargs,
 ):
     """
     Plot multiple kdeplots for each category level.
@@ -191,8 +195,9 @@ def top_categorical_vs_kdeplot(
     # Group and plot for each category level
     iterator = view.groupby(gr_condition)[numerical_col]
     for name, grp in iterator:
-        sns.kdeplot(grp, shade=True, alpha=0.4,
-                    label=f'{name}', color=palette[i], **kde_kwargs)
+        sns.kdeplot(
+            grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i], **kde_kwargs
+        )
         i = i + 1
     title_str = f'Feature {numerical_col} distributions across '
     title_str += f'different {categorical_col}'
@@ -639,7 +644,7 @@ def get_null_count_aggr(
     pre_clause = NULL_COUNT_CLAUSE
     if empty_string_null:
 
-        pre_clause = pre_clause.replace('IS NULL', '= ''')
+        pre_clause = pre_clause.replace('IS NULL', "= ''")
     for col in columns_list:
 
         rv += pre_clause.format(col=col, as_col=as_name + col) + ',\n'
