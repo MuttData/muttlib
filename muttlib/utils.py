@@ -687,8 +687,12 @@ def df_encode_categorical_dummies(
         top_categories = df[c].value_counts().index.values[0:top]
         df[c] = df[c].where(df[c].isin(top_categories), other=other_val)
 
+    logger.debug(f'Getting dummies from these top categories:{cat_cols}...')
     df = pd.get_dummies(df, columns=cat_cols, drop_first=False)
     dummy_cols = list(set(df.columns.tolist()) - set(pre_dummy_cols))
+    logger.debug(
+        f"{len(df.columns)} columns after dummies:\n {sorted(df.columns.tolist())}"
+    )
     return df, dummy_cols
 
 
