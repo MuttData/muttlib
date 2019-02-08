@@ -630,20 +630,20 @@ def get_sql_stats_aggr(
 
 
 def get_null_count_aggr(
-    columns_list, as_name="null_count_", no_ending_comma=False, empty_string_null=False
+    columns_list, as_name='null_count_', no_ending_comma=False, empty_string_null=False
 ):
     """Get Cloudera-valid expression counting nulls for columns."""
     rv = ""
     pre_clause = NULL_COUNT_CLAUSE
     if empty_string_null:
 
-        pre_clause = pre_clause.replace("IS NULL", "= ''")
+        pre_clause = pre_clause.replace('IS NULL', '= ''')
     for col in columns_list:
 
-        rv += pre_clause.format(col=col, as_col=as_name + col) + ",\n"
+        rv += pre_clause.format(col=col, as_col=as_name + col) + ',\n'
     if no_ending_comma:
 
-        rv = rv.rsplit(",", 1)[0]
+        rv = rv.rsplit(',', 1)[0]
 
     return rv
 
@@ -673,7 +673,7 @@ def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     """Get SQL Server-valid synthax for hashed-sampling an id clause.on
 
     Takes as imput a given sample_pct in (0, 1)."""
-    assert 0 < sample_pct < 1, f"{sample_pct} should be a float  in (0,1)"
+    assert 0 < sample_pct < 1, f'{sample_pct} should be a float  in (0,1)'
     int_pct = int(sample_pct * 100)
     rv = f"""
     AND ABS(CAST(HASHBYTES('SHA1',
