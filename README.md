@@ -38,3 +38,8 @@ python -c 'from muttlib import dbconn, utils'
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
 python -c 'from muttlib import ipynb_const, ipynb_utils'
 ```
+
+# Pre-Commit for Version Control Integration
+
+Use [pre-commit](https://pre-commit.com/). Once you've installed it locally then run
+`pre-commit install` and you are good to go.
