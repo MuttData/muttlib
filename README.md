@@ -47,7 +47,7 @@ Run coverage:
 py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
 ```
 
-That should generate a dir `cov_html/` inside that dir open index.html in your browser to see a per file visualization of the code that was executed during the tests.
+That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
 
 
 ## Dirty Dry-run (done dirt cheap)
