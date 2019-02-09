@@ -1,22 +1,28 @@
 repos:
--   repo: https://github.com/ambv/black
-    rev: stable
+-   repo: local
     hooks:
+    - id: isort
+      name: isort
+      entry: isort
+      language: system
+      types: [python]
     - id: black
-      language_version: python3.7
-
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.5
-    hooks:
-    -   id: flake8
-    additional_dependencies: [flake8-docstrings, flake8-bugbear]
-
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 55201b4da58d5ec5d934bbc3b32f8a2814f57fb6
-    hooks:
-    -   id: mypy
-
--   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: b6148ca8a12dcbd6e200b32291ae449532cad814
-    hooks:
-    -   id: pylint
+      name: black
+      entry: black
+      language: system
+      types: [python]
+    - id: flake8
+      name: flake8
+      entry: flake8
+      language: system
+      types: [python]
+    - id: mypy
+      name: mpypy
+      entry: mypy
+      language: system
+      types: [python]
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
