@@ -20,6 +20,13 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    setup_requires=['pytest-runner'],
+    tests_require=[
+        "pytest",
+        "pytest-cov",
+        "pytest-html",
+    ],
+    test_suite='test',
     install_requires=[
         "jinja2",
         "pandas",
