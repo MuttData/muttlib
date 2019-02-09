@@ -49,7 +49,7 @@ setuptools.setup(
         ],
         'dev': [
             'pre-commit',
-            'isort @ https://github.com/timothycrosley/isort.git@develop',
+            'isort @ https://github.com/timothycrosley/isort.git@develop#egg=isort',
             'flake8',
             'flake8-bugbear',
             'flake8-docstrings',
