@@ -18,7 +18,7 @@ from IPython.display import display
 from textwrap import wrap
 import matplotlib
 
-import utils
+import muttlib.utils as utils
 
 # Special back-end set to have the ipynb **not** use tkinter
 matplotlib.use('Agg')
