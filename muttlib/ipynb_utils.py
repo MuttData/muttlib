@@ -196,6 +196,7 @@ def top_categorical_vs_kdeplot(
             logger.info(
                 f"Factor level {grp} is skipped due to degenerate P distribution."
             )
+            continue
         sns.kdeplot(
             grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i], **kde_kwargs
         )
