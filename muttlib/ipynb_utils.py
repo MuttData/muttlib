@@ -3,6 +3,7 @@ import re
 import _string
 import subprocess
 from hashlib import md5
+import logging
 from functools import partial
 from pathlib import Path
 from string import Formatter
@@ -17,6 +18,9 @@ from IPython.display import display
 from textwrap import wrap
 import matplotlib
 
+import muttlib.utils as utils
+
+
 # Special back-end set to have the ipynb **not** use tkinter
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # NOQA
@@ -29,6 +33,8 @@ import matplotlib.dates as mdates  # NOQA
 
 # Cleanear matplotlib formatting
 from matplotlib import ticker  # NOQA
+
+logger = logging.getLogger(f'ipynb_utils.{__name__}')
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -85,16 +91,6 @@ def ab_split(id, salt, control_group_size: float):
     return ab_split > control_group_size
 
 
-def get_ordered_category_levels(df, cat_col, top_n=None):
-    """
-    Return a list of a categorical column's levels and num of levels.
-
-    Levels list are ordered by descending popularity.
-    """
-    rv = df[cat_col].value_counts().index[:top_n]
-    return rv, len(rv)
-
-
 def col_sample_display(
     df: pd.DataFrame,
     col: str,
@@ -125,7 +121,7 @@ def col_sample_display(
     try:
         pd.to_numeric(df[col].sample(num_sample))
         is_numeric_type = True
-    except Exception as e:
+    except ValueError:
         is_numeric_type = False
 
     if is_numeric_type or num_unique_vals < 15:
@@ -171,7 +167,7 @@ def top_categorical_vs_kdeplot(
     """
     # Get enough colors for our test
     palette = sns.color_palette('husl', num_category_levels)
-    top_values, _ = get_ordered_category_levels(
+    top_values, _ = utils.get_ordered_factor_levels(
         df, categorical_col, num_category_levels
     )
 
@@ -195,6 +191,12 @@ def top_categorical_vs_kdeplot(
     # Group and plot for each category level
     iterator = view.groupby(gr_condition)[numerical_col]
     for name, grp in iterator:
+        # Skip degeneerate  empirical distribution for this factor_level
+        if grp.max() == grp.min():
+            logger.info(
+                f"Factor level {grp} is skipped due to degenerate P distribution."
+            )
+            continue
         sns.kdeplot(
             grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i], **kde_kwargs
         )
@@ -374,20 +376,20 @@ def plot_category2category_pie_charts(
     The maximum category levels will filter out both categorical cols' "tail"
     levels.
     """
-    unique_levels, n_cols = get_ordered_category_levels(df, cat_col)
-    unique2_levels, _ = get_ordered_category_levels(df, cat2_col)
+    unique_levels, n_cols = utils.get_ordered_factor_levels(df, cat_col)
+    unique2_levels, _ = utils.get_ordered_factor_levels(df, cat2_col)
 
     if max_category_levels < len(unique_levels):
         col_name = f'reduced_{cat_col}'
         df[col_name] = category_reductor(df, cat_col, n_levels=max_category_levels)
         cat_col = col_name  # update new category col
-        unique_levels, n_cols = get_ordered_category_levels(df, cat_col)
+        unique_levels, n_cols = utils.get_ordered_factor_levels(df, cat_col)
 
     if max_category_levels < len(unique2_levels):
         col_name = f'reduced_{cat2_col}'
         df[col_name] = category_reductor(df, cat2_col, n_levels=max_category_levels)
         cat2_col = col_name  # update new category col
-        unique2_levels, _ = get_ordered_category_levels(df, cat2_col)
+        unique2_levels, _ = utils.get_ordered_factor_levels(df, cat2_col)
 
     # Plot pie charts
     fig, axes = plt.subplots(figsize=figsize)
@@ -543,7 +545,7 @@ def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
     This outputs a new cat col with reduced levels.
     It will not modify any null values in original category.
     """
-    top_levels, _ = get_ordered_category_levels(df, categorical_col, n_levels - 1)
+    top_levels, _ = utils.get_ordered_factor_levels(df, categorical_col, n_levels - 1)
 
     def sub_categorize(x, top_levels):
         """Reduce category series levels."""
