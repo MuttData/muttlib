@@ -3,6 +3,7 @@ import re
 import _string
 import subprocess
 from hashlib import md5
+import logging
 from functools import partial
 from pathlib import Path
 from string import Formatter
@@ -31,6 +32,8 @@ import matplotlib.dates as mdates  # NOQA
 
 # Cleanear matplotlib formatting
 from matplotlib import ticker  # NOQA
+
+logger = logging.getLogger(f'ipynb_utils.{__name__}')
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -187,6 +190,11 @@ def top_categorical_vs_kdeplot(
     # Group and plot for each category level
     iterator = view.groupby(gr_condition)[numerical_col]
     for name, grp in iterator:
+        # Skip degeneerate  empirical distribution for this factor_level
+        if grp.max() == grp.min():
+            logger.info(
+                f"Factor level {grp} is skipped due to degenerate P distribution."
+            )
         sns.kdeplot(
             grp, shade=True, alpha=0.4, label=f'{name}', color=palette[i], **kde_kwargs
         )
