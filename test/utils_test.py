@@ -42,41 +42,41 @@ def test_create_dict_id():
 def test_get_ordered_factor_levels():
     lst = ['cat', 'dog', 'cat', 'dog', 'cat', 'dog', 'horse', 'dog', 'horse',]
     df = pd.DataFrame({'olmcdonald': lst}, columns=['olmcdonald'])
-    df2 = utils.get_ordered_factor_levels(df,'olmcdonald')
+    factor_levels = utils.get_ordered_factor_levels(df,'olmcdonald')
 
-    assert np.array_equal(np.array(['dog', 'cat', 'horse']),df2[0])
-    assert 3 == df2[1]
+    assert np.array_equal(np.array(['dog', 'cat', 'horse']),factor_levels[0])
+    assert 3 == factor_levels[1]
     # Testing the other params
-    df2 = utils.get_ordered_factor_levels(df,'olmcdonald',2)
+    factor_levels = utils.get_ordered_factor_levels(df,'olmcdonald',2)
 
-    assert np.array_equal(np.array(['dog', 'cat']),df2[0])
-    assert 2 == df2[1]
+    assert np.array_equal(np.array(['dog', 'cat']),factor_levels[0])
+    assert 2 == factor_levels[1]
 
-    df2 = utils.get_ordered_factor_levels(df,'olmcdonald',2,4)
+    factor_levels = utils.get_ordered_factor_levels(df,'olmcdonald',2,4)
     
-    assert np.array_equal(np.array(['dog']),df2[0])
-    assert 1 == df2[1]
+    assert np.array_equal(np.array(['dog']),factor_levels[0])
+    assert 1 == factor_levels[1]
 
 def test_query_yes_no(monkeypatch):
     # Testing the possible defaults and rewriting the input for the valid or invalid inputs
     og = utils.__builtins__["input"]
     with pytest.raises(ValueError):
         utils.query_yes_no("hit or miss?", 's')
-    utils.__builtins__["input"] = lambda: ''
+    monkeypatch.setattr('builtins.input', lambda : '')
     assert False == utils.query_yes_no("hit or miss?")
-    utils.__builtins__["input"] = lambda: ''
+    monkeypatch.setattr('builtins.input', lambda : '')
     assert True == utils.query_yes_no("hit or miss?",'yes')
-    utils.__builtins__["input"] = lambda: 'yes'
+    monkeypatch.setattr('builtins.input', lambda : 'yes')
     assert True == utils.query_yes_no("hit or miss?")
-    utils.__builtins__["input"] = lambda: 'y'
+    monkeypatch.setattr('builtins.input', lambda : 'y')
     assert True == utils.query_yes_no("hit or miss?")
-    utils.__builtins__["input"] = lambda: 'ye'
+    monkeypatch.setattr('builtins.input', lambda : 'ye')
     assert True == utils.query_yes_no("hit or miss?")
-    utils.__builtins__["input"] = lambda: 'no'
+    monkeypatch.setattr('builtins.input', lambda : 'no')
     assert False == utils.query_yes_no("hit or miss?")
-    utils.__builtins__["input"] = lambda: 'n'
+    monkeypatch.setattr('builtins.input', lambda : 'n')
     assert False == utils.query_yes_no("hit or miss?")
-    utils.__builtins__["input"] = ['y', 'miss', 'miss'].pop
+    monkeypatch.setattr('builtins.input', ['y', 'miss', 'miss'].pop)
     assert True == utils.query_yes_no("hit or miss?")
 
     utils.__builtins__["input"] = og
