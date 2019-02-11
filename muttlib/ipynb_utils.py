@@ -20,6 +20,7 @@ import matplotlib
 
 import muttlib.utils as utils
 
+
 # Special back-end set to have the ipynb **not** use tkinter
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # NOQA
@@ -120,8 +121,9 @@ def col_sample_display(
     try:
         pd.to_numeric(df[col].sample(num_sample))
         is_numeric_type = True
-    except Exception as e:
+    except ValueError:
         is_numeric_type = False
+        logger.info
 
     if is_numeric_type or num_unique_vals < 15:
 
