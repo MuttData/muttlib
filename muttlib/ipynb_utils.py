@@ -123,7 +123,6 @@ def col_sample_display(
         is_numeric_type = True
     except ValueError:
         is_numeric_type = False
-        logger.info
 
     if is_numeric_type or num_unique_vals < 15:
 
