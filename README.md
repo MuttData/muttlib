@@ -50,6 +50,7 @@ There are two ways to install to these binaries:
 The easiest way to set this up is by first installing `pipx` with
 ```commandline
 pip install --user pipx
+pipx ensurepath
 ```
 and then use `pipx` to actually install the `pre-commit` binary along the linters and
 formatters globally:
