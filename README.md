@@ -72,7 +72,7 @@ the `pre-commit` hooks defined in `.pre-commit-config.yaml`.
 
 The binaries are also listed as `dev` packages in `setup.py`. Therefore you can
 alternatively install `muttlib` locally in a virtual environment using `pipenv`. To do
-that first clone the repo and then run
+that first clone the repo, `cd` into this `muttlib` folder and then run
 
 ```commandline
 pipenv install -e .[dev] --skip-lock
