@@ -49,7 +49,7 @@ There are two ways to install to these binaries:
 
 The easiest way to set this up is by first installing `pipx` with
 ```commandline
-pip install --user pipx
+pip3 install --user pipx
 pipx ensurepath
 ```
 and then use `pipx` to actually install the `pre-commit` binary along the linters and
@@ -64,9 +64,9 @@ pipx install mypy --verbose
 pipx install pylint --verbose
 ```
 
-Once that's done then simply run `pre-commit install` and you are good to go: every time
-you do a `git commit` it will run the `pre-commit` hooks defined in
-`.pre-commit-config.yaml`.
+Once that's done, `cd` into the repo where `.pre-commit-config.yaml` exists, run
+`pre-commit install` and you are good to go: every time you do a `git commit` it will run
+the `pre-commit` hooks defined in `.pre-commit-config.yaml`.
 
 ## Local install of binaries
 
