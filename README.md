@@ -65,7 +65,6 @@ formatters globally:
 
 ```commandline
 pipx install pre-commit --verbose
-pipx install isort --spec git+https://github.com/timothycrosley/isort@develop#egg=isort[pyproject] --verbose
 pipx install flake8 --spec git+https://github.com/PyCQA/flake8 --verbose
 pipx inject flake8 flake8-bugbear flake8-docstrings --verbose
 pipx install black --verbose

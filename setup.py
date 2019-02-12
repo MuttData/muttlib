@@ -49,7 +49,6 @@ setuptools.setup(
         ],
         'dev': [
             'pre-commit',
-            'isort @ https://github.com/timothycrosley/isort/archive/develop.zip#egg=isort[pyproject]',  # noqa
             'flake8',
             'flake8-bugbear',
             'flake8-docstrings',
