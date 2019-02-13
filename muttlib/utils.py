@@ -60,9 +60,9 @@ def local_df_cache(
     cache_fn='cache_file',
     cache_dir='/tmp/',
     cache_format='pickle',
-    cache_hit_msg="Reading cached data from file: ",
-    cache_miss_msg="Cache missing for file: ",
-    cache_put_msg="Saving data to file: ",
+    cache_hit_msg='Reading cached data from file: ',
+    cache_miss_msg='Cache missing for file: ',
+    cache_put_msg='Saving data to file: ',
 ):
     """Decorate the target function to cache ouputed DataFrames.
 
@@ -129,14 +129,14 @@ def local_df_cache(
             else:
                 cache_fn = cache_fn
 
-            base_fn = f'{cache_fn}.{cache_format}'
+            base_fn = f"{cache_fn}.{cache_format}"
             cache_fn = os.path.join(cache_dir, base_fn)
             if use_cache:
                 if os.access(cache_fn, os.R_OK):
-                    logger.debug(f'{cache_hit_msg}{cache_fn}')
+                    logger.debug(f"{cache_hit_msg}{cache_fn}")
                     return df_read_multi(cache_fn)
                 else:
-                    logger.debug(f'{cache_miss_msg}{cache_fn}')
+                    logger.debug(f"{cache_miss_msg}{cache_fn}")
 
             rv = func(*args, **kwargs)
 
@@ -317,8 +317,7 @@ def get_semi_month_pay_days(start_date, end_date):
     second_semimonth_pay_days = [
         ts + offsets.Day(14) for ts in first_semimonth_pay_days
     ]
-    SEMIMONTH_PAY_DAYS = first_semimonth_pay_days + second_semimonth_pay_days
-    SEMIMONTH_PAY_DAYS.sort()
+    SEMIMONTH_PAY_DAYS = sorted(first_semimonth_pay_days + second_semimonth_pay_days)
     return SEMIMONTH_PAY_DAYS
 
 
@@ -342,7 +341,7 @@ def create_dict_id(d, length=10):
     return shake.hexdigest(int(length / 2))
 
 
-def query_yes_no(question, default="no"):
+def query_yes_no(question, default='no'):
     """Ask a yes/no question via input() and return their answer.
 
     "question" is a string that is presented to the user.
@@ -354,13 +353,13 @@ def query_yes_no(question, default="no"):
 
     https://stackoverflow.com/questions/3041986/apt-command-line-interface-like-yes-no-input
     """
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    valid = {'yes': True, 'y': True, 'ye': True, 'no': False, 'n': False}
     if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
+        prompt = ' [y/n] '
+    elif default == 'yes':
+        prompt = ' [Y/n] '
+    elif default == 'no':
+        prompt = ' [y/N] '
     else:
         raise ValueError("invalid default answer: '%s'" % default)
 
@@ -389,10 +388,11 @@ def get_ordered_factor_levels(df, col, top_n=None, min_counts=None):
         rv = rv[:top_n]
     return rv.index.values, len(rv)
 
-    def normalize_arr(arr):
-        """Normalize a numpy array to sum 1."""
-        arr_sum = pd.np.sum(arr, axis=0)
-        return 1.0 * arr / arr_sum if arr_sum != 0 else arr
+
+def normalize_arr(arr): 
+    """Normalize a numpy array to sum 1."""
+    arr_sum = pd.np.sum(arr, axis=0)
+    return 1.0 * arr / arr_sum if arr_sum != 0 else arr
 
 
 def apply_time_bounds(df, sd, ed, ds_col):
@@ -499,7 +499,7 @@ def template(path_or_str, **kwargs):
         lstrip_blocks=kwargs.pop('lstrip_blocks', True),
         **kwargs,
     )
-    jinja2.filters.FILTERS['inclause'] = format_in_clause
+    environment.filters['inclause'] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))
 
 
@@ -508,7 +508,7 @@ def render_jinja_template(path_or_str, jparams={}):
     # Standarize to pathlib object, supports str objects
     pat = Path(path_or_str).expanduser().resolve().as_posix()
     if pd.np.DataSource().exists(pat):
-        logger.debug(f"Loading jinja template from {pat}.")
+        logger.debug(f'Loading jinja template from {pat}.')
     return template(path_or_str).render(**jparams)
 
 
@@ -523,21 +523,21 @@ def get_cloudera_sql_stats_aggr(
 ):
     """Get Cloudera-valid battery of statistical aggregations clause."""
     rv_l = [
-        f"SUM({input_expression}) AS sum",
-        f"AVG({input_expression}) AS mean",
-        f"APPX_MEDIAN({input_expression}) AS median",
+        f'SUM({input_expression}) AS sum',
+        f'AVG({input_expression}) AS mean',
+        f'APPX_MEDIAN({input_expression}) AS median',
     ]
 
     if with_minmax:
-        rv_l.append(f"MIN({input_expression}) AS min")
-        rv_l.append(f"MAX({input_expression}) AS max")
+        rv_l.append(f'MIN({input_expression}) AS min')
+        rv_l.append(f'MAX({input_expression}) AS max')
     if with_std:
-        rv_l.append(f"STDDEV({input_expression}) AS std")
+        rv_l.append(f'STDDEV({input_expression}) AS std')
     if with_ndv:
-        rv_l.append(f"NDV({input_expression}) AS unique")
+        rv_l.append(f'NDV({input_expression}) AS unique')
     if with_count:
         rv_l.append(f'COUNT({input_expression}) AS count_rows')
-    rv = ",\n".join([f"{i}_{as_name}" for i in rv_l]) + ","
+    rv = ',\n'.join([f'{i}_{as_name}' for i in rv_l]) + ','
     if not ends_comma:
         rv = rv[:-1]
     return rv
@@ -559,10 +559,10 @@ def get_cloudera_hashed_sample_clause(col_or_exp, sample_pct):
     This will work on an id col or on a given expression that outputs
     a valid column. It takes a sample_pct number between 0 and 1.
     """
-    assert 0 < sample_pct < 1, f"{sample_pct} should be a float  in (0,1)"
+    assert 0 < sample_pct < 1, f'{sample_pct} should be a float  in (0,1)'
 
     threshold_int = get_cloudera_sample_cut(sample_lines_ratio=sample_pct)
-    rv = f"AND abs(fnv_hash(CAST({col_or_exp} AS bigint))) <= {threshold_int}"
+    rv = f'AND abs(fnv_hash(CAST({col_or_exp} AS bigint))) <= {threshold_int}'
 
     return rv
 
@@ -601,3 +601,134 @@ def str_normalize_pandas(data, str_replace_kws=None):
         if str_replace_kws:
             data = data.str.replace(**str_replace_kws)
     return data
+
+
+def df_optimize_float_types(
+    df, type_mappings={"float64": "float16", "float32": "float16"}
+):
+    """Cast dataframe columns to more memory friendly types.
+
+    WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
+    Eg:
+    >>> n = 2**128
+    >>> np.float64(n), np.float32(n)
+    (3.402823669209385e+38, inf)
+    """
+    new_dtypes = {c: type_mappings.get(t.name, t) for c, t in df.dtypes.iteritems()}
+    df = df.astype(new_dtypes, copy=False)
+    return df
+
+
+def df_replace_empty_strs_null(df):
+    """Replace whitespace or empty strs with nan values."""
+    str_cols = df.select_dtypes(include='object').columns.tolist()
+    if str_cols:
+        logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
+        df[str_cols].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
+    return df
+
+
+def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
+    """Drop null columns in df, for null share over a certain threshold."""
+    # Note: Pandas treats string columns as `object` data types
+    logger.debug(
+        f'Dropping columns with null ratio greater than {max_null_prop:.2%}...'
+    )
+    df = df_replace_empty_strs_null(df)
+    null_means = df.isnull().mean()
+    null_mask = null_means < max_null_prop
+    null_mask[[c for c in df.columns if c in protected_cols]] = True
+    drop_cols = null_mask[~null_mask].index.tolist()
+    logger.debug(
+        f'Null proportions:\n'
+        f'{null_means.loc[drop_cols].sort_values(ascending=False)}'
+    )
+
+    logger.debug(f'Dropping the following {len(drop_cols)} columns:\n {drop_cols}')
+    df.drop(drop_cols, axis=1, inplace=True)
+    return df
+
+
+def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
+    """Drop low variance cols."""
+    std_values = df.std()
+    low_variance_cols = std_values < min_std_dev
+    low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
+    low_variance_cols = [c for c in low_variance_cols if c not in protected_cols]
+    logger.debug(
+        f'Dropping the following {len(low_variance_cols)} columns '
+        f'due to low variance:\n {low_variance_cols}'
+    )
+    df.drop(low_variance_cols, axis=1, inplace=True)
+    return df
+
+
+def df_drop_corr(df, target_col, max_corr=0.3, protected_cols=[]):
+    """Drop high correlated to-target cols."""
+    assert target_col in df.columns
+    corr_df = df.sample(frac=0.2).corr()
+    high_corr_cols = (abs(corr_df[target_col]) > max_corr)
+    high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
+    high_corr_cols = [
+        c for c in high_corr_cols if c not in protected_cols]
+    logger.debug(
+        f'Dropping the following {len(high_corr_cols)} columns due to high correlation '
+        f'with target:\n {high_corr_cols}'
+    )
+    df.drop(high_corr_cols, axis=1, inplace=True)
+    return df
+
+
+def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
+    """Get typed columns, excluding protected cols if passed."""
+    assert col_type in ('cat', 'num', 'date', 'bool', 'timedelta')
+    if col_type == 'cat':  # Work in cases, else dont define include var
+        include = ['object', 'category']
+    elif col_type == 'num':
+        include = [pd.np.number]
+    elif col_type == 'date':
+        include = ['datetime']
+    elif col_type in ('bool', 'timedelta'):
+        include = [col_type]
+    typed_cols = [
+        c for c in df.select_dtypes(include=include).columns if c not in protected_cols
+    ]
+    return typed_cols
+
+
+def df_encode_categorical_dummies(
+    df, cat_cols=[], skip_cols=[], top=25, other_val='OTHER'
+):
+    """Encode categorical columns into dummies."""
+    pre_dummy_cols = df.columns.tolist()
+    cat_cols = df_get_typed_cols(df, col_type='cat') if cat_cols == [] else cat_cols
+    cat_cols = [c for c in cat_cols if c not in skip_cols]
+
+    for c in cat_cols:
+        top_categories = df[c].value_counts().index.values[0:top]
+        df[c] = df[c].where(df[c].isin(top_categories), other=other_val)
+
+    logger.debug(f'Getting dummies from these top categories:{cat_cols}...')
+    df = pd.get_dummies(df, columns=cat_cols, drop_first=False)
+    dummy_cols = list(set(df.columns.tolist()) - set(pre_dummy_cols))
+    logger.debug(
+        f'{len(df.columns)} columns after dummies:\n {sorted(df.columns.tolist())}'
+    )
+    return df, dummy_cols
+
+
+def df_drop_single_factor_level(df):
+    """Drop categorical columns with null or 1 level."""
+    cat_cols = df_get_typed_cols(df, col_type='cat')
+    cols_to_drop = []
+    for c in cat_cols:
+        val_count = df[c].value_counts(dropna=False)
+        vals = val_count.index.tolist()
+        if (len(vals) == 2 and '' in vals) or (len(vals) == 1):
+            cols_to_drop.append(c)
+    logger.debug(
+        f'Dropping the following {len(cols_to_drop)} columns with low factor levels:'
+        f'\n {cols_to_drop}.'
+    )
+    df.drop(cols_to_drop, axis=1, inplace=True)
+    return df
