@@ -7,7 +7,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='muttlib-mutt',
+    name='muttlib',
     version=muttlib.__version__,
     author='Mutt Data',
     author_email='pablo@muttdata.ai',
@@ -45,7 +45,7 @@ setuptools.setup(
             'pandas',
             'seaborn',
             'tabulate',
-            'textwrap',
+            'textwrap3',
         ],
         'dev': [
             'pre-commit',
