@@ -1,4 +1,4 @@
-# pylint:disable=W0611, W0123, E1101
+# pylint:disable=W0611, E1101
 
 from muttlib import utils
 import datetime
@@ -8,67 +8,38 @@ from collections import OrderedDict, namedtuple, deque  # noqa: F401
 import pandas as pd
 import numpy as np
 
-timestamps_inclause = (
-    pd.Timestamp('2018-06-17 00:00:00'),
-    pd.Timestamp('2018-10-21 00:00:00'),
-    pd.Timestamp('2018-08-19 00:00:00'),
-)
-
 
 @pytest.mark.parametrize(
     "test_input,expected",
     [
+        ('2019-10-25 18:35:22', datetime.datetime(2019, 10, 25, 18, 35, 22)),
+        ('2019-10-25', datetime.datetime(2019, 10, 25, 0, 0)),
         (
-            "utils.str_to_datetime('2019-10-25 18:35:22')",
-            datetime.datetime(2019, 10, 25, 18, 35, 22),
-        ),
-        ("utils.str_to_datetime('2019-10-25')", datetime.datetime(2019, 10, 25, 0, 0)),
-        (
-            "utils.str_to_datetime('2019-10-25 18:35:22.000333')",
+            '2019-10-25 18:35:22.000333',
             datetime.datetime(2019, 10, 25, 18, 35, 22, 333),
         ),
-        (
-            "utils.str_to_datetime('18:35:22.000333')",
-            datetime.datetime(1900, 1, 1, 18, 35, 22, 333),
-        ),
-        (
-            "utils.str_to_datetime('18:35:22')",
-            datetime.datetime(1900, 1, 1, 18, 35, 22),
-        ),
-        (
-            "utils.str_to_datetime('20191025T18:35:22')",
-            datetime.datetime(2019, 10, 25, 18, 35, 22),
-        ),
-        (
-            "utils.str_to_datetime('2019-10-25T18:35:22')",
-            datetime.datetime(2019, 10, 25, 18, 35, 22),
-        ),
-        ("utils.str_to_datetime('20191025')", datetime.datetime(2019, 10, 25, 0, 0)),
-        (
-            "utils.str_to_datetime('2019-10-25T18')",
-            datetime.datetime(2019, 10, 25, 18, 0),
-        ),
-        ("utils.str_to_datetime('201910')", datetime.datetime(2019, 10, 1, 0, 0)),
+        ('18:35:22.000333', datetime.datetime(1900, 1, 1, 18, 35, 22, 333)),
+        ('18:35:22', datetime.datetime(1900, 1, 1, 18, 35, 22)),
+        ('20191025T18:35:22', datetime.datetime(2019, 10, 25, 18, 35, 22)),
+        ('2019-10-25T18:35:22', datetime.datetime(2019, 10, 25, 18, 35, 22)),
+        ('20191025', datetime.datetime(2019, 10, 25, 0, 0)),
+        ('2019-10-25T18', datetime.datetime(2019, 10, 25, 18, 0)),
+        ('201910', datetime.datetime(2019, 10, 1, 0, 0)),
     ],
 )
 def test_str_to_datetime(test_input, expected):
     # Testing all posible datetime formats and the exception for wrong format
-    assert eval(test_input) == expected
+    assert utils.str_to_datetime(test_input) == expected
     with pytest.raises(ValueError):
         utils.str_to_datetime("25/10/2019")
 
 
 @pytest.mark.parametrize(
     "test_input,expected",
-    [
-        (
-            "namedtuple('mr','meeseeks') ('look at me')",
-            utils.dict_to_namedtuple('mr', {'meeseeks': 'look at me'}),
-        )
-    ],
+    [('look at me', utils.dict_to_namedtuple('mr', {'meeseeks': 'look at me'}))],
 )
 def test_dict_to_namedtuple(test_input, expected):
-    assert eval(test_input) == expected
+    assert namedtuple('mr', 'meeseeks')(test_input) == expected
 
 
 def test_create_dict_id():
@@ -224,14 +195,19 @@ def test_get_fathers_mothers_kids_day():
 @pytest.mark.parametrize(
     "test_input,expected",
     [
-        ("utils.is_special_day(datetime.datetime(2018,1,18),timestamps_inclause)", 0),
-        ("utils.is_special_day(datetime.datetime(2018,6,17),timestamps_inclause)", 1),
-        ("utils.is_special_day('2018-01-18',timestamps_inclause)", 0),
-        ("utils.is_special_day('2018-06-17',timestamps_inclause)", 1),
+        (datetime.datetime(2018, 1, 18), 0),
+        (datetime.datetime(2018, 6, 17), 1),
+        ('2018-01-18', 0),
+        ('2018-06-17', 1),
     ],
 )
 def test_is_special_day(test_input, expected):
-    assert eval(test_input) == expected
+    timestamps_inclause = (
+        pd.Timestamp('2018-06-17 00:00:00'),
+        pd.Timestamp('2018-10-21 00:00:00'),
+        pd.Timestamp('2018-08-19 00:00:00'),
+    )
+    assert utils.is_special_day(test_input, timestamps_inclause) == expected
 
 
 def test_get_friends_day():
