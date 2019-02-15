@@ -5,5 +5,5 @@ before_script:
 
 test:
   script:
-  - cd /builds/mutt_data/
+  - cd /builds/mutt_data/muttlib/
   - python setup.py test
