@@ -12,7 +12,7 @@ import numpy as np
 @pytest.mark.parametrize(
     "test_input,expected",
     [
-        ('2019-10-25 18:35:20', datetime.datetime(2019, 10, 25, 18, 35, 22)),
+        ('2019-10-25 18:35:22', datetime.datetime(2019, 10, 25, 18, 35, 22)),
         ('2019-10-25', datetime.datetime(2019, 10, 25, 0, 0)),
         (
             '2019-10-25 18:35:22.000333',
