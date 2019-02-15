@@ -11,6 +11,6 @@ test:
   - mkdir dirty_run_test
   - cd dirty_run_test/
   - pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
-  - python -c 'from muttlib import asdf,dbconn, utils'
+  - python -c 'from muttlib import dbconn, utils'
   - pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
   - python -c 'from muttlib import ipynb_const, ipynb_utils'
