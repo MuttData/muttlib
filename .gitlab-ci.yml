@@ -3,7 +3,14 @@ image: python:3.7
 before_script:
   - apt-get update
 
+
 test:
   script:
   - cd /builds/mutt_data/muttlib/
   - python setup.py test
+  - mkdir dirty_run_test
+  - cd dirty_run_test/
+  - pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+  - python -c 'from muttlib import dbconn, utils'
+  - pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+  - python -c 'from muttlib import ipynb_const, ipynb_utils'
