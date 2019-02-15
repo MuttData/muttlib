@@ -1,0 +1,9 @@
+image: python:3.7
+
+before_script:
+  - apt-get update
+
+test:
+  script:
+  - cd /builds/mutt_data/muttlib/
+  - python setup.py test
