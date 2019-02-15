@@ -2,9 +2,8 @@ image: python:3.7
 
 before_script:
   - apt-get update
-  - git clone https://gitlab.com/mutt_data/muttlib.git
 
 test:
   script:
-  - cd muttlib/
+  - cd /builds/mutt_data/
   - python setup.py test
