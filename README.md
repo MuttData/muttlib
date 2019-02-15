@@ -77,7 +77,7 @@ pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 
 ```commandline
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
->>>>>>> master
+
 python -c 'from muttlib import dbconn, utils'
 
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
