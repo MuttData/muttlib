@@ -136,5 +136,5 @@ If your commit message contains [ci skip] or [skip ci], using any capitalization
 
 Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer:
 
-git push -o ci.ski
+git push -o ci.skip
 https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds
