@@ -12,7 +12,7 @@ import numpy as np
 @pytest.mark.parametrize(
     "test_input,expected",
     [
-        ('2019-10-25 18:35:22', datetime.datetime(2019, 10, 25, 18, 35, 22)),
+        ('2019-10-25 18:35:20', datetime.datetime(2019, 10, 25, 18, 35, 22)),
         ('2019-10-25', datetime.datetime(2019, 10, 25, 0, 0)),
         (
             '2019-10-25 18:35:22.000333',
@@ -268,9 +268,6 @@ def test_non_empty_dirs(tmpdir):
     assert [str(Path(p).parent)] == utils.non_empty_dirs(Path(p).parent)
 
 
-# WIP
-
-
 def test_render_jinja_template(tmpdir):
     tmp_template = (
         "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
@@ -284,7 +281,6 @@ def test_render_jinja_template(tmpdir):
     assert str_template == utils.render_jinja_template(tmp_template, params)
 
 
-# [TODO] Need to make special shit for this ones
 def test_make_dirs(tmpdir):
     p = tmpdir.mkdir("sub")
 
