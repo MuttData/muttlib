@@ -131,10 +131,12 @@ shell at the time of `git commit` you'll then have to run `git commit` from with
 `pipenv` subshell by first running `pipenv shell`.
 
 
-### Skipping CI jobs
+### CI jobs
+The CI Jobs will run all the tests in the test dir for every push you make and if it fail it will disable the option to make a merge of that branch. 
 If your commit message contains [ci skip] or [skip ci], using any capitalization, the commit will be created but the pipeline will be skipped.
 
 Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer:
 
 git push -o ci.skip
-https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds
+more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds
+`#F00 IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
