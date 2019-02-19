@@ -139,4 +139,4 @@ Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or new
 
 git push -o ci.skip
 more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds
-`#F00 IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
+`IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
