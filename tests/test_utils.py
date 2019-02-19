@@ -95,6 +95,7 @@ def test_path_or_string(tmpdir):
     p = tmpdir.mkdir("sub").join("test.txt")
     p.write("True")
     assert 'True' == utils.path_or_string(p)
+    assert 'show me what you got' == utils.path_or_string("show me what you got")
 
 
 def test_hash_str():
