@@ -341,6 +341,11 @@ def test_df_to_multi(tmpdir):
         utils.df_to_multi(df_test, fn)
 
 
+def test_convert_to_snake_case():
+    test_str = 'meme_review_best_news_source'
+    assert test_str == utils.convert_to_snake_case("MemeReviewBestNewsSource")
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
