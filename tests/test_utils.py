@@ -288,6 +288,33 @@ def test_make_dirs(tmpdir):
     assert str(p) == utils.make_dirs(p)
 
 
+def test_df_read_multi(tmpdir):
+    # I tried to refactor this to a list of dics but I had a problem with the index=false for the csv
+    p = tmpdir.mkdir("sub")
+    df_test = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
+    )
+    # test for csv
+    fn = p.join("test.csv")
+    df_test.to_csv(fn, index=False)
+    assert df_test.equals(utils.df_read_multi(fn))
+    # test for feather
+    fn = p.join("test.feather")
+    df_test.to_feather(fn)
+    pd.read_feather(fn)
+    assert df_test.equals(utils.df_read_multi(fn))
+    # test for pickle
+    fn = p.join("test.pickle")
+    df_test.to_pickle(fn)
+    pd.read_pickle(fn)
+    assert df_test.equals(utils.df_read_multi(fn))
+
+    with pytest.raises(ValueError):
+        fn = p.join("test.test")
+        fn.write("the sins of the father")
+        utils.df_read_multi(fn)
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
