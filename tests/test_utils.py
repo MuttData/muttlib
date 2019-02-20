@@ -289,7 +289,7 @@ def test_make_dirs(tmpdir):
 
 
 def test_df_read_multi(tmpdir):
-    # I tried to refactor this to a list of dics but I had a problem with the index=false for the csv
+    # I should refactor this test with a list or something using functools import partial for the csv case
     p = tmpdir.mkdir("sub")
     df_test = pd.DataFrame(
         np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
@@ -313,6 +313,32 @@ def test_df_read_multi(tmpdir):
         fn = p.join("test.test")
         fn.write("the sins of the father")
         utils.df_read_multi(fn)
+
+
+def test_df_to_multi(tmpdir):
+    p = tmpdir.mkdir("sub")
+    df_test = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
+    )
+    # test for csv
+    fn = p.join('test.csv')
+    utils.df_to_multi(df_test, fn)
+    df = pd.read_csv(fn, index_col=False)
+    assert df.equals(df_test)
+    # test for feather
+    fn = p.join('test.feather')
+    utils.df_to_multi(df_test, fn)
+    df = pd.read_feather(fn)
+    assert df.equals(df_test)
+    # test for csv
+    fn = p.join('test.pickle')
+    utils.df_to_multi(df_test, fn)
+    df = pd.read_pickle(fn)
+    assert df.equals(df_test)
+
+    with pytest.raises(ValueError):
+        fn = p.join("test.test")
+        utils.df_to_multi(df_test, fn)
 
 
 # [WONT DO]
