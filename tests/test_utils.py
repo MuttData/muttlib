@@ -71,6 +71,8 @@ def test_query_yes_no(monkeypatch):
     og = utils.__builtins__["input"]
     with pytest.raises(ValueError):
         utils.query_yes_no("hit or miss?", 's')
+    monkeypatch.setattr('builtins.input', lambda: 'yes')
+    assert utils.query_yes_no("hit or miss?", default=None)
     monkeypatch.setattr('builtins.input', lambda: '')
     assert not utils.query_yes_no("hit or miss?")
     monkeypatch.setattr('builtins.input', lambda: '')
