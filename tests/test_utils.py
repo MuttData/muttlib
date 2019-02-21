@@ -346,6 +346,12 @@ def test_convert_to_snake_case():
     assert test_str == utils.convert_to_snake_case("MemeReviewBestNewsSource")
 
 
+def test_wrap_list_values_quotes():
+    test_lst = ["'6'", "'7'", "'8'", "'9'", "'1'", "'3'", "'5'"]
+
+    assert test_lst == utils.wrap_list_values_quotes([6, 7, 8, 9, 1, 3, 5])
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
