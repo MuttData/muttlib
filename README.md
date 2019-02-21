@@ -129,3 +129,12 @@ pipenv install -e .[dev] --skip-lock
 Since the `.pre-commit-config.yaml` forces `pre-commit` to execute the environment of the
 shell at the time of `git commit` you'll then have to run `git commit` from within a
 `pipenv` subshell by first running `pipenv shell`.
+
+
+### CI jobs
+The CI Jobs will run all the tests in the test dir for every push you make and if it fail it will disable the option to make a merge of that branch. 
+If your commit message contains [ci skip] or [skip ci], using any capitalization, the commit will be created but the pipeline will be skipped.
+
+Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer: `git push -o ci.skip`
+more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
+`IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
