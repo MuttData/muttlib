@@ -6,6 +6,7 @@ import pytest
 from pathlib import Path
 from collections import OrderedDict, namedtuple, deque  # noqa: F401
 import pandas as pd
+from pandas.tseries import offsets
 import numpy as np
 
 
@@ -350,6 +351,29 @@ def test_wrap_list_values_quotes():
     test_lst = ["'6'", "'7'", "'8'", "'9'", "'1'", "'3'", "'5'"]
 
     assert test_lst == utils.wrap_list_values_quotes([6, 7, 8, 9, 1, 3, 5])
+
+
+def test_range_datetime():
+    datetime_start = datetime.datetime(2019, 1, 15)
+    datetime_end = datetime.datetime(2019, 1, 20)
+    range_lst_no_offset = [
+        datetime.datetime(2019, 1, 15, 0, 0),
+        datetime.datetime(2019, 1, 16, 0, 0),
+        datetime.datetime(2019, 1, 17, 0, 0),
+        datetime.datetime(2019, 1, 18, 0, 0),
+        datetime.datetime(2019, 1, 19, 0, 0),
+        datetime.datetime(2019, 1, 20, 0, 0),
+    ]
+    range_lst_w_offset = [
+        datetime.datetime(2019, 1, 15, 0, 0),
+        datetime.datetime(2019, 1, 17, 0, 0),
+        datetime.datetime(2019, 1, 19, 0, 0),
+    ]
+
+    drange = utils.range_datetime(datetime_start, datetime_end)
+    assert range_lst_no_offset == list(drange)
+    drange = utils.range_datetime(datetime_start, datetime_end, offsets.Day(2))
+    assert range_lst_w_offset == list(drange)
 
 
 # [WONT DO]
