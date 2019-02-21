@@ -376,6 +376,11 @@ def test_range_datetime():
     assert range_lst_w_offset == list(drange)
 
 
+def test_get_first_fortnight_last_day():
+    day = utils.get_first_fortnight_last_day(datetime.datetime(2019, 1, 17))
+    assert datetime.datetime(2019, 1, 14) == day
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
