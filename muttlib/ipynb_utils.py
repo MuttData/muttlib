@@ -22,7 +22,7 @@ import muttlib.utils as utils
 
 
 # Special back-end set to have the ipynb **not** use tkinter
-matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
@@ -77,18 +77,18 @@ def list_vals_contains_str(in_list, val: str):
     return [s for s in in_list if val.lower() in s.lower()]
 
 
-def ab_split(id, salt, control_group_size: float):
+def ab_split(id_obj, salt, control_group_size: float):
     """Return True (for test) or False (for control).
 
     Logic is based on the ID string and salt.. The control_group_size number
     is between 0 and 1. This sets how big the control group is in perc.
     """
-    test_id = str(id) + '-' + str(salt)
+    test_id = str(id_obj) + '-' + str(salt)
     test_id_digest = md5(test_id.encode('ascii')).hexdigest()
     test_id_first_digits = test_id_digest[:6]
     test_id_last_int = int(test_id_first_digits, 16)
-    ab_split = test_id_last_int / 0xFFFFFF
-    return ab_split > control_group_size
+    split = test_id_last_int / 0xFFFFFF
+    return split > control_group_size
 
 
 def col_sample_display(
@@ -392,7 +392,7 @@ def plot_category2category_pie_charts(
         unique2_levels, _ = utils.get_ordered_factor_levels(df, cat2_col)
 
     # Plot pie charts
-    fig, axes = plt.subplots(figsize=figsize)
+    fig, axes = plt.subplots(figsize=figsize)  # pylint: disable=W0612
 
     # Remove unnecessary bounding box lines, xticks, yticks etc.
     for spine in plt.gca().spines.values():
@@ -436,6 +436,7 @@ def plot_timeseries(
     hourly_formatted=False,
     fig_ax=None,
     y_thousands_fmt=1000,
+    secondary_y_scale=False,
     fmt='-o',
     label=None,
     color=None,
@@ -471,12 +472,15 @@ def plot_timeseries(
     y_thousands_fmt : numeric, optional
         Format y-axis with thousand-ticks, activated when y-col median is over
         this numerical threshold.
+    secondary_y_scale : bool
+        To add another right-scale where to draw the series.    
     fmt : [matplotlib] str, optional
         The series's format string.
     label : [matplotlib] str, optional
         The series's legend name.
     color : [matplotlib] str, optional
         The series color.
+
     kwargs: dict, optional
         Additional matplotlib-kind of arguments passed to the matplotlib
         plotting functions.
@@ -494,6 +498,11 @@ def plot_timeseries(
 
     # Plot values on index
     plot_method = ax.plot_date if ix_date_type else ax.plot
+    if secondary_y_scale:
+        # instantiate a second axes that shares the same x-axis
+        ax2 = ax.twinx()
+        plot_method = ax2.plot_date if ix_date_type else ax2.plot
+
     plot_method(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
 
     if ix_date_type:
@@ -533,6 +542,7 @@ def plot_timeseries(
         ax.yaxis.set_major_formatter(
             ticker.FuncFormatter(lambda x, p: format(int(x), ','))
         )
+    fig.tight_layout()
     fig.set_size_inches(fig_size)
     plt.suptitle(wrap(title_str))
     ax.set_ylabel(y_col)
@@ -556,7 +566,7 @@ def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
 
     # Modify only non-null values
     rv = df[categorical_col].apply(
-        lambda x: sub_categorize(x) if (pd.notnull(x)) else x
+        lambda x: sub_categorize(x, top_levels) if (pd.notnull(x)) else x
     )
 
     return rv
