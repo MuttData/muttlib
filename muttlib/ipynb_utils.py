@@ -473,7 +473,8 @@ def plot_timeseries(
         Format y-axis with thousand-ticks, activated when y-col median is over
         this numerical threshold.
     secondary_y_scale : bool
-        To add another right-scale where to draw the series.    fmt : [matplotlib] str, optional
+        To add another right-scale where to draw the series.    
+    fmt : [matplotlib] str, optional
         The series's format string.
     label : [matplotlib] str, optional
         The series's legend name.
