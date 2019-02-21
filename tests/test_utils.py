@@ -383,6 +383,12 @@ def test_get_first_fortnight_last_day():
     assert datetime.datetime(2019, 1, 14) == day
 
 
+def test_normalize_arr():
+    arr = utils.normalize_arr(np.array([2, 5, 7, 6, 5]))
+    arr_test = np.array([0.08, 0.2, 0.28, 0.24, 0.2])
+    assert np.array_equal(arr, arr_test)
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
