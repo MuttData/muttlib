@@ -510,6 +510,14 @@ APPX_MEDIAN(plz kill me) AS median_None"""
     )
 
 
+def test_get_cloudera_sample_cut():
+    int_test_none = 9223372036854775807
+    int_test_not_none = 18446744073709551615
+
+    assert int_test_none == utils.get_cloudera_sample_cut(None)
+    assert int_test_not_none == utils.get_cloudera_sample_cut(2)
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
