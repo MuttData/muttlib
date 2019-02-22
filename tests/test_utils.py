@@ -459,6 +459,14 @@ def test_in_clause_requirement():
     assert not utils.in_clause_requirement(34)
 
 
+def test_format_in_clause():
+    str_test = "(walk,away,my,boy)"
+    with pytest.raises(utils.BadInClauseException):
+        utils.format_in_clause("hello")
+
+    assert str_test == utils.format_in_clause(["walk", "away", "my", "boy"])
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
