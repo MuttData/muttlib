@@ -467,6 +467,49 @@ def test_format_in_clause():
     assert str_test == utils.format_in_clause(["walk", "away", "my", "boy"])
 
 
+def test_get_cloudera_sql_stats_aggr():
+    str_test1 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,"""
+    str_test2 = """SUM(plz kill me) AS sum_tiny_Rick,
+AVG(plz kill me) AS mean_tiny_Rick,
+APPX_MEDIAN(plz kill me) AS median_tiny_Rick,"""
+    str_test3 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+MIN(plz kill me) AS min_None,
+MAX(plz kill me) AS max_None,"""
+    str_test4 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+STDDEV(plz kill me) AS std_None,"""
+    str_test5 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+NDV(plz kill me) AS unique_None,"""
+    str_test6 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+COUNT(plz kill me) AS count_rows_None,"""
+    str_test7 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None"""
+
+    assert str_test1 == utils.get_cloudera_sql_stats_aggr("plz kill me")
+    assert str_test2 == utils.get_cloudera_sql_stats_aggr("plz kill me", "tiny_Rick")
+    assert str_test3 == utils.get_cloudera_sql_stats_aggr(
+        "plz kill me", with_minmax=True
+    )
+    assert str_test4 == utils.get_cloudera_sql_stats_aggr("plz kill me", with_std=True)
+    assert str_test5 == utils.get_cloudera_sql_stats_aggr("plz kill me", with_ndv=True)
+    assert str_test6 == utils.get_cloudera_sql_stats_aggr(
+        "plz kill me", with_count=True
+    )
+    assert str_test7 == utils.get_cloudera_sql_stats_aggr(
+        "plz kill me", ends_comma=False
+    )
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
