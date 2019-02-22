@@ -389,7 +389,6 @@ def test_normalize_arr():
     assert np.array_equal(arr, arr_test)
 
 
-# [TODO] Need help with this one
 def test_apply_time_bounds():
     sd = '2019-01-02'
     ed = '2019-01-03'
@@ -407,6 +406,22 @@ def test_apply_time_bounds():
     df_test['date'] = pd.date_range(start='1/02/2019', end='1/03/2019', freq='D')
 
     assert utils.apply_time_bounds(df, sd, ed, 'date').equals(df_test)
+
+
+def test_normalize_ds_index():
+    # test ds_col in df. ds_col in index and ds_col not in ds
+    df = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
+    )
+
+    assert df.equals(utils.normalize_ds_index(df, 'b'))
+
+    df.index = df.index.rename('PLUS_ULTRA')
+
+    print(utils.normalize_ds_index(df, 'PLUS_ULTRA'))
+
+    with pytest.raises(ValueError):
+        utils.normalize_ds_index(df, 'not')
 
 
 # [WONT DO]
