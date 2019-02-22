@@ -389,6 +389,26 @@ def test_normalize_arr():
     assert np.array_equal(arr, arr_test)
 
 
+# [TODO] Need help with this one
+def test_apply_time_bounds():
+    sd = '2019-01-02'
+    ed = '2019-01-03'
+    df_test = pd.DataFrame(
+        np.array([[4, 5, 6], [7, 8, 9]]),
+        index=pd.date_range(start='1/02/2019', end='1/03/2019', freq='D'),
+    )
+    df = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [3, 2, 1], [6, 5, 4]]),
+        index=pd.date_range(start='1/1/2019', end='1/05/2019', freq='D'),
+    )
+    assert utils.apply_time_bounds(df, sd, ed, None).equals(df_test)
+
+    df['date'] = pd.date_range(start='1/1/2019', end='1/05/2019', freq='D')
+    df_test['date'] = pd.date_range(start='1/02/2019', end='1/03/2019', freq='D')
+
+    assert utils.apply_time_bounds(df, sd, ed, 'date').equals(df_test)
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
