@@ -98,7 +98,7 @@ class BaseClient:
         host = f"{self.host}{f':{self.port}' if self.port is not None else ''}"
         return f'{dialect}://{login}@{host}/{self.database}'
 
-    def _get_engine(self, custom_uri=None, connect_args=None, echo=False):
+    def get_engine(self, custom_uri=None, connect_args=None, echo=False):
         connect_args = {} if connect_args is None else connect_args
         if not self._engine:
             db_uri = custom_uri or self._db_uri
@@ -106,7 +106,7 @@ class BaseClient:
         return self._engine
 
     def _connect(self):
-        return self._get_engine().connect()
+        return self.get_engine().connect()
 
     @staticmethod
     def _cursor_columns(cursor):
@@ -163,7 +163,7 @@ class OracleClient(BaseClient):
             'encoding': 'UTF-8',
             'nencoding': 'UTF-8',
         }
-        conn = self._get_engine(custom_uri=db_uri, connect_args=connect_args).connect()
+        conn = self.get_engine(custom_uri=db_uri, connect_args=connect_args).connect()
         if self.schema is not None:
             conn.connection.current_schema = self.schema
         return conn
