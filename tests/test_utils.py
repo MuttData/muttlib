@@ -431,6 +431,12 @@ def test_standarize_ts():
     assert np.array_equal(np.array(utils.standarize_ts(ts)), lst_test)
 
 
+def test_robust_standarize_ts():
+    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
+
+    assert df_test.equals(utils.robust_standarize_ts(pd.Series([2, 4, 6, 8, 10])))
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
