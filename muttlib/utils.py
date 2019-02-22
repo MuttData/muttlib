@@ -389,7 +389,7 @@ def get_ordered_factor_levels(df, col, top_n=None, min_counts=None):
     return rv.index.values, len(rv)
 
 
-def normalize_arr(arr): 
+def normalize_arr(arr):
     """Normalize a numpy array to sum 1."""
     arr_sum = pd.np.sum(arr, axis=0)
     return 1.0 * arr / arr_sum if arr_sum != 0 else arr
@@ -428,6 +428,7 @@ def robust_standarize_ts(ts_values):
     return (ts_values - ts_values.median()) / iqr(ts_values)
 
 
+# @Lizzard, @johngalt this function has a critical error when you pass non pandas obj
 def none_or_empty_pandas(obj):
     """Check if object is None or empty pd.Dataframe / pd.Series."""
     if obj is None:
@@ -667,10 +668,9 @@ def df_drop_corr(df, target_col, max_corr=0.3, protected_cols=[]):
     """Drop high correlated to-target cols."""
     assert target_col in df.columns
     corr_df = df.sample(frac=0.2).corr()
-    high_corr_cols = (abs(corr_df[target_col]) > max_corr)
+    high_corr_cols = abs(corr_df[target_col]) > max_corr
     high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
-    high_corr_cols = [
-        c for c in high_corr_cols if c not in protected_cols]
+    high_corr_cols = [c for c in high_corr_cols if c not in protected_cols]
     logger.debug(
         f'Dropping the following {len(high_corr_cols)} columns due to high correlation '
         f'with target:\n {high_corr_cols}'

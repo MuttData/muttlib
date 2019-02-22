@@ -437,6 +437,16 @@ def test_robust_standarize_ts():
     assert df_test.equals(utils.robust_standarize_ts(pd.Series([2, 4, 6, 8, 10])))
 
 
+def test_none_or_empty_pandas():
+    assert True == utils.none_or_empty_pandas(None)
+    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
+    assert False == utils.none_or_empty_pandas(df_test)
+    df_test = pd.DataFrame(np.linspace(-1.0, 1.0, num=5))
+    assert False == utils.none_or_empty_pandas(df_test)
+    df_test = 22
+    assert False == utils.none_or_empty_pandas(df_test)
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
