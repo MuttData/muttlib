@@ -424,6 +424,13 @@ def test_normalize_ds_index():
         utils.normalize_ds_index(df, 'not')
 
 
+def test_standarize_ts():
+    ts = pd.to_datetime(['1/2/2018', '1/4/2018', '1/6/2018', '1/8/2018', '1/10/2018'])
+    lst_test = np.array([-0.0, -0.25, -0.5, -0.75, -1.0])
+
+    assert np.array_equal(np.array(utils.standarize_ts(ts)), lst_test)
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
