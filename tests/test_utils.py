@@ -524,6 +524,24 @@ def test_get_cloudera_hashed_sample_clause():
     assert str_test == utils.get_cloudera_hashed_sample_clause(34, 0.5)
 
 
+def test_str_normalize_pandas():
+    # testing if lst returns as lst_test and the replace with kwargs.
+    lst = ["HeLLo", "darkñéSS", "mÿ", "odd", "frieñd"]
+    lst_test = ["hello", "darkness", "my", "odd", "friend"]
+    lst_test_repl = ["hello", "darkness", "my", "old", "friend"]
+    kwargs = {'pat': 'odd', 'repl': 'old'}
+
+    assert pd.DataFrame(lst_test).equals(utils.str_normalize_pandas(pd.DataFrame(lst)))
+    assert pd.DataFrame(lst_test_repl).equals(
+        utils.str_normalize_pandas(pd.DataFrame(lst), kwargs)
+    )
+    assert pd.Series(lst_test).equals(utils.str_normalize_pandas(pd.Series(lst)))
+    assert pd.Series(lst_test_repl).equals(
+        utils.str_normalize_pandas(pd.Series(lst), kwargs)
+    )
+    utils.str_normalize_pandas(22)  # this should raise a valueError exception
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
