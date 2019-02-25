@@ -517,6 +517,13 @@ def test_get_cloudera_sample_cut():
     assert int_test_not_none == utils.get_cloudera_sample_cut(2)
 
 
+def test_get_cloudera_hashed_sample_clause():
+    str_test = 'AND abs(fnv_hash(CAST(34 AS bigint))) <= 4611686018427387903'
+    # utils.get_cloudera_hashed_sample_clause(34,69) # This logic should be changed
+
+    assert str_test == utils.get_cloudera_hashed_sample_clause(34, 0.5)
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
