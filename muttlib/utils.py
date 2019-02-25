@@ -417,6 +417,7 @@ def normalize_ds_index(df, ds_col):
 
 def standarize_values(values):
     """Standarize array values with MinMAx."""
+    assert pd.np.issubdtype(values, pd.np.number)
     shifted_values = values - values.min()
     # Degenerate case when values array has all same input values
     if pd.np.count_nonzero(shifted_values) == 0:
@@ -426,6 +427,7 @@ def standarize_values(values):
 
 def robust_standarize_values(values):
     """Standarize values with InterQuartile Range and median."""
+    assert pd.np.issubdtype(values, pd.np.number)
     return (values - values.median()) / iqr(values)
 
 
