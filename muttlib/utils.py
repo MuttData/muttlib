@@ -436,7 +436,10 @@ def none_or_empty_pandas(obj):
     elif isinstance(obj, (pd.DataFrame, pd.Series)):
         return obj.empty
     else:
-        return False
+        raise ValueError(
+            "Argument type should be one of: "
+            f"'{(type(None) , pd.Series, pd.DataFrame)}'. Type passed was {type(obj)}"
+        )
 
 
 def hash_str(s, length=8):
