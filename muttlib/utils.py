@@ -424,9 +424,9 @@ def standarize_values(values):
     return shifted_values / (shifted_values.max() - shifted_values.min())
 
 
-def robust_standarize_ts(ts_values):
-    """Standarize timesries values with InterQuartile Range and median."""
-    return (ts_values - ts_values.median()) / iqr(ts_values)
+def robust_standarize_values(values):
+    """Standarize values with InterQuartile Range and median."""
+    return (values - values.median()) / iqr(values)
 
 
 def none_or_empty_pandas(obj):
