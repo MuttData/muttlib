@@ -445,9 +445,8 @@ def test_none_or_empty_pandas():
     assert not utils.none_or_empty_pandas(df_test)
     df_test = pd.DataFrame(np.linspace(-1.0, 1.0, num=5))
     assert not utils.none_or_empty_pandas(df_test)
-    assert not utils.none_or_empty_pandas(
-        34
-    )  # this should rise a value error or something
+    with pytest.raises(ValueError):
+        assert not utils.none_or_empty_pandas(34)
 
 
 def test_in_clause_requirement():
