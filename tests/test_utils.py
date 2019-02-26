@@ -424,19 +424,22 @@ def test_normalize_ds_index():
         utils.normalize_ds_index(df, 'not')
 
 
-def test_standarize_ts():
-    ts = pd.to_datetime(['1/2/2018', '1/4/2018', '1/6/2018', '1/8/2018', '1/10/2018'])
-    lst_test = np.array([-0.0, -0.25, -0.5, -0.75, -1.0])
+def test_standarize_values():
+    sr = pd.Series([2, 4, 6, 8, 10])
+    sr_test = pd.Series([0.0, 0.25, 0.5, 0.75, 1.0])
     test_ceros = pd.Series([0, 0, 0, 0, 0, 0])
 
-    assert test_ceros.equals(utils.standarize_ts(test_ceros))
-    assert np.array_equal(np.array(utils.standarize_ts(ts)), lst_test)
+    assert sr_test.equals(utils.standarize_values(sr))
+    assert test_ceros.equals(utils.standarize_values(test_ceros))
+
+    with pytest.raises(TypeError):
+        utils.standarize_values([1, 2, 3, 4, 5])
 
 
-def test_robust_standarize_ts():
-    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
+# def test_robust_standarize_ts():
+#     df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
 
-    assert df_test.equals(utils.robust_standarize_ts(pd.Series([2, 4, 6, 8, 10])))
+#     assert df_test.equals(utils.robust_standarize_ts(pd.Series([2, 4, 6, 8, 10])))
 
 
 def test_none_or_empty_pandas():
