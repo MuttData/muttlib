@@ -436,10 +436,12 @@ def test_standarize_values():
         utils.standarize_values([1, 2, 3, 4, 5])
 
 
-# def test_robust_standarize_ts():
-#     df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
+def test_robust_standarize_values():
+    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
 
-#     assert df_test.equals(utils.robust_standarize_ts(pd.Series([2, 4, 6, 8, 10])))
+    assert df_test.equals(utils.robust_standarize_values(pd.Series([2, 4, 6, 8, 10])))
+    with pytest.raises(TypeError):
+        utils.robust_standarize_values([1, 2, 3, 4, 5])
 
 
 def test_none_or_empty_pandas():
