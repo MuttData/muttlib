@@ -415,17 +415,20 @@ def normalize_ds_index(df, ds_col):
     return df
 
 
-def standarize_ts(ts_values):
-    """Standarize timesries values with MinMAx."""
-    # Degenerate case when array is all 0
-    if pd.np.count_nonzero(ts_values) == 0:
-        return ts_values
-    return (ts_values - ts_values.min()) / (ts_values.min() - ts_values.max())
+def standarize_values(values):
+    """Standarize array values with MinMAx."""
+    assert pd.np.issubdtype(values, pd.np.number)
+    shifted_values = values - values.min()
+    # Degenerate case when values array has all same input values
+    if pd.np.count_nonzero(shifted_values) == 0:
+        return values
+    return shifted_values / (shifted_values.max() - shifted_values.min())
 
 
-def robust_standarize_ts(ts_values):
-    """Standarize timesries values with InterQuartile Range and median."""
-    return (ts_values - ts_values.median()) / iqr(ts_values)
+def robust_standarize_values(values):
+    """Standarize values with InterQuartile Range and median."""
+    assert pd.np.issubdtype(values, pd.np.number)
+    return (values - values.median()) / iqr(values)
 
 
 def none_or_empty_pandas(obj):
