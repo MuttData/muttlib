@@ -564,6 +564,32 @@ def test_df_replace_empty_strs_null():
     assert df_test.equals(utils.df_replace_empty_strs_null(df))
 
 
+# [TODO] this needs a little more work, protected_cols is not working
+def test_df_drop_nulls():
+    df = pd.DataFrame(
+        {
+            'a': [pd.np.nan, pd.np.nan, "batman!"],
+            'b': [1, 2, 3],
+            'c': ["", "", "lider!"],
+        }
+    )
+    df_test = pd.DataFrame({'b': [1, 2, 3]})
+
+    assert df_test.equals(utils.df_drop_nulls(df))
+    # assert df_test.equals(utils.df_drop_nulls(df, protected_cols=['c']))
+
+
+# [TODO] Protected cols is not working here either
+def test_df_drop_std():
+    df = pd.DataFrame({'a': [0.01, 0.012, 0.013], 'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
+    df_test = pd.DataFrame({'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
+    df_test_diff_std = pd.DataFrame({'c': [2, 2, 3]})
+
+    assert df_test.equals(utils.df_drop_std(df))
+    assert df_test_diff_std.equals(utils.df_drop_std(df, min_std_dev=0.5))
+    # assert df_test_diff_std.equals(utils.df_drop_std(df, protected_cols=['a'])
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
