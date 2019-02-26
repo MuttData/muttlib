@@ -544,7 +544,8 @@ def test_str_normalize_pandas():
     assert pd.Series(lst_test_repl).equals(
         utils.str_normalize_pandas(pd.Series(lst), kwargs)
     )
-    utils.str_normalize_pandas(22)  # this should raise a valueError exception
+    with pytest.raises(TypeError):
+        utils.str_normalize_pandas(22)
 
 
 # this looks hard should I do it?

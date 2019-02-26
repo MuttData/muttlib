@@ -595,7 +595,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
             )
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
-
+        return data
     elif isinstance(data, pd.Series) and data.dtype == pd.np.object:
         data = (
             data.str.lower()
@@ -606,7 +606,9 @@ def str_normalize_pandas(data, str_replace_kws=None):
         )
         if str_replace_kws:
             data = data.str.replace(**str_replace_kws)
-    return data
+        return data
+    else:
+        raise TypeError(f"File format '{type(data)}' not supported!")
 
 
 def df_optimize_float_types(
