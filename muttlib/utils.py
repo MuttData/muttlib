@@ -428,7 +428,6 @@ def robust_standarize_ts(ts_values):
     return (ts_values - ts_values.median()) / iqr(ts_values)
 
 
-# @Lizzard, @johngalt this function has a critical error when you pass non pandas obj
 def none_or_empty_pandas(obj):
     """Check if object is None or empty pd.Dataframe / pd.Series."""
     if obj is None:
