@@ -557,6 +557,13 @@ def test_df_optimize_float_types():
     assert type16_test.dtypes.equals(utils.df_optimize_float_types(df32).dtypes)
 
 
+def test_df_replace_empty_strs_null():
+    df = pd.DataFrame([' ', " ", "batman!"])
+    df_test = pd.DataFrame([pd.np.nan, pd.np.nan, "batman!"])
+
+    assert df_test.equals(utils.df_replace_empty_strs_null(df))
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass

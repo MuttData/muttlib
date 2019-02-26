@@ -632,7 +632,8 @@ def df_replace_empty_strs_null(df):
     str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
         logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
-        df[str_cols].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
+        for col in str_cols:
+            df[col].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
     return df
 
 
