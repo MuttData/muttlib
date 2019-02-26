@@ -548,6 +548,15 @@ def test_str_normalize_pandas():
         utils.str_normalize_pandas(22)
 
 
+def test_df_optimize_float_types():
+    df64 = pd.DataFrame([2.0, 4.0, 5.0, 6.0, 8.0, 10.0], dtype='float64')
+    df32 = pd.DataFrame([2.0, 4.0, 5.0, 6.0, 8.0, 10.0], dtype='float32')
+    type16_test = pd.DataFrame([2.0, 4.0, 5.0, 6.0, 8.0, 10.0], dtype='float16')
+
+    assert type16_test.dtypes.equals(utils.df_optimize_float_types(df64).dtypes)
+    assert type16_test.dtypes.equals(utils.df_optimize_float_types(df32).dtypes)
+
+
 # this looks hard should I do it?
 # def test_setup_logging():
 # pass
