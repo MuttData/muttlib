@@ -564,7 +564,7 @@ def test_df_replace_empty_strs_null():
     assert df_test.equals(utils.df_replace_empty_strs_null(df))
 
 
-# [TODO] this needs a little more work, protected_cols is not working
+# [TODO] I cant make tests for protected_cols work
 def test_df_drop_nulls():
     df = pd.DataFrame(
         {
@@ -579,7 +579,7 @@ def test_df_drop_nulls():
     # assert df_test.equals(utils.df_drop_nulls(df, protected_cols=['c']))
 
 
-# [TODO] Protected cols is not working here either
+# [TODO] Protected cols is not tested here either
 def test_df_drop_std():
     df = pd.DataFrame({'a': [0.01, 0.012, 0.013], 'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
     df_test = pd.DataFrame({'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
@@ -588,6 +588,38 @@ def test_df_drop_std():
     assert df_test.equals(utils.df_drop_std(df))
     assert df_test_diff_std.equals(utils.df_drop_std(df, min_std_dev=0.5))
     # assert df_test_diff_std.equals(utils.df_drop_std(df, protected_cols=['a'])
+
+
+# [TODO] I FUCKING HATE PANDAS
+# def test_df_drop_corr():
+#     df = pd.DataFrame({'a': [0.01, 0.012, 0.013, 0.05], 'b': [2, 2, 3,2], 'c': [2, 2, 3,2]})
+#     with pytest.raises(AssertionError):
+#         utils.df_drop_corr(df, '34')
+
+#     utils.df_drop_corr(df, 'a')
+
+
+def test_df_get_typed_cols():
+    df = pd.DataFrame(
+        {
+            'a': [0.01, 0.012, 0.013],
+            'b': [True, True, False],
+            'c': [
+                datetime.datetime(2019, 10, 25),
+                datetime.datetime(2019, 10, 26),
+                datetime.datetime(2019, 10, 27),
+            ],
+            'd': ['bip', "bip", "Ritchie"],
+        }
+    )
+
+    assert pd.Series(utils.df_get_typed_cols(df)).equals(pd.Series(['d']))
+    assert pd.Series(utils.df_get_typed_cols(df, col_type='num')).equals(
+        pd.Series(['a'])
+    )
+    assert pd.Series(utils.df_get_typed_cols(df, col_type='date')).equals(
+        pd.Series(['c'])
+    )
 
 
 # this looks hard should I do it?
