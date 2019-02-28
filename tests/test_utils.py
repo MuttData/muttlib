@@ -593,13 +593,23 @@ def test_df_drop_std():
     assert df_test_protected.equals(utils.df_drop_std(df, protected_cols=['a']))
 
 
-# [TODO] I FUCKING HATE PANDAS
-# def test_df_drop_corr():
-#     df = pd.DataFrame({'a': [0.01, 0.012, 0.013, 0.05], 'b': [2, 2, 3,2], 'c': [2, 2, 3,2]})
-#     with pytest.raises(AssertionError):
-#         utils.df_drop_corr(df, '34')
+# [NTH] it will be cool to use some normal distribution for the df
+def test_df_drop_corr():
+    df = pd.DataFrame(
+        [(0.4, 0.3, 0.2), (0.4, 0.6, 0.3), (0.4, 0.0, 0.2), (0.7, 0.1, 0.5)],
+        columns=['a', 'b', 'c'],
+    )
+    df_test = pd.DataFrame(index=[0, 1, 2, 3])
 
-#     utils.df_drop_corr(df, 'a')
+    with pytest.raises(AssertionError):
+        utils.df_drop_corr(df.copy(), '34')
+
+    df_test.equals(utils.df_drop_corr(df.copy(), 'a', frac=1, random_state=42))
+
+    df_test = pd.DataFrame(data={'c': [0.2, 0.3, 0.2, 0.5]})
+    df_test.equals(
+        utils.df_drop_corr(df, 'a', protected_cols=['c'], frac=1, random_state=42)
+    )
 
 
 def test_df_get_typed_cols():
@@ -628,11 +638,42 @@ def test_df_get_typed_cols():
     assert pd.Series(utils.df_get_typed_cols(df)).equals(pd.Series(['d']))
 
 
-# [TODO] idk
-# def test_df_encode_categorical_dummies():
-# utils.df_encode_categorical_dummies()
-# def test_df_drop_single_factor_level():
-#     utils.df_drop_single_factor_level()
+def test_df_encode_categorical_dummies():
+    # df, cat_cols=[], skip_cols=[], top=25, other_val='OTHER'
+    df = pd.DataFrame(
+        [(0.4, "s", 0.2), (0.4, "m", 0.3), (0.4, "h", 0.2)], columns=['a', 'b', 'c']
+    )
+
+    df_test = pd.DataFrame(
+        [[0.4, 0.2, 0, 0, 1], [0.4, 0.3, 0, 1, 0], [0.4, 0.2, 1, 0, 0]],
+        columns=['a', 'c', 'b_h', 'b_m', 'b_s'],
+    )
+    df_test = df_test.astype(
+        dtype={
+            'a': 'float64',
+            'c': 'float64',
+            'b_h': 'uint8',
+            'b_m': 'uint8',
+            'b_s': 'uint8',
+        }
+    )
+    dummy_test = np.array(['b_m', 'b_h', 'b_s'])
+
+    df_res, dummy = utils.df_encode_categorical_dummies(df.copy(), ['b'])
+    assert df_test.equals(df_res)
+    assert np.array_equal(np.sort(dummy_test), np.sort(np.array(dummy)))
+
+    df_res, dummy = utils.df_encode_categorical_dummies(df.copy(), ['b'], ['b'])
+
+    assert df_res.equals(df)
+    assert not dummy
+
+
+def test_df_drop_single_factor_level():
+    df = pd.DataFrame([(0.4, "s", 0.2), (0.4, "", 0.3)], columns=['a', 'b', 'c'])
+    df_test = pd.DataFrame([(0.4, 0.2), (0.4, 0.3)], columns=['a', 'c'])
+
+    assert df_test.equals(utils.df_drop_single_factor_level(df))
 
 
 # this looks hard should I do it?

@@ -677,11 +677,13 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     return df
 
 
-def df_drop_corr(df, target_col, max_corr=0.3, protected_cols=[]):
+def df_drop_corr(
+    df, target_col, max_corr=0.3, protected_cols=[], frac=0.2, random_state=None
+):
     """Drop high correlated to-target cols."""
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     assert target_col in df.columns
-    corr_df = df.sample(frac=0.2).corr()
+    corr_df = df.sample(frac=frac, random_state=random_state).corr()
     high_corr_cols = abs(corr_df[target_col]) > max_corr
     high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
     high_corr_cols = [c for c in high_corr_cols if c not in protected_cols]
