@@ -418,8 +418,6 @@ def test_normalize_ds_index():
 
     df.index = df.index.rename('PLUS_ULTRA')
 
-    print(utils.normalize_ds_index(df, 'PLUS_ULTRA'))
-
     with pytest.raises(ValueError):
         utils.normalize_ds_index(df, 'not')
 
@@ -573,10 +571,12 @@ def test_df_drop_nulls():
             'c': ["", "", "lider!"],
         }
     )
-    df_test = pd.DataFrame({'b': [1, 2, 3]})
 
-    assert df_test.equals(utils.df_drop_nulls(df))
-    # assert df_test.equals(utils.df_drop_nulls(df, protected_cols=['c']))
+    df_test = pd.DataFrame({'b': [1, 2, 3]})
+    assert df_test.equals(utils.df_drop_nulls(df.copy()))
+
+    df_test = pd.DataFrame({'b': [1, 2, 3], 'c': [pd.np.nan, pd.np.nan, "lider!"]})
+    assert df_test.equals(utils.df_drop_nulls(df.copy(), protected_cols=['c']))
 
 
 # [TODO] Protected cols is not tested here either
@@ -613,13 +613,23 @@ def test_df_get_typed_cols():
         }
     )
 
-    assert pd.Series(utils.df_get_typed_cols(df)).equals(pd.Series(['d']))
     assert pd.Series(utils.df_get_typed_cols(df, col_type='num')).equals(
         pd.Series(['a'])
+    )
+    assert pd.Series(utils.df_get_typed_cols(df, col_type='bool')).equals(
+        pd.Series(['b'])
     )
     assert pd.Series(utils.df_get_typed_cols(df, col_type='date')).equals(
         pd.Series(['c'])
     )
+    assert pd.Series(utils.df_get_typed_cols(df)).equals(pd.Series(['d']))
+
+
+# [TODO] idk
+# def test_df_encode_categorical_dummies():
+# utils.df_encode_categorical_dummies()
+# def test_df_drop_single_factor_level():
+#     utils.df_drop_single_factor_level()
 
 
 # this looks hard should I do it?
