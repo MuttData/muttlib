@@ -647,9 +647,8 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     df = df_replace_empty_strs_null(df)
     null_means = df.isnull().mean()
     null_mask = null_means < max_null_prop
-    for c in protected_cols:
-        if c in protected_cols:
-            null_mask[c] = True
+
+    null_mask[[c for c in df.columns if c in protected_cols]] = True
     drop_cols = null_mask[~null_mask].index.tolist()
 
     logger.debug(
