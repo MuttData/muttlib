@@ -287,6 +287,21 @@ def test_make_dirs(tmpdir):
     assert str(p) == utils.make_dirs(p)
 
 
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ([], []),
+        ([4, 3, 2, 2, 1], [4, 3, 2, 1]),
+        ([1, 1, 1], [1]),
+        (['a', 'aa', []], ['a', 'aa', []]),
+    ],
+)
+def test_dedup_list(test_input, expected):
+    assert utils.dedup_list(test_input) == expected
+    with pytest.raises(ValueError):
+        utils.dedup_list("a")
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
