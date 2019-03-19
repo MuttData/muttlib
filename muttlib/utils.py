@@ -761,6 +761,9 @@ def dedup_list(li: list):
         >>> dedup_list([])
         []
     """
+    assert isinstance(li, list), ValueError(
+        f"Input argument should be a list. Value passed was: {li}."
+    )
     new_list: List[int] = []
     for val in li:
         if val not in new_list:
