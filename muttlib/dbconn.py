@@ -156,14 +156,18 @@ class OracleClient(BaseClient):
         super().__init__(dialect=dialect, **kwargs)
         self.schema = schema
 
-    def _connect(self):
+    @property
+    def _db_uri(self):
         dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.database)
         db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
+        return db_uri
+
+    def _connect(self):
         connect_args = {
             'encoding': 'UTF-8',
             'nencoding': 'UTF-8',
         }
-        conn = self.get_engine(custom_uri=db_uri, connect_args=connect_args).connect()
+        conn = self.get_engine(connect_args=connect_args).connect()
         if self.schema is not None:
             conn.connection.current_schema = self.schema
         return conn
