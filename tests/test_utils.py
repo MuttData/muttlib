@@ -298,7 +298,7 @@ def test_make_dirs(tmpdir):
 )
 def test_dedup_list(test_input, expected):
     assert utils.dedup_list(test_input) == expected
-    with pytest.raises(ValueError):
+    with pytest.raises(AssertionError):
         utils.dedup_list("a")
 
 
