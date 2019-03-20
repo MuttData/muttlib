@@ -13,7 +13,7 @@ from copy import deepcopy
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import jinja2
 import pandas as pd
@@ -761,10 +761,10 @@ def dedup_list(li: list):
         >>> dedup_list([])
         []
     """
-    assert isinstance(li, list), ValueError(
-        f"Input argument should be a list. Value passed was: {li}."
-    )
-    new_list: List[int] = []
+    assert isinstance(
+        li, list
+    ), f"Input argument should be a list. Value passed was: {li}."
+    new_list: List[Union[int, str, list]] = []
     for val in li:
         if val not in new_list:
             new_list.append(val)
