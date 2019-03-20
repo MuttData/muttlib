@@ -5,14 +5,8 @@ import datetime
 import pytest
 from pathlib import Path
 from collections import OrderedDict, namedtuple, deque  # noqa: F401
-from contextlib import contextmanager
 import pandas as pd
 import numpy as np
-
-
-@contextmanager
-def does_not_raise():
-    yield
 
 
 @pytest.mark.parametrize(
@@ -296,8 +290,8 @@ def test_make_dirs(tmpdir):
 @pytest.mark.parametrize(
     "example_input, expected",
     [
-        # pytest.raises(('test', None), exception=AssertionError),
-        ('test', pytest.raises(AssertionError)),
+        # TODO March 19, 2019: add parametrized raises, might be like:
+        # ('test', pytest.raises(AssertionError)),
         ([], []),
         ([4, 3, 2, 2, 1], [4, 3, 2, 1]),
         ([1, 1, 1], [1]),
@@ -306,6 +300,8 @@ def test_make_dirs(tmpdir):
 )
 def test_dedup_list(example_input, expected):
     assert utils.dedup_list(example_input) == expected
+    with pytest.raises(AssertionError):
+        utils.dedup_list("a")
 
 
 # [WONT DO]
