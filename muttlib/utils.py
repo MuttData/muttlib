@@ -13,6 +13,7 @@ from copy import deepcopy
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from typing import List, Union
 
 import jinja2
 import pandas as pd
@@ -237,11 +238,11 @@ def str_to_datetime(datetime_str):
         '%Y-%m-%dT%H',
         '%Y%m',
     )
-    for format in formats:
+    for frmt in formats:
         try:
-            return datetime.strptime(datetime_str, format)
+            return datetime.strptime(datetime_str, frmt)
         except ValueError:
-            if format is formats[-1]:
+            if frmt is formats[-1]:
                 raise
 
 
@@ -389,7 +390,7 @@ def get_ordered_factor_levels(df, col, top_n=None, min_counts=None):
     return rv.index.values, len(rv)
 
 
-def normalize_arr(arr): 
+def normalize_arr(arr):
     """Normalize a numpy array to sum 1."""
     arr_sum = pd.np.sum(arr, axis=0)
     return 1.0 * arr / arr_sum if arr_sum != 0 else arr
@@ -673,10 +674,9 @@ def df_drop_corr(df, target_col, max_corr=0.3, protected_cols=[]):
     """Drop high correlated to-target cols."""
     assert target_col in df.columns
     corr_df = df.sample(frac=0.2).corr()
-    high_corr_cols = (abs(corr_df[target_col]) > max_corr)
+    high_corr_cols = abs(corr_df[target_col]) > max_corr
     high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
-    high_corr_cols = [
-        c for c in high_corr_cols if c not in protected_cols]
+    high_corr_cols = [c for c in high_corr_cols if c not in protected_cols]
     logger.debug(
         f'Dropping the following {len(high_corr_cols)} columns due to high correlation '
         f'with target:\n {high_corr_cols}'
@@ -738,3 +738,34 @@ def df_drop_single_factor_level(df):
     )
     df.drop(cols_to_drop, axis=1, inplace=True)
     return df
+
+
+def dedup_list(li: list):
+    """
+    Deduplicates list while preserving order.
+
+    Note:
+        Not the same as `list(set(li))`.
+        Copied from https://stackoverflow.com/questions/31479188/quickest-way-to-dedupe-list-in-dict
+
+    Args:
+        li (list): list of elements. Can be empty.
+
+    Returns:
+        list: The deduplicated list.
+
+    Examples:
+        >>> dedup_list([1, 1, 'a'])
+        [1, 'a']
+
+        >>> dedup_list([])
+        []
+    """
+    assert isinstance(
+        li, list
+    ), f"Input argument should be a list. Value passed was: {li}."
+    new_list: List[Union[int, str, list]] = []
+    for val in li:
+        if val not in new_list:
+            new_list.append(val)
+    return new_list
