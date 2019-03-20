@@ -5,8 +5,14 @@ import datetime
 import pytest
 from pathlib import Path
 from collections import OrderedDict, namedtuple, deque  # noqa: F401
+from contextlib import contextmanager
 import pandas as pd
 import numpy as np
+
+
+@contextmanager
+def does_not_raise():
+    yield
 
 
 @pytest.mark.parametrize(
@@ -288,18 +294,18 @@ def test_make_dirs(tmpdir):
 
 
 @pytest.mark.parametrize(
-    "test_input,expected",
+    "example_input, expected",
     [
+        # pytest.raises(('test', None), exception=AssertionError),
+        ('test', pytest.raises(AssertionError)),
         ([], []),
         ([4, 3, 2, 2, 1], [4, 3, 2, 1]),
         ([1, 1, 1], [1]),
         (['a', 'aa', []], ['a', 'aa', []]),
     ],
 )
-def test_dedup_list(test_input, expected):
-    assert utils.dedup_list(test_input) == expected
-    with pytest.raises(AssertionError):
-        utils.dedup_list("a")
+def test_dedup_list(example_input, expected):
+    assert utils.dedup_list(example_input) == expected
 
 
 # [WONT DO]
