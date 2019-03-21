@@ -678,6 +678,24 @@ def test_df_drop_single_factor_level():
 # def test_setup_logging():
 # pass
 
+
+@pytest.mark.parametrize(
+    "example_input, expected",
+    [
+        # TODO March 19, 2019: add parametrized raises, might be like:
+        # ('test', pytest.raises(AssertionError)),
+        ([], []),
+        ([4, 3, 2, 2, 1], [4, 3, 2, 1]),
+        ([1, 1, 1], [1]),
+        (['a', 'aa', []], ['a', 'aa', []]),
+    ],
+)
+def test_dedup_list(example_input, expected):
+    assert utils.dedup_list(example_input) == expected
+    with pytest.raises(AssertionError):
+        utils.dedup_list("a")
+
+
 # [WONT DO]
 # def test_local_df_cache():
 #     pass

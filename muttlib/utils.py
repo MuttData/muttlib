@@ -13,6 +13,7 @@ from copy import deepcopy
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from typing import List, Union
 
 import jinja2
 import pandas as pd
@@ -237,11 +238,11 @@ def str_to_datetime(datetime_str):
         '%Y-%m-%dT%H',
         '%Y%m',
     )
-    for format in formats:
+    for frmt in formats:
         try:
-            return datetime.strptime(datetime_str, format)
+            return datetime.strptime(datetime_str, frmt)
         except ValueError:
-            if format is formats[-1]:
+            if frmt is formats[-1]:
                 raise
 
 
@@ -683,6 +684,7 @@ def df_drop_corr(
     """Drop high correlated to-target cols."""
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     assert target_col in df.columns
+
     corr_df = df.sample(frac=frac, random_state=random_state).corr()
     high_corr_cols = abs(corr_df[target_col]) > max_corr
     high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
@@ -749,3 +751,34 @@ def df_drop_single_factor_level(df):
     )
     df.drop(cols_to_drop, axis=1, inplace=True)
     return df
+
+
+def dedup_list(li: list):
+    """
+    Deduplicates list while preserving order.
+
+    Note:
+        Not the same as `list(set(li))`.
+        Copied from https://stackoverflow.com/questions/31479188/quickest-way-to-dedupe-list-in-dict
+
+    Args:
+        li (list): list of elements. Can be empty.
+
+    Returns:
+        list: The deduplicated list.
+
+    Examples:
+        >>> dedup_list([1, 1, 'a'])
+        [1, 'a']
+
+        >>> dedup_list([])
+        []
+    """
+    assert isinstance(
+        li, list
+    ), f"Input argument should be a list. Value passed was: {li}."
+    new_list: List[Union[int, str, list]] = []
+    for val in li:
+        if val not in new_list:
+            new_list.append(val)
+    return new_list
