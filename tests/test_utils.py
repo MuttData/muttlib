@@ -562,7 +562,6 @@ def test_df_replace_empty_strs_null():
     assert df_test.equals(utils.df_replace_empty_strs_null(df))
 
 
-# [TODO] I cant make tests for protected_cols work
 def test_df_drop_nulls():
     df = pd.DataFrame(
         {
@@ -579,7 +578,6 @@ def test_df_drop_nulls():
     assert df_test.equals(utils.df_drop_nulls(df.copy(), protected_cols=['c']))
 
 
-# [TODO] Protected cols is not tested here either
 def test_df_drop_std():
     df = pd.DataFrame({'a': [0.01, 0.012, 0.013], 'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
     df_test = pd.DataFrame({'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
