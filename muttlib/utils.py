@@ -596,7 +596,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
             )
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
-
+        return data
     elif isinstance(data, pd.Series) and data.dtype == pd.np.object:
         data = (
             data.str.lower()
@@ -607,7 +607,9 @@ def str_normalize_pandas(data, str_replace_kws=None):
         )
         if str_replace_kws:
             data = data.str.replace(**str_replace_kws)
-    return data
+        return data
+    else:
+        raise TypeError(f"File format '{type(data)}' not supported!")
 
 
 def df_optimize_float_types(
@@ -631,21 +633,25 @@ def df_replace_empty_strs_null(df):
     str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
         logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
-        df[str_cols].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
+        for col in str_cols:
+            df[col].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
     return df
 
 
 def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     """Drop null columns in df, for null share over a certain threshold."""
-    # Note: Pandas treats string columns as `object` data types
+    # Note: Pandas treats string columns as `object` data types.
+    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     logger.debug(
         f'Dropping columns with null ratio greater than {max_null_prop:.2%}...'
     )
     df = df_replace_empty_strs_null(df)
     null_means = df.isnull().mean()
     null_mask = null_means < max_null_prop
+
     null_mask[[c for c in df.columns if c in protected_cols]] = True
     drop_cols = null_mask[~null_mask].index.tolist()
+
     logger.debug(
         f'Null proportions:\n'
         f'{null_means.loc[drop_cols].sort_values(ascending=False)}'
@@ -653,11 +659,13 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
 
     logger.debug(f'Dropping the following {len(drop_cols)} columns:\n {drop_cols}')
     df.drop(drop_cols, axis=1, inplace=True)
+
     return df
 
 
 def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     """Drop low variance cols."""
+    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
@@ -670,10 +678,14 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     return df
 
 
-def df_drop_corr(df, target_col, max_corr=0.3, protected_cols=[]):
+def df_drop_corr(
+    df, target_col, max_corr=0.3, protected_cols=[], frac=0.2, random_state=None
+):
     """Drop high correlated to-target cols."""
+    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     assert target_col in df.columns
-    corr_df = df.sample(frac=0.2).corr()
+
+    corr_df = df.sample(frac=frac, random_state=random_state).corr()
     high_corr_cols = abs(corr_df[target_col]) > max_corr
     high_corr_cols = high_corr_cols.index[high_corr_cols].tolist()
     high_corr_cols = [c for c in high_corr_cols if c not in protected_cols]
@@ -725,6 +737,7 @@ def df_encode_categorical_dummies(
 
 def df_drop_single_factor_level(df):
     """Drop categorical columns with null or 1 level."""
+    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     cat_cols = df_get_typed_cols(df, col_type='cat')
     cols_to_drop = []
     for c in cat_cols:

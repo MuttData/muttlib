@@ -6,6 +6,7 @@ import pytest
 from pathlib import Path
 from collections import OrderedDict, namedtuple, deque  # noqa: F401
 import pandas as pd
+from pandas.tseries import offsets
 import numpy as np
 
 
@@ -70,6 +71,8 @@ def test_query_yes_no(monkeypatch):
     og = utils.__builtins__["input"]
     with pytest.raises(ValueError):
         utils.query_yes_no("hit or miss?", 's')
+    monkeypatch.setattr('builtins.input', lambda: 'yes')
+    assert utils.query_yes_no("hit or miss?", default=None)
     monkeypatch.setattr('builtins.input', lambda: '')
     assert not utils.query_yes_no("hit or miss?")
     monkeypatch.setattr('builtins.input', lambda: '')
@@ -95,6 +98,7 @@ def test_path_or_string(tmpdir):
     p = tmpdir.mkdir("sub").join("test.txt")
     p.write("True")
     assert 'True' == utils.path_or_string(p)
+    assert 'show me what you got' == utils.path_or_string("show me what you got")
 
 
 def test_hash_str():
@@ -285,6 +289,394 @@ def test_make_dirs(tmpdir):
     p = tmpdir.mkdir("sub")
 
     assert str(p) == utils.make_dirs(p)
+
+
+def test_df_read_multi(tmpdir):
+    # I should refactor this test with a list or something using functools import partial for the csv case
+    p = tmpdir.mkdir("sub")
+    df_test = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
+    )
+    # test for csv
+    fn = p.join("test.csv")
+    df_test.to_csv(fn, index=False)
+    assert df_test.equals(utils.df_read_multi(fn))
+    # test for feather
+    fn = p.join("test.feather")
+    df_test.to_feather(fn)
+    pd.read_feather(fn)
+    assert df_test.equals(utils.df_read_multi(fn))
+    # test for pickle
+    fn = p.join("test.pickle")
+    df_test.to_pickle(fn)
+    pd.read_pickle(fn)
+    assert df_test.equals(utils.df_read_multi(fn))
+
+    with pytest.raises(ValueError):
+        fn = p.join("test.test")
+        fn.write("the sins of the father")
+        utils.df_read_multi(fn)
+
+
+def test_df_to_multi(tmpdir):
+    p = tmpdir.mkdir("sub")
+    df_test = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
+    )
+    # test for csv
+    fn = p.join('test.csv')
+    utils.df_to_multi(df_test, fn)
+    df = pd.read_csv(fn, index_col=False)
+    assert df.equals(df_test)
+    # test for feather
+    fn = p.join('test.feather')
+    utils.df_to_multi(df_test, fn)
+    df = pd.read_feather(fn)
+    assert df.equals(df_test)
+    # test for csv
+    fn = p.join('test.pickle')
+    utils.df_to_multi(df_test, fn)
+    df = pd.read_pickle(fn)
+    assert df.equals(df_test)
+
+    with pytest.raises(ValueError):
+        fn = p.join("test.test")
+        utils.df_to_multi(df_test, fn)
+
+
+def test_convert_to_snake_case():
+    test_str = 'meme_review_best_news_source'
+    assert test_str == utils.convert_to_snake_case("MemeReviewBestNewsSource")
+
+
+def test_wrap_list_values_quotes():
+    test_lst = ["'6'", "'7'", "'8'", "'9'", "'1'", "'3'", "'5'"]
+
+    assert test_lst == utils.wrap_list_values_quotes([6, 7, 8, 9, 1, 3, 5])
+
+
+def test_range_datetime():
+    datetime_start = datetime.datetime(2019, 1, 15)
+    datetime_end = datetime.datetime(2019, 1, 20)
+    range_lst_no_offset = [
+        datetime.datetime(2019, 1, 15, 0, 0),
+        datetime.datetime(2019, 1, 16, 0, 0),
+        datetime.datetime(2019, 1, 17, 0, 0),
+        datetime.datetime(2019, 1, 18, 0, 0),
+        datetime.datetime(2019, 1, 19, 0, 0),
+        datetime.datetime(2019, 1, 20, 0, 0),
+    ]
+    range_lst_w_offset = [
+        datetime.datetime(2019, 1, 15, 0, 0),
+        datetime.datetime(2019, 1, 17, 0, 0),
+        datetime.datetime(2019, 1, 19, 0, 0),
+    ]
+
+    drange = utils.range_datetime(datetime_start, datetime_end)
+    assert range_lst_no_offset == list(drange)
+    drange = utils.range_datetime(datetime_start, datetime_end, offsets.Day(2))
+    assert range_lst_w_offset == list(drange)
+
+
+def test_get_first_fortnight_last_day():
+    day = utils.get_first_fortnight_last_day(datetime.datetime(2019, 1, 17))
+    assert datetime.datetime(2019, 1, 14) == day
+
+
+def test_normalize_arr():
+    arr = utils.normalize_arr(np.array([2, 5, 7, 6, 5]))
+    arr_test = np.array([0.08, 0.2, 0.28, 0.24, 0.2])
+    assert np.array_equal(arr, arr_test)
+
+
+def test_apply_time_bounds():
+    sd = '2019-01-02'
+    ed = '2019-01-03'
+    df_test = pd.DataFrame(
+        np.array([[4, 5, 6], [7, 8, 9]]),
+        index=pd.date_range(start='1/02/2019', end='1/03/2019', freq='D'),
+    )
+    df = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [3, 2, 1], [6, 5, 4]]),
+        index=pd.date_range(start='1/1/2019', end='1/05/2019', freq='D'),
+    )
+    assert utils.apply_time_bounds(df, sd, ed, None).equals(df_test)
+
+    df['date'] = pd.date_range(start='1/1/2019', end='1/05/2019', freq='D')
+    df_test['date'] = pd.date_range(start='1/02/2019', end='1/03/2019', freq='D')
+
+    assert utils.apply_time_bounds(df, sd, ed, 'date').equals(df_test)
+
+
+def test_normalize_ds_index():
+    # test ds_col in df. ds_col in index and ds_col not in ds
+    df = pd.DataFrame(
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
+    )
+
+    assert df.equals(utils.normalize_ds_index(df, 'b'))
+
+    df.index = df.index.rename('PLUS_ULTRA')
+
+    with pytest.raises(ValueError):
+        utils.normalize_ds_index(df, 'not')
+
+
+def test_standarize_values():
+    sr = pd.Series([2, 4, 6, 8, 10])
+    sr_test = pd.Series([0.0, 0.25, 0.5, 0.75, 1.0])
+    test_ceros = pd.Series([0, 0, 0, 0, 0, 0])
+
+    assert sr_test.equals(utils.standarize_values(sr))
+    assert test_ceros.equals(utils.standarize_values(test_ceros))
+
+    with pytest.raises(TypeError):
+        utils.standarize_values([1, 2, 3, 4, 5])
+
+
+def test_robust_standarize_values():
+    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
+
+    assert df_test.equals(utils.robust_standarize_values(pd.Series([2, 4, 6, 8, 10])))
+    with pytest.raises(TypeError):
+        utils.robust_standarize_values([1, 2, 3, 4, 5])
+
+
+def test_none_or_empty_pandas():
+    assert utils.none_or_empty_pandas(None)
+    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
+    assert not utils.none_or_empty_pandas(df_test)
+    df_test = pd.DataFrame(np.linspace(-1.0, 1.0, num=5))
+    assert not utils.none_or_empty_pandas(df_test)
+    with pytest.raises(ValueError):
+        assert not utils.none_or_empty_pandas(34)
+
+
+def test_in_clause_requirement():
+    lst_test = [1, 2, 3, 4, 5]
+    tppl_test = (1, 2, 3, 4, 5)
+
+    assert utils.in_clause_requirement(lst_test)
+    assert utils.in_clause_requirement(tppl_test)
+    assert not utils.in_clause_requirement(34)
+
+
+def test_format_in_clause():
+    str_test = "(walk,away,my,boy)"
+    with pytest.raises(utils.BadInClauseException):
+        utils.format_in_clause("hello")
+
+    assert str_test == utils.format_in_clause(["walk", "away", "my", "boy"])
+
+
+def test_get_cloudera_sql_stats_aggr():
+    str_test1 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,"""
+    str_test2 = """SUM(plz kill me) AS sum_tiny_Rick,
+AVG(plz kill me) AS mean_tiny_Rick,
+APPX_MEDIAN(plz kill me) AS median_tiny_Rick,"""
+    str_test3 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+MIN(plz kill me) AS min_None,
+MAX(plz kill me) AS max_None,"""
+    str_test4 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+STDDEV(plz kill me) AS std_None,"""
+    str_test5 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+NDV(plz kill me) AS unique_None,"""
+    str_test6 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None,
+COUNT(plz kill me) AS count_rows_None,"""
+    str_test7 = """SUM(plz kill me) AS sum_None,
+AVG(plz kill me) AS mean_None,
+APPX_MEDIAN(plz kill me) AS median_None"""
+
+    assert str_test1 == utils.get_cloudera_sql_stats_aggr("plz kill me")
+    assert str_test2 == utils.get_cloudera_sql_stats_aggr("plz kill me", "tiny_Rick")
+    assert str_test3 == utils.get_cloudera_sql_stats_aggr(
+        "plz kill me", with_minmax=True
+    )
+    assert str_test4 == utils.get_cloudera_sql_stats_aggr("plz kill me", with_std=True)
+    assert str_test5 == utils.get_cloudera_sql_stats_aggr("plz kill me", with_ndv=True)
+    assert str_test6 == utils.get_cloudera_sql_stats_aggr(
+        "plz kill me", with_count=True
+    )
+    assert str_test7 == utils.get_cloudera_sql_stats_aggr(
+        "plz kill me", ends_comma=False
+    )
+
+
+def test_get_cloudera_sample_cut():
+    int_test_none = 9223372036854775807
+    int_test_not_none = 18446744073709551615
+
+    assert int_test_none == utils.get_cloudera_sample_cut(None)
+    assert int_test_not_none == utils.get_cloudera_sample_cut(2)
+
+
+def test_get_cloudera_hashed_sample_clause():
+    str_test = 'AND abs(fnv_hash(CAST(34 AS bigint))) <= 4611686018427387903'
+    # utils.get_cloudera_hashed_sample_clause(34,69) # This logic should be changed
+
+    assert str_test == utils.get_cloudera_hashed_sample_clause(34, 0.5)
+
+
+def test_str_normalize_pandas():
+    # testing if lst returns as lst_test and the replace with kwargs.
+    lst = ["HeLLo", "darkñéSS", "mÿ", "odd", "frieñd"]
+    lst_test = ["hello", "darkness", "my", "odd", "friend"]
+    lst_test_repl = ["hello", "darkness", "my", "old", "friend"]
+    kwargs = {'pat': 'odd', 'repl': 'old'}
+
+    assert pd.DataFrame(lst_test).equals(utils.str_normalize_pandas(pd.DataFrame(lst)))
+    assert pd.DataFrame(lst_test_repl).equals(
+        utils.str_normalize_pandas(pd.DataFrame(lst), kwargs)
+    )
+    assert pd.Series(lst_test).equals(utils.str_normalize_pandas(pd.Series(lst)))
+    assert pd.Series(lst_test_repl).equals(
+        utils.str_normalize_pandas(pd.Series(lst), kwargs)
+    )
+    with pytest.raises(TypeError):
+        utils.str_normalize_pandas(22)
+
+
+def test_df_optimize_float_types():
+    df64 = pd.DataFrame([2.0, 4.0, 5.0, 6.0, 8.0, 10.0], dtype='float64')
+    df32 = pd.DataFrame([2.0, 4.0, 5.0, 6.0, 8.0, 10.0], dtype='float32')
+    type16_test = pd.DataFrame([2.0, 4.0, 5.0, 6.0, 8.0, 10.0], dtype='float16')
+
+    assert type16_test.dtypes.equals(utils.df_optimize_float_types(df64).dtypes)
+    assert type16_test.dtypes.equals(utils.df_optimize_float_types(df32).dtypes)
+
+
+def test_df_replace_empty_strs_null():
+    df = pd.DataFrame([' ', " ", "batman!"])
+    df_test = pd.DataFrame([pd.np.nan, pd.np.nan, "batman!"])
+
+    assert df_test.equals(utils.df_replace_empty_strs_null(df))
+
+
+def test_df_drop_nulls():
+    df = pd.DataFrame(
+        {
+            'a': [pd.np.nan, pd.np.nan, "batman!"],
+            'b': [1, 2, 3],
+            'c': ["", "", "lider!"],
+        }
+    )
+
+    df_test = pd.DataFrame({'b': [1, 2, 3]})
+    assert df_test.equals(utils.df_drop_nulls(df.copy()))
+
+    df_test = pd.DataFrame({'b': [1, 2, 3], 'c': [pd.np.nan, pd.np.nan, "lider!"]})
+    assert df_test.equals(utils.df_drop_nulls(df.copy(), protected_cols=['c']))
+
+
+def test_df_drop_std():
+    df = pd.DataFrame({'a': [0.01, 0.012, 0.013], 'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
+    df_test = pd.DataFrame({'b': [1, 1.2, 1.3], 'c': [2, 2, 3]})
+    df_test_diff_std = pd.DataFrame({'c': [2, 2, 3]})
+    df_test_protected = pd.DataFrame(
+        {'a': [0.01, 0.012, 0.013], 'b': [1, 1.2, 1.3], 'c': [2, 2, 3]}
+    )
+
+    assert df_test.equals(utils.df_drop_std(df.copy()))
+    assert df_test_diff_std.equals(utils.df_drop_std(df.copy(), min_std_dev=0.5))
+    assert df_test_protected.equals(utils.df_drop_std(df, protected_cols=['a']))
+
+
+# [NTH] it will be cool to use some normal distribution for the df
+def test_df_drop_corr():
+    df = pd.DataFrame(
+        [(0.4, 0.3, 0.2), (0.4, 0.6, 0.3), (0.4, 0.0, 0.2), (0.7, 0.1, 0.5)],
+        columns=['a', 'b', 'c'],
+    )
+    df_test = pd.DataFrame(index=[0, 1, 2, 3])
+
+    with pytest.raises(AssertionError):
+        utils.df_drop_corr(df.copy(), '34')
+
+    df_test.equals(utils.df_drop_corr(df.copy(), 'a', frac=1, random_state=42))
+
+    df_test = pd.DataFrame(data={'c': [0.2, 0.3, 0.2, 0.5]})
+    df_test.equals(
+        utils.df_drop_corr(df, 'a', protected_cols=['c'], frac=1, random_state=42)
+    )
+
+
+def test_df_get_typed_cols():
+    df = pd.DataFrame(
+        {
+            'a': [0.01, 0.012, 0.013],
+            'b': [True, True, False],
+            'c': [
+                datetime.datetime(2019, 10, 25),
+                datetime.datetime(2019, 10, 26),
+                datetime.datetime(2019, 10, 27),
+            ],
+            'd': ['bip', "bip", "Ritchie"],
+        }
+    )
+
+    assert pd.Series(utils.df_get_typed_cols(df, col_type='num')).equals(
+        pd.Series(['a'])
+    )
+    assert pd.Series(utils.df_get_typed_cols(df, col_type='bool')).equals(
+        pd.Series(['b'])
+    )
+    assert pd.Series(utils.df_get_typed_cols(df, col_type='date')).equals(
+        pd.Series(['c'])
+    )
+    assert pd.Series(utils.df_get_typed_cols(df)).equals(pd.Series(['d']))
+
+
+def test_df_encode_categorical_dummies():
+    # df, cat_cols=[], skip_cols=[], top=25, other_val='OTHER'
+    df = pd.DataFrame(
+        [(0.4, "s", 0.2), (0.4, "m", 0.3), (0.4, "h", 0.2)], columns=['a', 'b', 'c']
+    )
+
+    df_test = pd.DataFrame(
+        [[0.4, 0.2, 0, 0, 1], [0.4, 0.3, 0, 1, 0], [0.4, 0.2, 1, 0, 0]],
+        columns=['a', 'c', 'b_h', 'b_m', 'b_s'],
+    )
+    df_test = df_test.astype(
+        dtype={
+            'a': 'float64',
+            'c': 'float64',
+            'b_h': 'uint8',
+            'b_m': 'uint8',
+            'b_s': 'uint8',
+        }
+    )
+    dummy_test = np.array(['b_m', 'b_h', 'b_s'])
+
+    df_res, dummy = utils.df_encode_categorical_dummies(df.copy(), ['b'])
+    assert df_test.equals(df_res)
+    assert np.array_equal(np.sort(dummy_test), np.sort(np.array(dummy)))
+
+    df_res, dummy = utils.df_encode_categorical_dummies(df.copy(), ['b'], ['b'])
+
+    assert df_res.equals(df)
+    assert not dummy
+
+
+def test_df_drop_single_factor_level():
+    df = pd.DataFrame([(0.4, "s", 0.2), (0.4, "", 0.3)], columns=['a', 'b', 'c'])
+    df_test = pd.DataFrame([(0.4, 0.2), (0.4, 0.3)], columns=['a', 'c'])
+
+    assert df_test.equals(utils.df_drop_single_factor_level(df))
+
+
+# this looks hard should I do it?
+# def test_setup_logging():
+# pass
 
 
 @pytest.mark.parametrize(
