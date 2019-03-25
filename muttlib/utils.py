@@ -782,3 +782,9 @@ def dedup_list(li: list):
         if val not in new_list:
             new_list.append(val)
     return new_list
+
+# TODO March 25, 2019: add unit-test
+def setup_logging(log_config, logger_name='root', level='INFO'):
+    """Set logging config."""
+    log_config['loggers'][logger_name]['level'] = level
+    logging.config.dictConfig(log_config)
