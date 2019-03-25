@@ -503,7 +503,7 @@ def plot_timeseries(
         ax2 = ax.twinx()
         plot_method = ax2.plot_date if ix_date_type else ax2.plot
 
-    plot_method(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
+    plot_method(indext, df[y_col], fmt, label=label, color=color, **kwargs)
 
     if ix_date_type:
 
