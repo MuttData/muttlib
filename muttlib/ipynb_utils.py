@@ -26,7 +26,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
-import seaborn as sns  # NOQA
+import seaborn as sns  # NOQA       
 
 # Cleanear matplotlib dates as day in letters
 import matplotlib.dates as mdates  # NOQA
@@ -497,16 +497,17 @@ def plot_timeseries(
     ix_date_type = np.issubdtype(indext.dtype, np.datetime64)
 
     # Plot values on index
-    plot_method = ax.plot_date if ix_date_type else ax.plot
+    tgt_ax = ax
     if secondary_y_scale:
         # instantiate a second axes that shares the same x-axis
-        ax2 = ax.twinx()
-        plot_method = ax2.plot_date if ix_date_type else ax2.plot
-
-    plot_method(indext, df[y_col], fmt, label=label, color=color, **kwargs)
+        tgt_ax = ax.twinx()
+        
+    if ix_date_type:
+        tgt_ax.plot_date(indext, df[y_col], fmt, label=label, color=color, **kwargs)
+    else:
+        tgt_ax.plot(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
 
     if ix_date_type:
-
         # Ticks formatting
         monthly_format = mdates.DateFormatter('\n\n\n\n\n%b\n%Y')
         daily_format = mdates.DateFormatter('\n\n%d\n%a')
