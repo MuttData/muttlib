@@ -513,8 +513,8 @@ def template(path_or_str, **kwargs):
 def render_jinja_template(path_or_str, jparams={}):
     """Render a query with jinja, from a complete path to a sql-like file."""
     # Standarize to pathlib object, supports str objects
-    pat = Path(path_or_str).expanduser().resolve().as_posix()
-    if pd.np.DataSource().exists(pat):
+    pat = Path(path_or_str).expanduser().resolve()
+    if pat.exists():
         logger.debug(f'Loading jinja template from {pat}.')
     return template(path_or_str).render(**jparams)
 

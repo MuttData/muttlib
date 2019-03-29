@@ -605,8 +605,7 @@ def get_string_named_placeholders(s):
 def load_sql_query(sql, query_context_params=None):
     """Read sql file or string and format with a dictionary of params."""
     pat = Path(sql).expanduser()
-    # This `pat.is_file()` breaks for long enough
-    if np.DataSource().exists(pat.as_posix()):
+    if pat.exists():
         with open(pat, 'r') as f:
             sql = f.read()
 
