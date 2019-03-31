@@ -26,7 +26,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
-import seaborn as sns  # NOQA       
+import seaborn as sns  # NOQA
 
 # Cleanear matplotlib dates as day in letters
 import matplotlib.dates as mdates  # NOQA
@@ -490,11 +490,11 @@ def plot_timeseries(
     A matplotlib (figure, axis) tuple.
     """
     fig, ax = fig_ax or plt.subplots()
-    indext = df[non_index_col] if non_index_col else df.index 
+    indext = df[non_index_col] if non_index_col else df.index
     ix_date_type = np.issubdtype(indext.dtype, np.datetime64)
 
     # Maybe instantiate a second axes that shares the same x-axis
-    tgt_ax = ax.twinx() if secondary_y_scale tgt_ax else ax 
+    tgt_ax = ax.twinx() if secondary_y_scale else ax
 
     # Plot values on correct index
     if not ix_date_type:
