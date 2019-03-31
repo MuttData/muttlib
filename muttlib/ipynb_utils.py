@@ -504,10 +504,6 @@ def plot_timeseries(
         
     if ix_date_type:
         tgt_ax.plot_date(indext, df[y_col], fmt, label=label, color=color, **kwargs)
-    else:
-        tgt_ax.plot(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
-
-    if ix_date_type:
         # Ticks formatting
         monthly_format = mdates.DateFormatter('\n\n\n\n\n%b\n%Y')
         daily_format = mdates.DateFormatter('\n\n%d\n%a')
@@ -534,6 +530,8 @@ def plot_timeseries(
         max_date = indext.max().date()
         metadata_str = f'Data from {min_date} thru {max_date}'
         plt.title(metadata_str)
+    else:
+        tgt_ax.plot(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
 
     ax.xaxis.grid(True, which='minor')
     ax.yaxis.grid()
