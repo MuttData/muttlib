@@ -26,7 +26,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
-import seaborn as sns  # NOQA       
+import seaborn as sns  # NOQA
 
 # Cleanear matplotlib dates as day in letters
 import matplotlib.dates as mdates  # NOQA
@@ -489,25 +489,19 @@ def plot_timeseries(
     -------
     A matplotlib (figure, axis) tuple.
     """
-    if not fig_ax:
-        fig, ax = plt.subplots()
-    else:
-        fig, ax = fig_ax
-    indext = df.index if not non_index_col else df[non_index_col]
+    fig, ax = fig_ax or plt.subplots()
+    indext = df[non_index_col] if non_index_col else df.index
     ix_date_type = np.issubdtype(indext.dtype, np.datetime64)
 
-    # Plot values on index
-    tgt_ax = ax
-    if secondary_y_scale:
-        # instantiate a second axes that shares the same x-axis
-        tgt_ax = ax.twinx()
-        
-    if ix_date_type:
-        tgt_ax.plot_date(indext, df[y_col], fmt, label=label, color=color, **kwargs)
-    else:
+    # Maybe instantiate a second axes that shares the same x-axis
+    tgt_ax = ax.twinx() if secondary_y_scale else ax
+
+    # Plot values on correct index
+    if not ix_date_type:
         tgt_ax.plot(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
 
-    if ix_date_type:
+    else:  # multiple formatting and plotting options for date-like indexes
+        tgt_ax.plot_date(indext, df[y_col], fmt, label=label, color=color, **kwargs)
         # Ticks formatting
         monthly_format = mdates.DateFormatter('\n\n\n\n\n%b\n%Y')
         daily_format = mdates.DateFormatter('\n\n%d\n%a')
