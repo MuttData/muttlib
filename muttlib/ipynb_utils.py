@@ -489,10 +489,7 @@ def plot_timeseries(
     -------
     A matplotlib (figure, axis) tuple.
     """
-    if not fig_ax:
-        fig, ax = plt.subplots()
-    else:
-        fig, ax = fig_ax
+    fig, ax = fig_ax or plt.subplots()
     indext = df.index if not non_index_col else df[non_index_col]
     ix_date_type = np.issubdtype(indext.dtype, np.datetime64)
 
