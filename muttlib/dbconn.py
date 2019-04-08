@@ -134,9 +134,6 @@ class BaseClient:
 
     def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
         # TODO: Validate types here?
-        if self.dialect == 'oracle':
-            df.columns = [c.upper() for c in df.columns]
-
         connection = self._connect()
         with connection:
             df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
