@@ -284,10 +284,9 @@ def test_render_jinja_template(tmpdir):
 
     assert str_template == utils.render_jinja_template(tmp_template, params)
 
-    long_str = 300*'a'
+    long_str = 300 * 'a'
     expected = long_str
     assert expected == utils.render_jinja_template(long_str)
-
 
 
 def test_make_dirs(tmpdir):
