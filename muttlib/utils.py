@@ -42,7 +42,14 @@ def non_empty_dirs(path):
 
 
 def is_readable_path(str_or_path):
-    """Check if string passed is a path."""
+    """Check if string or Path passed corresponds to a readable file.
+
+    Args:
+        str_or_path (str, Path): A string or a path to be checked.
+    Returns:
+        (bool): A bool indicating whether or not str_or_path corresponds to a
+        readable file.
+    """
     try:
         f = open(str_or_path)
         f.close()
