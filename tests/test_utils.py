@@ -103,10 +103,15 @@ def test_is_readable_path(tmpdir):
     this_file_does_not_exists = sub_dir.join("not_existing.txt")
     assert not utils.is_readable_path(this_file_does_not_exists)
 
-    sub_dir = tmpdir.mkdir("sub")
     assert not utils.is_readable_path(sub_dir)
 
     some_str = 'just a random string'
+    assert not utils.is_readable_path(some_str)
+
+    some_str = 'a' * 300
+    assert not utils.is_readable_path(some_str)
+
+    some_str = 'a\x00a'
     assert not utils.is_readable_path(some_str)
 
 
