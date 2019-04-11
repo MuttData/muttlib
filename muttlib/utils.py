@@ -41,15 +41,24 @@ def non_empty_dirs(path):
     return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
 
 
+def is_readable_path(str_or_path):
+    """Check if string passed is a path."""
+    try:
+        f = open(str_or_path)
+        f.close()
+    except Exception as e:
+        return False
+
+    return True
+
+
 def path_or_string(str_or_path):
     """Load file contents as string or return input str."""
     file_path = Path(str_or_path)
-    try:
-        if file_path.is_file():
-            with file_path.open('r') as f:
-                return f.read()
-    except OSError:
-        pass
+    if is_readable_path(file_path):
+        with file_path.open('r') as f:
+            return f.read()
+
     return str_or_path
 
 
