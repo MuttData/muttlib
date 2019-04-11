@@ -511,10 +511,28 @@ def template(path_or_str, **kwargs):
 
 
 def render_jinja_template(path_or_str, jparams={}):
-    """Render a query with jinja, from a complete path to a sql-like file."""
+    """
+    Render a query via jinja, from a str or a sql-like file.
+    
+    Args:
+        path_or_str (str, Path): A string or a path object from which to load 
+            the sql-like file, if one exists.
+        jparams (dict): The mapping of jinja placeholders {{}} to python values to be
+            replaced in the query.
+    Returns:
+        (str): A str where all possible jinja placeholders were replaced.  
+        
+    Notes:
+        Given that the first argument might both be a query in str form, a 
+        path in string form, or a pure path, it must be said that the func will log the path's location, if the arg is an existing file-path. 
+        We do not use `pat.exists()` method as it breaks for long enough strings 
+        (which might be queries)!
+    """
+    # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
+    #  share a method that checks is_valid_path()
     # Standarize to pathlib object, supports str objects
+
     pat = Path(path_or_str).expanduser().resolve().as_posix()
-    # The `pat.exists()` method breaks for long enough strings!
     if pd.np.DataSource().exists(pat):
         logger.debug(f'Loading jinja template from {pat}.')
     return template(path_or_str).render(**jparams)
