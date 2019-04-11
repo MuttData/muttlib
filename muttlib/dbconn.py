@@ -1,6 +1,5 @@
 """Module to get and use multiple Big Data DB connections."""
 import logging
-import os
 import re
 import shutil
 from functools import wraps
@@ -10,15 +9,15 @@ from urllib.parse import urlparse
 
 import jinja2
 import pandas as pd
-from pandas.io.json import json_normalize
 import progressbar
 import pyarrow.parquet as pq
+from pandas.io.json import json_normalize
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
 
 import muttlib.utils as utils
 
-logger = logging.getLogger(f'dbconn.{__name__}') # NOQA
+logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 
 try:
     import cx_Oracle
@@ -70,7 +69,7 @@ class BaseClient:
 
     def __init__(
         self,
-        username,
+        username=None,
         database=None,
         host=None,
         dialect=None,
@@ -146,6 +145,17 @@ class PgClient(BaseClient):
         super().__init__(dialect=dialect, port=5432, **kwargs)
 
 
+class SQLiteClient(BaseClient):
+    """Create SQLite DB client"""
+
+    def __init__(self, dialect='sqlite', **kwargs):
+        super().__init__(dialect=dialect, **kwargs)
+
+    def _connect(self):
+        db_uri = f'{self.dialect}:///{self.database}'
+        return self.get_engine(custom_uri=db_uri).connect()
+
+
 class OracleClient(BaseClient):
     """Create Oracle DB client."""
 
@@ -160,16 +170,15 @@ class OracleClient(BaseClient):
         return db_uri
 
     def _connect(self):
-        connect_args = {
-            'encoding': 'UTF-8',
-            'nencoding': 'UTF-8',
-        }
+        connect_args = {'encoding': 'UTF-8', 'nencoding': 'UTF-8'}
         conn = self.get_engine(connect_args=connect_args).connect()
         if self.schema is not None:
             conn.connection.current_schema = self.schema
         return conn
 
-    def insert_from_frame(self, df, table, fix_clobs=True, upper_case_cols=True, **kwargs):
+    def insert_from_frame(
+        self, df, table, fix_clobs=True, upper_case_cols=True, **kwargs
+    ):
         """
         Fix columns case and cast CLOBs to VARCHAR o avoid slow inserts.
 
@@ -191,7 +200,6 @@ class OracleClient(BaseClient):
             df.columns = [c.upper() for c in df.columns]
 
         super().insert_from_frame(df, table, dtype=dtyp, **kwargs)
-
 
 
 class IbisClient:
