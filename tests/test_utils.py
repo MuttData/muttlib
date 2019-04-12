@@ -93,6 +93,28 @@ def test_query_yes_no(monkeypatch):
     utils.__builtins__["input"] = og
 
 
+def test_is_readable_path(tmpdir):
+    """Check is_readable_path."""
+    sub_dir = tmpdir.mkdir("sub")
+    this_file_exist = sub_dir.join("test.txt")
+    this_file_exist.write("True")
+    assert utils.is_readable_path(this_file_exist)
+
+    this_file_does_not_exists = sub_dir.join("not_existing.txt")
+    assert not utils.is_readable_path(this_file_does_not_exists)
+
+    assert not utils.is_readable_path(sub_dir)
+
+    some_str = 'just a random string'
+    assert not utils.is_readable_path(some_str)
+
+    some_str = 'a' * 300
+    assert not utils.is_readable_path(some_str)
+
+    some_str = 'a\x00a'
+    assert not utils.is_readable_path(some_str)
+
+
 def test_path_or_string(tmpdir):
     # generate a tmp file for this test
     p = tmpdir.mkdir("sub").join("test.txt")

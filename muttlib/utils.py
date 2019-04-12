@@ -41,15 +41,31 @@ def non_empty_dirs(path):
     return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
 
 
+def is_readable_path(str_or_path):
+    """Check if string or Path passed corresponds to a readable file.
+
+    Args:
+        str_or_path (str, Path): A string or a path to be checked.
+    Returns:
+        (bool): A bool indicating whether or not str_or_path corresponds to a
+        readable file.
+    """
+    try:
+        f = open(str_or_path)
+        f.close()
+    except Exception:
+        return False
+
+    return True
+
+
 def path_or_string(str_or_path):
     """Load file contents as string or return input str."""
     file_path = Path(str_or_path)
-    try:
-        if file_path.is_file():
-            with file_path.open('r') as f:
-                return f.read()
-    except OSError:
-        pass
+    if is_readable_path(file_path):
+        with file_path.open('r') as f:
+            return f.read()
+
     return str_or_path
 
 
@@ -513,19 +529,20 @@ def template(path_or_str, **kwargs):
 def render_jinja_template(path_or_str, jparams={}):
     """
     Render a query via jinja, from a str or a sql-like file.
-    
+
     Args:
-        path_or_str (str, Path): A string or a path object from which to load 
+        path_or_str (str, Path): A string or a path object from which to load
             the sql-like file, if one exists.
         jparams (dict): The mapping of jinja placeholders {{}} to python values to be
             replaced in the query.
     Returns:
-        (str): A str where all possible jinja placeholders were replaced.  
-        
+        (str): A str where all possible jinja placeholders were replaced.
+
     Notes:
-        Given that the first argument might both be a query in str form, a 
-        path in string form, or a pure path, it must be said that the func will log the path's location, if the arg is an existing file-path. 
-        We do not use `pat.exists()` method as it breaks for long enough strings 
+        Given that the first argument might both be a query in str form, a
+        path in string form, or a pure path, it must be said that the func will log
+        the path's location, if the arg is an existing file-path.
+        We do not use `pat.exists()` method as it breaks for long enough strings
         (which might be queries)!
     """
     # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
@@ -533,7 +550,7 @@ def render_jinja_template(path_or_str, jparams={}):
     # Standarize to pathlib object, supports str objects
 
     pat = Path(path_or_str).expanduser().resolve().as_posix()
-    if pd.np.DataSource().exists(pat):
+    if is_readable_path(pat):
         logger.debug(f'Loading jinja template from {pat}.')
     return template(path_or_str).render(**jparams)
 
