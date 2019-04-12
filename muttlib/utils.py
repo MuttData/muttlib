@@ -540,7 +540,8 @@ def render_jinja_template(path_or_str, jparams={}):
 
     Notes:
         Given that the first argument might both be a query in str form, a
-        path in string form, or a pure path, it must be said that the func will log the path's location, if the arg is an existing file-path.
+        path in string form, or a pure path, it must be said that the func will log
+        the path's location, if the arg is an existing file-path.
         We do not use `pat.exists()` method as it breaks for long enough strings
         (which might be queries)!
     """
