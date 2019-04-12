@@ -53,7 +53,7 @@ def is_readable_path(str_or_path):
     try:
         f = open(str_or_path)
         f.close()
-    except Exception as e:
+    except Exception:
         return False
 
     return True
@@ -529,19 +529,19 @@ def template(path_or_str, **kwargs):
 def render_jinja_template(path_or_str, jparams={}):
     """
     Render a query via jinja, from a str or a sql-like file.
-    
+
     Args:
-        path_or_str (str, Path): A string or a path object from which to load 
+        path_or_str (str, Path): A string or a path object from which to load
             the sql-like file, if one exists.
         jparams (dict): The mapping of jinja placeholders {{}} to python values to be
             replaced in the query.
     Returns:
-        (str): A str where all possible jinja placeholders were replaced.  
-        
+        (str): A str where all possible jinja placeholders were replaced.
+
     Notes:
-        Given that the first argument might both be a query in str form, a 
-        path in string form, or a pure path, it must be said that the func will log the path's location, if the arg is an existing file-path. 
-        We do not use `pat.exists()` method as it breaks for long enough strings 
+        Given that the first argument might both be a query in str form, a
+        path in string form, or a pure path, it must be said that the func will log the path's location, if the arg is an existing file-path.
+        We do not use `pat.exists()` method as it breaks for long enough strings
         (which might be queries)!
     """
     # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
