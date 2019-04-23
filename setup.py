@@ -3,7 +3,7 @@ import setuptools
 
 import muttlib
 
-with open('README.md', 'r') as fh:
+with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
 setuptools.setup(
