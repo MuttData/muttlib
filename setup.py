@@ -2,11 +2,6 @@
 import setuptools
 from setuptools.dist import Distribution
 
-
-class BinaryDistribution(Distribution):
-    def is_pure(self):
-        return False
-
 import muttlib
 
 with open('README.md', 'r', encoding='utf8') as fh:
@@ -17,13 +12,12 @@ setuptools.setup(
     version=muttlib.__version__,
     author='Mutt Data',
     home_page = "https://gitlab.com/mutt_data/muttlib/",
-    keywords = "data pandas spark data-analysis database data-munging plumbing",
+    keywords = "data pandas spark data-analysis database data-mungingz",
     author_email='info@muttdata.ai',
     description='Collection of helper modules by Mutt Data.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    distclass=BinaryDistribution,
     packages=setuptools.find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',
