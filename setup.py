@@ -1,6 +1,5 @@
 """Muttlib setup file."""
 import setuptools
-from setuptools.dist import Distribution
 
 import muttlib
 
@@ -11,8 +10,8 @@ setuptools.setup(
     name='muttlib',
     version=muttlib.__version__,
     author='Mutt Data',
-    home_page = "https://gitlab.com/mutt_data/muttlib/",
-    keywords = "data pandas spark data-analysis database data-mungingz",
+    home_page="https://gitlab.com/mutt_data/muttlib/",
+    keywords="data pandas spark data-analysis database data-mungingz",
     author_email='info@muttdata.ai',
     description='Collection of helper modules by Mutt Data.',
     long_description=long_description,
