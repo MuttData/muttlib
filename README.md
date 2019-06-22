@@ -1,6 +1,6 @@
 # muttlib 🐶📚
 
-Library with helper code to start a project by [Mutt Data](https://muttdata.ai/).
+ibrary with helper code to start a project by [Mutt Data](https://muttdata.ai/).
 
 Current modules:
 
