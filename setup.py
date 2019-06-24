@@ -11,7 +11,7 @@ setuptools.setup(
     version=muttlib.__version__,
     author='Mutt Data',
     home_page="https://gitlab.com/mutt_data/muttlib/",
-    keywords="data pandas spark data-analysis database data-mungingz",
+    keywords="data pandas spark data-analysis database data-munging",
     author_email='info@muttdata.ai',
     description='Collection of helper modules by Mutt Data.',
     long_description=long_description,
