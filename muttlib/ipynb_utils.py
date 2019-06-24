@@ -498,7 +498,7 @@ def plot_timeseries(
 
     # Plot values on correct index
     if not ix_date_type:
-        tgt_ax.plot(indext, df[y_col], fmt=fmt, label=label, color=color, **kwargs)
+        tgt_ax.plot(indext, df[y_col], fmt=[fmt], label=label, color=color, **kwargs)
 
     else:  # multiple formatting and plotting options for date-like indexes
         tgt_ax.plot_date(indext, df[y_col], fmt, label=label, color=color, **kwargs)
