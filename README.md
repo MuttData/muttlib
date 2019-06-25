@@ -7,7 +7,7 @@ Current modules:
 - `dbconn`: Somewhat homogeneus lib to access multiple DBs.
 - `file_processing`: Helpers for concurrent file processing.
 - `utils`: A single version of miscellaneous functions needed every now and then.
-- `ipynb_const.py` and `ipynb_utils.py`: Utilities when for exploratory work.
+- `ipynb_const.py` and `ipynb_utils.py`: Utilities when doing exploratory work (helpful for jupyter notebooks).
 
 ## Install
 
@@ -138,3 +138,62 @@ If your commit message contains [ci skip] or [skip ci], using any capitalization
 Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer: `git push -o ci.skip`
 more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
 `IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
+
+
+
+
+
+
+
+Creating a Python Environment (pip)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you aren't using conda for your development environment, follow these instructions.
+You'll need to have at least python3.5 installed on your system.
+
+.. code-block:: none
+
+   # Create a virtual environment
+   # Use an ENV_DIR of your choice. We'll use ~/virtualenvs/pandas-dev
+   # Any parent directories should already exist
+   python3 -m venv ~/virtualenvs/pandas-dev
+   # Activate the virtulaenv
+   . ~/virtualenvs/pandas-dev/bin/activate
+
+   # Install the build dependencies
+   python -m pip install -r requirements-dev.txt
+
+   # Build and install pandas
+   python setup.py build_ext --inplace -j 4
+   python -m pip install -e .
+
+Creating a branch
+-----------------
+
+You want your master branch to reflect only production-ready code, so create a
+feature branch for making your changes. For example::
+
+    git branch shiny-new-feature
+    git checkout shiny-new-feature
+
+The above can be simplified to::
+
+    git checkout -b shiny-new-feature
+
+This changes your working directory to the shiny-new-feature branch.  Keep any
+changes in this branch specific to one bug or feature so it is clear
+what the branch brings to *pandas*. You can have many shiny-new-features
+and switch in between them using the git checkout command.
+
+When creating this branch, make sure your master branch is up to date with
+the latest upstream master version. To update your local master branch, you
+can do::
+
+    git checkout master
+    git pull upstream master --ff-only
+
+When you want to update the feature branch with changes in master after
+you created the branch, check the section on
+:ref:`updating a PR <contributing.update-pr>`.
+
+.. _contributing.documentation:
