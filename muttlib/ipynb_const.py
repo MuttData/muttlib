@@ -10,17 +10,20 @@ MAIN_SAMPLE_PCT = 0.1
 LIMIT_N = 30000
 MB_TO_B_FACTOR = 1024*1024
 SQL_DESCRIBE_QUERY = "SELECT TOP 1 * FROM {d}.{t}"
-GET_COLUMNS_DESCRIPTIONS = """
+
+SQL_COLUMNS_DESCRIPTIONS = """
   SELECT
-      COLUMN_NAME,
-      DATA_TYPE,
-      IS_NULLABLE
-      DATETIME_PRECISION
+      COLUMN_NAME AS 'column_name',
+      DATA_TYPE AS 'data_type',
+      lower(IS_NULLABLE) AS 'is_nullable',
+      DATETIME_PRECISION AS 'datetime_precision'
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE 
-       TABLE_NAME = '{table}'
-       AND TABLE_CATALOG = '{catalog}'
-       """
+       TABLE_NAME = '{{TABLE_NAME}}'
+{% if catalog %}
+       AND TABLE_CATALOG = '{{CATALOG_NAME}}'
+{% endif %}
+"""
 
 # STATS
 PERCENTILES = np.asarray([0.01, 0.03, 0.05, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5])
