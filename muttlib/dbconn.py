@@ -7,7 +7,6 @@ from os import makedirs
 from time import sleep
 from urllib.parse import urlparse
 
-import jinja2
 import pandas as pd
 import progressbar
 import pyarrow.parquet as pq
@@ -21,23 +20,24 @@ logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 
 try:
     import cx_Oracle
-except:
+except ModuleNotFoundError:
     logger.warning("No Oracle support.")
 
 try:
-    from TCLIService.ttypes import TOperationState
-except:
+    from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
+    from pyhive import hive
+except ModuleNotFoundError:
     logger.warning("No Hive support.")
 
 try:
     import pymongo
-except:
+except ModuleNotFoundError:
     logger.warning("No Mongo support.")
 
 
 try:
     import ibis
-except:
+except ModuleNotFoundError:
     logger.warning("No Ibis support.")
 
 
@@ -115,7 +115,7 @@ class BaseClient:
             return [c[0] for c in cursor.description]
 
     @_parse_sql_statement_decorator
-    def execute(self, sql, params=None, connection=None):
+    def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
         if connection is None:
             connection = self._connect()
         return connection.execute(sql)
@@ -165,7 +165,9 @@ class OracleClient(BaseClient):
 
     @property
     def _db_uri(self):
-        dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.database)
+        dsn = cx_Oracle.makedsn(  # pylint: disable=I1101
+            self.host, self.port, service_name=self.database
+        )
         db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
         return db_uri
 
@@ -177,7 +179,12 @@ class OracleClient(BaseClient):
         return conn
 
     def insert_from_frame(
-        self, df, table, fix_clobs=True, upper_case_cols=True, **kwargs
+        self,
+        df,
+        table,
+        fix_clobs=True,
+        upper_case_cols=True,
+        **kwargs,  # pylint: disable=W0221
     ):
         """
         Fix columns case and cast CLOBs to VARCHAR o avoid slow inserts.
@@ -482,7 +489,7 @@ class HiveDb:
         return cursor
 
     def _show_query_progress(self, cursor, max_val=100, poll_interval=1):
-        from TCLIService.ttypes import TOperationState
+        from TCLIService.ttypes import TOperationState  # pylint: disable=W0621 # noqa
 
         # TODO: Add timer logging
         status = cursor.poll()
@@ -495,7 +502,7 @@ class HiveDb:
             if progress is None:
                 progress = self._get_progress_from_logs(cursor)
             bar.update(progress * max_val)
-            time.sleep(poll_interval)
+            sleep(poll_interval)
             status = cursor.poll()
         bar.finish()
 
