@@ -3,7 +3,6 @@ import logging
 import re
 import shutil
 from functools import wraps
-from os import makedirs
 from time import sleep
 from urllib.parse import urlparse
 
@@ -240,12 +239,13 @@ class IbisClient:
 
     Notes
     --------
-    It is strongly advised to set the Impala Session option 'SYNC_DDL' to `True` as
-    this will set the load balancer to sync the metadata to all other nodes after a
-    DDL statement. If using the `via_hdfs=True` arg of the `to_frame` method, then it
-    is advised that one does not use the load-balancer as CRUD operations are done
-    on temp tales.
-
+    It is strongly advised to set the Impala Session option 'SYNC_DDL' to `True` when 
+    working with an Impala load-balancer. This will make the balancer sync the metadata 
+    to all other nodes after a DDL statement. 
+    When using the via_hdfs=True argument in the to_frame method, you should use a 
+    particular's node hostname or a IP since this argument generates the creation and 
+    deletion of a temp table and the needed DDL operations are much faster in this way. 
+    If you need to point to a load balancer, remember to set SYNC_DDL as True.
 
     See also
     --------
@@ -338,7 +338,9 @@ class IbisClient:
                 """
                 try:
                     self._create_tmp_table(client, sql, tmp_table, drop_stmt)
-                    self._get_hdfs_data(client, tmp_table, local_tmp_table_dir)
+                    self._get_files_from_parquet_table(
+                        client, tmp_table, local_tmp_table_dir
+                    )
                 except Exception as e:
                     logger.error(e)
                     logger.debug(f"Cleanup of local tmp dir '{local_tmp_table_dir}'.")
@@ -402,7 +404,7 @@ class IbisClient:
                 else:
                     raise ValueError(f"SQL create/insert failed {i} times. Aborting!")
 
-    def _get_hdfs_data(self, client, tmp_table, local_tmp_dir):
+    def _get_files_from_parquet_table(self, client, tmp_table, local_tmp_dir):
         """Download hdfs parquet files to local temporary dir.
 
         Uses incremental backoff sleeping to patiently retry/wait until all files are
@@ -413,8 +415,8 @@ class IbisClient:
         )
         hdfs_dir = urlparse(hdfs_files[0]).path.rsplit('/', 1)[0]
         logger.debug(f"Downloading data from {hdfs_dir}...")
-        if not local_tmp_dir.parent.exists():
-            makedirs(local_tmp_dir.parent)
+        if not local_tmp_dir.exists():
+            utils.make_dirs(local_tmp_dir)
         # Dirty incr backoff to fix weird cases in which hdfs doesn't download the
         # parquet files created previously
         for i in range(1, self._max_retries + 1):
