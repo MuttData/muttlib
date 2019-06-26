@@ -8,7 +8,7 @@ COUNTRY_NAME = "ARGENTINA"
 COUNTRY_ISO3 = "ARG"
 MAIN_SAMPLE_PCT = 0.1
 LIMIT_N = 30000
-MB_TO_B_FACTOR = 1024*1024
+MB_TO_B_FACTOR = 1024 * 1024
 SQL_DESCRIBE_QUERY = "SELECT TOP 1 * FROM {d}.{t}"
 
 SQL_COLUMNS_DESCRIPTIONS = """
@@ -18,7 +18,7 @@ SQL_COLUMNS_DESCRIPTIONS = """
       lower(IS_NULLABLE) AS 'is_nullable',
       DATETIME_PRECISION AS 'datetime_precision'
   FROM INFORMATION_SCHEMA.COLUMNS
-  WHERE 
+  WHERE
        TABLE_NAME = '{{TABLE_NAME}}'
 {% if catalog %}
        AND TABLE_CATALOG = '{{CATALOG_NAME}}'
@@ -38,24 +38,22 @@ LAST_WEEK_DATE = END_DATE - pd.Timedelta('7d')
 FIXED_MONTH_DATE = pd.to_datetime('2018-11-01', dayfirst=False)
 HOURS_PER_DAY = 24
 
-FRIENDS_DAY = pd.to_datetime(
-    f'{pd.datetime.now().year}-07-20', dayfirst=False)
+FRIENDS_DAY = pd.to_datetime(f'{pd.datetime.now().year}-07-20', dayfirst=False)
 
-august_first = pd.to_datetime(
-    f'{pd.datetime.now().year}-08-01', dayfirst=False)
+august_first = pd.to_datetime(f'{pd.datetime.now().year}-08-01', dayfirst=False)
 kids_dow_iteration = 3  # third sunday each August
 KIDS_DAY = pd.date_range(
-    start=august_first, end=august_first + offsets.Day(21),
-    freq='W-SUN')[kids_dow_iteration - 1]
+    start=august_first, end=august_first + offsets.Day(21), freq='W-SUN'
+)[kids_dow_iteration - 1]
 
 october_first = august_first + offsets.MonthBegin(2)
 mother_dow_iteration = 3  # third sunday each October
 MOTHERS_DAY = pd.date_range(
-    start=october_first, end=october_first + offsets.Day(21),
-    freq='W-SUN')[mother_dow_iteration - 1]
+    start=october_first, end=october_first + offsets.Day(21), freq='W-SUN'
+)[mother_dow_iteration - 1]
 
 june_first = august_first - offsets.MonthBegin(2)
 father_dow_iteration = 3  # third sunday each June
 FATHERS_DAY = pd.date_range(
-    start=june_first, end=june_first + offsets.Day(21),
-    freq='W-SUN')[father_dow_iteration - 1]
+    start=june_first, end=june_first + offsets.Day(21), freq='W-SUN'
+)[father_dow_iteration - 1]
