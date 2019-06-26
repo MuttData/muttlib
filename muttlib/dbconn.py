@@ -310,7 +310,7 @@ class IbisClient:
         self,
         sql,
         params=None,  # pylint:disable=W0613
-        via_hdfs=True,
+        via_hdfs=False,
         cache_dir=None,
         table_prefix="ibis",
         refresh_cache=False,
