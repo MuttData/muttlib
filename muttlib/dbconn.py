@@ -467,6 +467,7 @@ class HiveDb:
         return conn.cursor()
 
     def execute(self, sql, params=None, show_progress=True, dry_run=False):
+        """Execute sql statement."""
         sql = utils.path_or_string(sql)
         if params is not None:
             try:
@@ -519,6 +520,7 @@ class HiveDb:
         return progress
 
     def to_frame(self, *args, **kwargs):
+        """Execute sql statement and return results as a Pandas dataframe."""
         cursor = self.execute(*args, **kwargs)
         if not cursor:
             return
