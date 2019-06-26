@@ -54,12 +54,14 @@ That should output a short summary and generate a dir `cov_html/` with a detaile
 
 
 ## Dirty Dry-run (done dirt cheap)
-```
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
-=======
 
 ```commandline
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+
+python -c 'from muttlib import dbconn, utils'
+
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+python -c 'from muttlib import ipynb_const, ipynb_utils'
 ```
 
 Misc DB support for dbconn:
@@ -71,17 +73,6 @@ pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
-```
-
-## Dirty Dry-run (done dirt cheap)
-
-```commandline
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
-
-python -c 'from muttlib import dbconn, utils'
-
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
-python -c 'from muttlib import ipynb_const, ipynb_utils'
 ```
 
 ## Pre-Commit for Version Control Integration
@@ -191,4 +182,3 @@ you created the branch, check the section on
 :ref:`updating a PR <contributing.update-pr>`.
 
 .. _contributing.documentation:
->>>>>>> Stashed changes
