@@ -89,7 +89,7 @@ def local_df_cache(
     It must be called as a function even when no arguments are passed:
     @local_df_cache()
 
-    The decorated function must not have any params that match the ones of this
+    The decorated function must not have any params that MATCH the ones of this
     decorator.
 
     Args:
