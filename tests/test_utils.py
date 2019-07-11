@@ -258,10 +258,12 @@ def test_df_info_to_str():
 RangeIndex: 5 entries, 0 to 4
 Data columns (total 1 columns):
 B    5 non-null int64
-dtypes: int64(1)
-memory usage: 120.0 bytes
-"""
-    assert str_cmp == utils.df_info_to_str(df)
+dtypes: int64(1)"""
+    # Remove last lines of df's `memory-sizes`, as they are platform dependent i.e.
+    # different platforms allocate different memory sizes for, say, int64 types
+    rv = utils.df_info_to_str(df)
+    rv = rv[: rv[:-1].rfind('\n')]
+    assert str_cmp == rv
 
 
 def test_template_basic(tmpdir):
