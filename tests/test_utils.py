@@ -8,6 +8,7 @@ from collections import OrderedDict, namedtuple, deque  # noqa: F401
 import pandas as pd
 from pandas.tseries import offsets
 import numpy as np
+from textwrap import dedent
 
 
 @pytest.mark.parametrize(
@@ -253,17 +254,24 @@ def test_get_semi_month_pay_days():
 
 
 def test_df_info_to_str():
+    # Almost the same `test_info_memory`:
+    # https://github.com/pandas-dev/pandas/blob/4edf938aedf55b9e6fbfb3199f70f857e8ec7e41/pandas/tests/frame/test_repr_info.py#L209
     df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns=['B'])
-    str_cmp = """<class 'pandas.core.frame.DataFrame'>
-RangeIndex: 5 entries, 0 to 4
-Data columns (total 1 columns):
-B    5 non-null int64
-dtypes: int64(1)"""
-    # Remove last lines of df's `memory-sizes`, as they are platform dependent i.e.
+    result = utils.df_info_to_str(df)
+    byt = float(df.memory_usage().sum())
+    # Manually imput the df's `memory-size` value, as they are platform dependent i.e.
     # different platforms allocate different memory sizes for, say, int64 types
-    rv = utils.df_info_to_str(df)
-    rv = rv[: rv[:-1].rfind('\n')]
-    assert str_cmp == rv
+    expected = dedent(
+        f"""\
+    <class 'pandas.core.frame.DataFrame'>
+    RangeIndex: 5 entries, 0 to 4
+    Data columns (total 1 columns):
+    B    5 non-null int64
+    dtypes: int64(1)
+    memory usage: {byt} bytes
+    """
+    )
+    assert result == expected
 
 
 def test_template_basic(tmpdir):
@@ -541,8 +549,8 @@ APPX_MEDIAN(plz kill me) AS median_None"""
 
 
 def test_get_cloudera_sample_cut():
-    int_test_none = 9223372036854775807
-    int_test_not_none = 18446744073709551615
+    int_test_none = 9_223_372_036_854_775_807
+    int_test_not_none = 18_446_744_073_709_551_615
 
     assert int_test_none == utils.get_cloudera_sample_cut(None)
     assert int_test_not_none == utils.get_cloudera_sample_cut(2)
