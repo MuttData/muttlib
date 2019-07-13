@@ -30,7 +30,7 @@ setuptools.setup(
         'jinja2',
         'pandas',
         'progressbar2',
-        'pyarrow',
+        'pyarrow==0.13.0',
         'pyyaml',
         'sqlalchemy',
         'scipy',
