@@ -115,17 +115,23 @@ def col_sample_display(
     display(df[col].describe())
     display(df[col].sample(10))
 
-    # Check either numerical or not
+    # Various checks either numerical or not
     if len_col < num_sample:
         num_sample = len_col
-    try:
-        pd.to_numeric(df[col].sample(num_sample))
-        is_numeric_type = True
-    except ValueError:
+    if col in utils.df_get_typed_cols(df, 'date'):
+        # Direct exit with `date`, as they can be miscasted to numeric
         is_numeric_type = False
+    else:
+        if col in utils.df_get_typed_cols(df, 'num'):
+            is_numeric_type = True
+        else:  # cols that are string which might get converted
+            try:
+                pd.to_numeric(df[col].sample(num_sample))
+                is_numeric_type = True
+            except ValueError:
+                is_numeric_type = False
 
     if is_numeric_type or num_unique_vals < 15:
-
         val_counts = df[col].value_counts().to_frame()
         val_counts.index.name = col
         val_counts.rename(columns={col: 'count'}, inplace=True)
@@ -133,11 +139,11 @@ def col_sample_display(
         display(val_counts.head(10))
 
     if is_numeric_type:
-
-        df[col] = pd.to_numeric(df[col], errors='coerce')
+        num_col = df[[col]].copy()  # keep in dataframe form to use the .query method
+        num_col[col] = pd.to_numeric(num_col[col].values, errors='coerce')
         query_str = f'{col} == {col}'
         if quantile is not None:
-            top_perc = df[col].quantile(q=quantile)
+            top_perc = num_col[col].quantile(q=quantile)
             # this +100 is a safety net for when top_perc results
             # are equal to the lower limit of the filter.
             query_str = f'{col}>=0 and {col}<= {top_perc+100}'
@@ -145,7 +151,7 @@ def col_sample_display(
         elif top_val is not None:
             query_str = f'{col}<= {top_val}'
 
-        df.query(query_str)[col].hist(bins=60)
+        num_col.query(query_str)[col].hist(bins=60)
         plt.title(query_str)
 
 
@@ -473,7 +479,7 @@ def plot_timeseries(
         Format y-axis with thousand-ticks, activated when y-col median is over
         this numerical threshold.
     secondary_y_scale : bool
-        To add another right-scale where to draw the series.    
+        To add another right-scale where to draw the series.
     fmt : [matplotlib] str, optional
         The series's format string.
     label : [matplotlib] str, optional
