@@ -1,0 +1,366 @@
+"""Module to give fbprophet a common interface to sklearn and general utilities
+for forecasting problems like limiting the datasets to the last n days,
+allowing wider grid search for hyperparameters not available like default.
+
+Classes:
+  - SkProphet: a wrapper around fbprophet to provide a scikit learn compatible
+    API.
+  - DaysSelectorEstimator: a scikit learn metaestimator to limit the amount of
+    days used to fit a forecast. Wraps another estimator.
+
+These two classes can be combined to perform gridsearch using fbprophet while
+also exploring the amount of training days to use in the dataset.
+
+The most relevant docstring are on:
+  - SkProphet.__init__
+  - SkProphet.fit
+  - DaysSelectorEstimator.__init__
+
+Simple examples can be taken from the tests.
+A complex example doing a grid search can be seen here:
+
+> import pandas as pd
+> from sklearn.model_selection import GridSearchCV, ParameterGrid
+> from muttlib.forecast import SkProphet, DaysSelectorEstimator
+>
+> # The grid has to be turned into a list if used in a DaysSelectorEstimator as
+> # it has to be copyable for get / set params
+> prophet_grid = list(ParameterGrid({
+>     'sk_date_column': ['date'],
+>     'sk_yhat_only': [True],
+>     'sk_extra_regressors': [
+>         [],
+>         [{'name': 'b'}],
+>         ],
+>     'prophet_kwargs': [
+>         dict(daily_seasonality='auto'),
+>         dict(daily_seasonality=True),
+>         ],
+>     }))
+>
+> days_selector_grid = {
+>     'estimator_class': [SkProphet],
+>     'amount_of_days': [90, 120],
+>     'sort_col': ['date'],
+>     'estimator_kwargs': prophet_grid,
+> }
+>
+> # GridSearchCV requires an initialized estimator for some reason
+> initial_estimator = DaysSelectorEstimator(
+>     SkProphet,
+>     days_selector_grid['amount_of_days'][0],
+>     prophet_grid[0])
+> cv = GridSearchCV(
+>     initial_estimator,
+>     days_selector_grid,
+>     cv=2,
+>     scoring='r2')
+>
+> X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
+> y = pd.Series([1, 1, 0, 1, 0])
+> cv.fit(X, y)
+
+TODO:
+  - If fbprophet has other parameters like *extra_regressors* that are not set
+    on initialization and are added later through a method like
+    *add_regressors*, this are not currently taken into account and should be
+    added like extra_regressors if they are a few, or generalize that if there
+    are many options. Note: I haven't used other parameters like this one.
+"""
+from copy import deepcopy
+from inspect import isclass
+
+import numpy as np
+import pandas as pd
+
+from fbprophet import Prophet
+from sklearn.base import BaseEstimator
+
+
+class SkProphet(Prophet):
+
+    def __init__(self, sk_date_column='ds', sk_yhat_only=True,
+                 sk_extra_regressors=[], prophet_kwargs={}):
+        """Scikit learn compatible interface for fbprophet.
+
+        Parameters
+        ----------
+        sk_date_column: str
+            Name of the column to use as date in Prophet.
+        sk_yhat_only= Boolean
+            True to return only the yhat from Prophet predictions.
+            False to return everything.
+        sk_extra_regressors: [] or [str] or [dict()]
+            List with extra regressors to use. The list can have:
+            * strings: column names (default prophet arguments for extra
+              regressors will be used).
+            * {name: *column_name*, prior_scale: _, standardize: _, mode: _}
+              For more information see Prophet.add_regressors.
+        prophet_kwargs: dict
+            Keyword arguments to forward to Prophet.
+        """
+        super().__init__(**prophet_kwargs)
+        self.sk_date_column = sk_date_column
+        self.sk_yhat_only = sk_yhat_only
+        self.sk_extra_regressors = sk_extra_regressors
+        self.prophet_kwargs = prophet_kwargs
+        self._set_my_extra_regressors()
+
+    def fit(self, X, y=None, **fit_params):
+        """Scikit learn's like fit to fit the Prophet.
+
+        Parameters
+        ----------
+        X: pd.DataFrame
+            A dataframe with the data to fit.
+            It is expected to have a column with datetime values named as
+            *self.sk_date_column*.
+        y: None or str or (list, tuple, numpy.ndarray, pandas.Series/DataFrame)
+            The label values to fit. If y is:
+            * None: the column 'y' should be contained in X.
+            * str: the name of the column to use in X.
+            * list, tuple, ndarray, etc: the values to fit.
+              If the values have two dimensions (a matrix instead of a vector)
+              the first column will be used.
+              E.g.: [1, 3] -> [1, 3] will be used.
+              E.g.: [[1], [3]] -> [1, 3] will be used.
+              E.g.: [[1, 2], [3, 4]] -> [1, 3] will be used.
+        fit_params: keyword arguments
+            Keyword arguments to forward to Prophet's fit.
+        """
+        assert isinstance(X, pd.DataFrame)
+        X = X.copy()
+        if self.sk_date_column != 'ds' and self.sk_date_column in X.columns:
+            X = X.rename({self.sk_date_column: 'ds'}, axis=1)
+        if y is not None:
+            if isinstance(y, str) and y in X.columns:
+                X = X.rename({y: 'y'}, axis=1)
+            else:
+                X['y'] = self._as_np_vector(y)
+        return super().fit(X, **fit_params)
+
+    def predict(self, X):
+        """Scikit learn's predict (returns predicted values)."""
+        X = X.copy()
+        if self.sk_date_column != 'ds' and self.sk_date_column in X.columns:
+            X = X.rename({self.sk_date_column: 'ds'}, axis=1)
+        predictions = super().predict(X)
+        if self.sk_yhat_only:
+            predictions = predictions.yhat.values
+        return predictions
+
+    def transform(self, X):
+        """Scikit learn's transform"""
+        return self.predict(X)
+
+    def fit_transform(self, X, y=None, **fit_params):
+        """Scikit learn's fit_transform"""
+        self.fit(X, y, **fit_params)
+        return self.transform(X)
+
+    def get_params(self, deep=False):
+        """Scikit learn's get_params (returns the estimator's params)."""
+        prophet_attrs = [
+            'growth', 'changepoints', 'n_changepoints', 'changepoint_range',
+            'yearly_seasonality', 'weekly_seasonality', 'daily_seasonality',
+            'holidays', 'seasonality_mode', 'seasonality_prior_scale',
+            'holidays_prior_scale', 'changepoint_prior_scale', 'mcmc_samples',
+            'interval_width', 'uncertainty_samples']
+        sk_attrs = ['sk_yhat_only', 'sk_extra_regressors', 'sk_date_column',
+                    'prophet_kwargs']
+        prophet_params = {a: getattr(self, a, None) for a in prophet_attrs}
+        sk_params = {a: getattr(self, a, None) for a in sk_attrs}
+        if deep:
+            prophet_params['extra_regressors'] = deepcopy(
+                prophet_params['extra_regressors'])
+            sk_params['sk_extra_regressors'] = deepcopy(
+                sk_params['sk_extra_regressors'])
+            sk_params = deepcopy(sk_params['prophet_kwargs'])
+        sk_params['prophet_kwargs'].update(prophet_params)
+        return sk_params
+
+    def set_params(self, **params):
+        """Scikit learn's set_params (sets the parameters provided)."""
+        for attr, value in params.items():
+            setattr(self, attr, value)
+        self._set_my_extra_regressors()
+        return self
+
+    def _set_my_extra_regressors(self):
+        """Adds the regressors defined in self.sk_extra_regressors.
+        It is meant to be used at initialization.
+        """
+        for regressor in self.sk_extra_regressors:
+            if isinstance(regressor, str):
+                self.add_regressor(regressor)
+            else:
+                self.add_regressor(**regressor)
+
+    def _as_np_vector(self, y):
+        """Ensures a list, tuple, pandas.Series, pandas.DataFrame
+        or numpy.ndarray is returned as a numpy.ndarray of dimension 1.
+
+        Parameters
+        ----------
+        y: list, tuple, numpy.ndarray, pandas.Series, pandas.DataFrame
+            The object containing the y values to fit.
+            If y is multidimensional, e.g.: [[1, 2], [3, 4]], the first column
+            will be returned as y value, continuining the example: [1, 3].
+
+        Returns
+        -------
+        numpy.ndarray of dimension 1
+            The values as a numpy array of dimension 1.
+        """
+        if isinstance(y, (list, tuple)):
+            y = np.asarray(y)
+        elif isinstance(y, (pd.Series, pd.DataFrame)):
+            y = y.values
+        if isinstance(y, np.ndarray):
+            if len(y.shape) > 1:
+                y = y[:, 0]
+        return y
+
+    def __repr__(self):
+        """Text representation of the object to look it nicely in the
+        interpreter.
+        """
+        return (('%s(sk_date_column="%s", sk_yhat_only=%s, '
+                 'sk_extra_regressors=%s, prophet_kwargs=%s)') %
+                (self.__class__.__name__, self.sk_date_column,
+                 self.sk_yhat_only, self.extra_regressors,
+                 self.prophet_kwargs))
+
+    __str__ = __repr__
+
+
+class DaysSelectorEstimator(BaseEstimator):
+
+    def __init__(self, estimator_class, amount_of_days, estimator_kwargs={},
+                 sort_col='date'):
+        """An estimator that only uses a certain amount of rows on fit.
+
+        Parameters
+        ----------
+        estimator_class: Classer or Estimator Class or estimator instance
+            Estimator class to use to fit, if an Estimator Class is provided
+            it will be wrapped with a metaestimator.Classer, if a instance
+            is provided, its classed will be wrapped.
+            examples:
+            - Classer(sklearn.ensemble.RandomForestRegressor)
+            - sklearn.ensemble.RandomForestRegressor
+            - sklearn.ensemble.RandomForestRegressor()
+        amount_of_days: int
+            The amount of days to use for training.
+        sort_col: str
+            Name of the column which will be used for sorting if X is a
+            dataframe and has the column.
+        estimator_kwargs: dict
+            Keyword arguments to initialize EstimatorClass
+
+        E.g.:
+
+        > DaysSelectorEstimator(RandomForestRegressor(), 100)
+        """
+        self.amount_of_days = amount_of_days
+        self.sort_col = sort_col
+        self.estimator_kwargs = estimator_kwargs
+        self.estimator_class = Classer.from_obj(estimator_class)
+        self._estimator = self.estimator_class.new(**self.estimator_kwargs)
+
+    def fit(self, X, y):
+        """Fits self.estimator only to the last self.amount_of_days rows.
+        Tries to sort X first.
+
+        Parameters
+        ----------
+        X: pd.DataFrame
+            A dataframe to fit.
+        y: vector like
+            Labels
+        """
+        if self.sort_col in X.columns:
+            X = X.sort_values(self.sort_col, axis=0)
+        index_to_drop = X.iloc[:-self.amount_of_days].index
+        y = y.drop(index_to_drop).reset_index(drop=True)
+        X = X.drop(index_to_drop).reset_index(drop=True)
+        self._estimator.fit(X, y)
+        return self
+
+    def predict(self, X):
+        """Scikit's learn like predict."""
+        return self._estimator.predict(X)
+
+    def get_params(self, deep=True):
+        """Get estimator params."""
+        kwargs = self.estimator_kwargs
+        if deep:
+            kwargs = deepcopy(kwargs)
+        return {
+            'estimator_class': self.estimator_class,
+            'amount_of_days': self.amount_of_days,
+            'sort_col': self.sort_col,
+            'estimator_kwargs': kwargs}
+
+    def set_params(self, **params):
+        """Sets the estimator's params to **params."""
+        self.estimator_class = Classer.from_obj(params['estimator_class'])
+        self.amount_of_days = params['amount_of_days']
+        self.sort_col = params['sort_col']
+        self.estimator_kwargs = params['estimator_kwargs']
+        self._estimator = self.estimator_class.new(**self.estimator_kwargs)
+        return self
+
+    def __repr__(self):
+        """Text representation of the object to look it nicely in the
+        interpreter.
+        """
+        args = ','.join('%s=%s' % kwarg for kwarg in self.get_params().items())
+        return '%s(%s)' % (self.__class__.__name__, args)
+
+    __str__ = __repr__
+
+
+class Classer:
+
+    def __init__(self, EstimatorClass):
+        """Wraps an EstimatorClass to avoid sklearn.base.clone exploting when
+        called against an EstimatorClass during grid search of metaestimators.
+
+        Parameters
+        ----------
+        EstimatorClass: class
+            A sklearn compatible estimator class.
+        """
+        self._class = EstimatorClass
+
+    def new(self, *args, **kwargs):
+        """Returns a new instance of the wrapped class initialized with the
+        args and kwargs.
+        """
+        return self._class(*args, **kwargs)
+
+    @classmethod
+    def from_obj(cls, obj):
+        """Initializes a new classer from an object, which can be another
+        Classer, a class or an instance.
+        """
+        if isinstance(obj, Classer):
+            return obj
+        elif isclass(obj):
+            return Classer(obj)
+        else:
+            return Classer(obj.__class__)
+
+    def __eq__(self, other):
+        """Equality checks inner class wrapped."""
+        return (self.__class__ == other.__class__ and
+                self._class == other._class)
+
+    def __repr__(self):
+        """Text representation of the object to look it nicely in the
+        interpreter.
+        """
+        return '%s(%s)' % (self.__class__.__name__, self._class.__name__)
+
+    __str__ = __repr__
