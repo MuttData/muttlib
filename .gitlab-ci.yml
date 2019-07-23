@@ -14,3 +14,5 @@ test:
   - python -c 'from muttlib import dbconn, utils'
   - pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
   - python -c 'from muttlib import ipynb_const, ipynb_utils'
+  - pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[forecast]
+  - python -c 'from muttlib import forecast'
