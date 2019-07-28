@@ -6,7 +6,7 @@ import pandas as pd
 
 from sklearn.linear_model import LinearRegression
 
-from muttlib.forecast import SkProphet, Classer, DaysSelectorEstimator
+from muttlib.forecast import SkProphet, Classer, StepsSelectorEstimator
 
 
 class TestSkProphet(TestCase):
@@ -166,17 +166,17 @@ class TestSkProphet(TestCase):
         return X
 
 
-class TestDaysSelectorEstimator(TestCase):
+class TestStepsSelectorEstimator(TestCase):
 
     def test_init(self):
         # Arguments
         estimator_class = LinearRegression
-        amount_of_days = 30
+        amount_of_steps = 30
         estimator_kwargs = {'fit_intercept': False}
         sort_col = 'date'
         # Initialize
-        ds = DaysSelectorEstimator(
-            estimator_class, amount_of_days, estimator_kwargs, sort_col)
+        ds = StepsSelectorEstimator(
+            estimator_class, amount_of_steps, estimator_kwargs, sort_col)
         # Asserts
         self.assertEqual(ds._estimator.__class__, estimator_class)
         self.assertFalse(ds._estimator.fit_intercept)
@@ -191,7 +191,7 @@ class TestDaysSelectorEstimator(TestCase):
         X = pd.DataFrame({'x': x})
         # Initialize
         estimator_class = LinearRegression
-        ds = DaysSelectorEstimator(estimator_class, 30)
+        ds = StepsSelectorEstimator(estimator_class, 30)
         # Fit
         ds.fit(X, y)
         # Predict
@@ -203,16 +203,16 @@ class TestDaysSelectorEstimator(TestCase):
     def test_get_set_params(self):
         # Initialize
         estimator_class = LinearRegression
-        amount_of_days = 30
+        amount_of_steps = 30
         estimator_kwargs = {'fit_intercept': False}
         sort_col = 'date'
-        ds = DaysSelectorEstimator(
-            estimator_class, amount_of_days, estimator_kwargs, sort_col)
+        ds = StepsSelectorEstimator(
+            estimator_class, amount_of_steps, estimator_kwargs, sort_col)
         # Assert deep
         params = ds.get_params()
         self.assertEqual(len(params), 4)
         self.assertEqual(params['estimator_class'], Classer(estimator_class))
-        self.assertEqual(params['amount_of_days'], amount_of_days)
+        self.assertEqual(params['amount_of_steps'], amount_of_steps)
         self.assertEqual(params['estimator_kwargs'], estimator_kwargs)
         self.assertTrue(params['estimator_kwargs'] is not estimator_kwargs)
         self.assertEqual(params['sort_col'], sort_col)
