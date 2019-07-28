@@ -1,30 +1,30 @@
-"""Module to give fbprophet a common interface to sklearn and general utilities
+"""Module to give FBProphet a common interface to Sklearn and general utilities
 for forecasting problems like limiting the datasets to the last n days,
 allowing wider grid search for hyperparameters not available like default.
 
 Classes:
-  - SkProphet: a wrapper around fbprophet to provide a scikit learn compatible
+  - SkProphet: a wrapper around FBProphet to provide a scikit learn compatible
     API.
-  - DaysSelectorEstimator: a scikit learn metaestimator to limit the amount of
+  - StepsSelectorEstimator: a scikit learn metaestimator to limit the amount of
     days used to fit a forecast. Wraps another estimator.
 
-These two classes can be combined to perform gridsearch using fbprophet while
+These two classes can be combined to perform gridsearch using FBProphet while
 also exploring the amount of training days to use in the dataset.
 
-The most relevant docstring are on:
+The most relevant docstrings are on:
   - SkProphet.__init__
   - SkProphet.fit
-  - DaysSelectorEstimator.__init__
+  - StepsSelectorEstimator.__init__
 
 Simple examples can be taken from the tests.
 A complex example doing a grid search can be seen here:
 
 > import pandas as pd
 > from sklearn.model_selection import GridSearchCV, ParameterGrid
-> from muttlib.forecast import SkProphet, DaysSelectorEstimator
+> from muttlib.forecast import SkProphet, StepsSelectorEstimator
 >
-> # The grid has to be turned into a list if used in a DaysSelectorEstimator as
-> # it has to be copyable for get / set params
+> # The grid has to be turned into a list if used in a StepsSelectorEstimator
+> # as it has to be copyable for get / set params
 > prophet_grid = list(ParameterGrid({
 >     'sk_date_column': ['date'],
 >     'sk_yhat_only': [True],
@@ -40,15 +40,16 @@ A complex example doing a grid search can be seen here:
 >
 > days_selector_grid = {
 >     'estimator_class': [SkProphet],
->     'amount_of_days': [90, 120],
+>     'amount_of_steps': [90, 120],
 >     'sort_col': ['date'],
 >     'estimator_kwargs': prophet_grid,
 > }
 >
-> # GridSearchCV requires an initialized estimator for some reason
-> initial_estimator = DaysSelectorEstimator(
+> # To instance GridSearchCV, we need to pass an initialized estimator
+> # (for example, a `StepsSelectorEstimator`)
+> initial_estimator = StepsSelectorEstimator(
 >     SkProphet,
->     days_selector_grid['amount_of_days'][0],
+>     days_selector_grid['amount_of_steps'][0],
 >     prophet_grid[0])
 > cv = GridSearchCV(
 >     initial_estimator,
@@ -61,14 +62,14 @@ A complex example doing a grid search can be seen here:
 > cv.fit(X, y)
 
 TODO:
-  - If fbprophet has other parameters like *extra_regressors* that are not set
+  - If FBProphet has other parameters like *extra_regressors* that are not set
     on initialization and are added later through a method like
-    *add_regressors*, this are not currently taken into account and should be
+    *add_regressors*, these are not currently taken into account and should be
     added like extra_regressors if they are a few, or generalize that if there
     are many options. Note: I haven't used other parameters like this one.
 """
 from copy import deepcopy
-from inspect import isclass
+from inspect import isclass, signature
 
 import numpy as np
 import pandas as pd
@@ -79,9 +80,11 @@ from sklearn.base import BaseEstimator
 
 class SkProphet(Prophet):
 
-    def __init__(self, sk_date_column='ds', sk_yhat_only=True,
+    DS = 'ds'
+
+    def __init__(self, sk_date_column=DS, sk_yhat_only=True,
                  sk_extra_regressors=[], prophet_kwargs={}):
-        """Scikit learn compatible interface for fbprophet.
+        """Scikit learn compatible interface for FBProphet.
 
         Parameters
         ----------
@@ -94,7 +97,8 @@ class SkProphet(Prophet):
             List with extra regressors to use. The list can have:
             * strings: column names (default prophet arguments for extra
               regressors will be used).
-            * {name: *column_name*, prior_scale: _, standardize: _, mode: _}
+            * dicts: {name: *column_name*, prior_scale: _, standardize: _,
+                      mode: _}
               For more information see Prophet.add_regressors.
         prophet_kwargs: dict
             Keyword arguments to forward to Prophet.
@@ -107,7 +111,7 @@ class SkProphet(Prophet):
         self._set_my_extra_regressors()
 
     def fit(self, X, y=None, **fit_params):
-        """Scikit learn's like fit to fit the Prophet.
+        """Scikit learn's like fit on the Prophet model.
 
         Parameters
         ----------
@@ -128,10 +132,12 @@ class SkProphet(Prophet):
         fit_params: keyword arguments
             Keyword arguments to forward to Prophet's fit.
         """
-        assert isinstance(X, pd.DataFrame)
+        if not isinstance(X, pd.DataFrame):
+            raise TypeError(
+                'Arg "X" passed can only be of pandas.DataFrame type.')
         X = X.copy()
-        if self.sk_date_column != 'ds' and self.sk_date_column in X.columns:
-            X = X.rename({self.sk_date_column: 'ds'}, axis=1)
+        if self.sk_date_column != self.DS and self.sk_date_column in X.columns:
+            X = X.rename({self.sk_date_column: self.DS}, axis=1)
         if y is not None:
             if isinstance(y, str) and y in X.columns:
                 X = X.rename({y: 'y'}, axis=1)
@@ -142,8 +148,8 @@ class SkProphet(Prophet):
     def predict(self, X):
         """Scikit learn's predict (returns predicted values)."""
         X = X.copy()
-        if self.sk_date_column != 'ds' and self.sk_date_column in X.columns:
-            X = X.rename({self.sk_date_column: 'ds'}, axis=1)
+        if self.sk_date_column != self.DS and self.sk_date_column in X.columns:
+            X = X.rename({self.sk_date_column: self.DS}, axis=1)
         predictions = super().predict(X)
         if self.sk_yhat_only:
             predictions = predictions.yhat.values
@@ -153,21 +159,14 @@ class SkProphet(Prophet):
         """Scikit learn's transform"""
         return self.predict(X)
 
-    def fit_transform(self, X, y=None, **fit_params):
-        """Scikit learn's fit_transform"""
-        self.fit(X, y, **fit_params)
-        return self.transform(X)
-
     def get_params(self, deep=False):
         """Scikit learn's get_params (returns the estimator's params)."""
         prophet_attrs = [
-            'growth', 'changepoints', 'n_changepoints', 'changepoint_range',
-            'yearly_seasonality', 'weekly_seasonality', 'daily_seasonality',
-            'holidays', 'seasonality_mode', 'seasonality_prior_scale',
-            'holidays_prior_scale', 'changepoint_prior_scale', 'mcmc_samples',
-            'interval_width', 'uncertainty_samples']
-        sk_attrs = ['sk_yhat_only', 'sk_extra_regressors', 'sk_date_column',
-                    'prophet_kwargs']
+            attr for attr in signature(Prophet.__init__).parameters
+            if attr != 'self']
+        sk_attrs = [
+            attr for attr in signature(self.__init__).parameters
+            if attr != 'self']
         prophet_params = {a: getattr(self, a, None) for a in prophet_attrs}
         sk_params = {a: getattr(self, a, None) for a in sk_attrs}
         if deep:
@@ -190,11 +189,19 @@ class SkProphet(Prophet):
         """Adds the regressors defined in self.sk_extra_regressors.
         It is meant to be used at initialization.
         """
+        if self.extra_regressors:
+            self.extra_regressors = self.extra_regressors.__class__()
         for regressor in self.sk_extra_regressors:
             if isinstance(regressor, str):
                 self.add_regressor(regressor)
-            else:
+            elif isinstance(regressor, dict):
                 self.add_regressor(**regressor)
+            else:
+                raise TypeError(
+                    'Invalid extra_regressor in SkProphet.'
+                    'Extra regressors must be strings or dicts with '
+                    '{name: *column_name*, prior_scale: _, standardize: _, '
+                    'mode: _}')
 
     def _as_np_vector(self, y):
         """Ensures a list, tuple, pandas.Series, pandas.DataFrame
@@ -234,9 +241,9 @@ class SkProphet(Prophet):
     __str__ = __repr__
 
 
-class DaysSelectorEstimator(BaseEstimator):
+class StepsSelectorEstimator(BaseEstimator):
 
-    def __init__(self, estimator_class, amount_of_days, estimator_kwargs={},
+    def __init__(self, estimator_class, amount_of_steps, estimator_kwargs={},
                  sort_col='date'):
         """An estimator that only uses a certain amount of rows on fit.
 
@@ -250,8 +257,8 @@ class DaysSelectorEstimator(BaseEstimator):
             - Classer(sklearn.ensemble.RandomForestRegressor)
             - sklearn.ensemble.RandomForestRegressor
             - sklearn.ensemble.RandomForestRegressor()
-        amount_of_days: int
-            The amount of days to use for training.
+        amount_of_steps: int
+            The amount of time steps to use for training.
         sort_col: str
             Name of the column which will be used for sorting if X is a
             dataframe and has the column.
@@ -260,16 +267,16 @@ class DaysSelectorEstimator(BaseEstimator):
 
         E.g.:
 
-        > DaysSelectorEstimator(RandomForestRegressor(), 100)
+        > StepsSelectorEstimator(RandomForestRegressor(), 100)
         """
-        self.amount_of_days = amount_of_days
+        self.amount_of_steps = amount_of_steps
         self.sort_col = sort_col
         self.estimator_kwargs = estimator_kwargs
         self.estimator_class = Classer.from_obj(estimator_class)
         self._estimator = self.estimator_class.new(**self.estimator_kwargs)
 
     def fit(self, X, y):
-        """Fits self.estimator only to the last self.amount_of_days rows.
+        """Fits self.estimator only to the last self.amount_of_steps rows.
         Tries to sort X first.
 
         Parameters
@@ -281,7 +288,7 @@ class DaysSelectorEstimator(BaseEstimator):
         """
         if self.sort_col in X.columns:
             X = X.sort_values(self.sort_col, axis=0)
-        index_to_drop = X.iloc[:-self.amount_of_days].index
+        index_to_drop = X.iloc[:-self.amount_of_steps].index
         y = y.drop(index_to_drop).reset_index(drop=True)
         X = X.drop(index_to_drop).reset_index(drop=True)
         self._estimator.fit(X, y)
@@ -298,14 +305,14 @@ class DaysSelectorEstimator(BaseEstimator):
             kwargs = deepcopy(kwargs)
         return {
             'estimator_class': self.estimator_class,
-            'amount_of_days': self.amount_of_days,
+            'amount_of_steps': self.amount_of_steps,
             'sort_col': self.sort_col,
             'estimator_kwargs': kwargs}
 
     def set_params(self, **params):
         """Sets the estimator's params to **params."""
         self.estimator_class = Classer.from_obj(params['estimator_class'])
-        self.amount_of_days = params['amount_of_days']
+        self.amount_of_steps = params['amount_of_steps']
         self.sort_col = params['sort_col']
         self.estimator_kwargs = params['estimator_kwargs']
         self._estimator = self.estimator_class.new(**self.estimator_kwargs)
@@ -330,7 +337,7 @@ class Classer:
         Parameters
         ----------
         EstimatorClass: class
-            A sklearn compatible estimator class.
+            A Sklearn compatible estimator class.
         """
         self._class = EstimatorClass
 
