@@ -1,6 +1,37 @@
 """
 Google Sheets <> Pandas connector
 
+Remember it is crucial that you acquire correct Google Cloud Platform credentials
+to interact with GSheets and GDrive APIs with authorization. See the README.md for
+more details.
+
+A full round trip of how this module operates scan be seen here:
+
+> import pandas as pd
+> ​from muttlib import gsheetsconn
+>
+> GOOGLE_SHEETS_SECRETS_JSON_FP = "/some/local/dir/path/to/json/file.json"
+> # A spreadhseet id is part of the url used in your browser
+> GSHEETS_SPREAD_ID = "1psc7zc-yppfpmEUWAi6hW4GLstiPyZqlov6w6eATeuU"
+> GSHEETS_WORKSHEET_NAME = 'test'
+>
+> gsheets_client = GSheetsClient(GOOGLE_SHEETS_SECRETS_JSON_FP)
+>​
+> # Construct random data from integers
+> keys = list('ABC')
+> numrows = 100
+> str_length = 4
+> df = pd.DataFrame(
+>     pd.np.random.randint(0, 15, sizimport pandas as pd
+> # And letters
+> df['letters'] = pd.util.testing.rands_array(str_length, numrows)
+​>
+> # Test push working gsheets conn
+> spreadsheet_id, worksheet = (GSHEETS_SPREAD_ID, GSHEETS_WORKSHEET_NAME)
+​>
+> gsheets_client.insert_from_frame(df, spreadsheet_id, index=True, worksheet=worksheet)
+>​
+> return_df = gsheets_client.to_frame(spreadsheet_id, worksheet=worksheet)
 """
 # TODO July 29, 2019: extend docstring with examples
 import logging
