@@ -62,11 +62,18 @@ A complex example doing a grid search can be seen here:
 > cv.fit(X, y)
 
 TODO:
-  - If FBProphet has other parameters like *extra_regressors* that are not set
-    on initialization and are added later through a method like
-    *add_regressors*, these are not currently taken into account and should be
-    added like extra_regressors if they are a few, or generalize that if there
-    are many options. Note: I haven't used other parameters like this one.
+  - At the moment, given FBProphet's current version we have that the model's
+    parameter for *extra_regressors* is not set on initialization but rather it
+    is set by using a specific prophet method. Thus, we have that our current
+    SKProphet class handles this parameter by setting it manually and knowing
+    about this implicitly. If, for some future reason, prophet's API changes to
+    include a variety of other/new parameters that are added _not-on-init_,
+    then it'ld be probably a good idea to keep an internal dictionary of the
+    parameter's dtype and prophet's method used to set it, so as to iterate and
+    set these in a "programatic" way.
+  - Evaluate if SkProphet.fit and SkProphet.copy default value should be False
+    to save memory and cpu by default, risking to modifying the input data as a
+    side effect of the function.
 """
 from copy import deepcopy
 from inspect import isclass, signature
@@ -110,7 +117,7 @@ class SkProphet(Prophet):
         self.prophet_kwargs = prophet_kwargs
         self._set_my_extra_regressors()
 
-    def fit(self, X, y=None, **fit_params):
+    def fit(self, X, y=None, copy=True, **fit_params):
         """Scikit learn's like fit on the Prophet model.
 
         Parameters
@@ -129,13 +136,21 @@ class SkProphet(Prophet):
               E.g.: [1, 3] -> [1, 3] will be used.
               E.g.: [[1], [3]] -> [1, 3] will be used.
               E.g.: [[1, 2], [3, 4]] -> [1, 3] will be used.
+        copy: Boolean
+            True to copy the input dataframe before working with it to avoid
+            modifying the original one.
+            If True is set, X should contain the `ds` and `y` columns for
+            prophet with those names.
+            If False is provided, the input data will be copied and the copy
+            modified if required.
         fit_params: keyword arguments
             Keyword arguments to forward to Prophet's fit.
         """
         if not isinstance(X, pd.DataFrame):
             raise TypeError(
                 'Arg "X" passed can only be of pandas.DataFrame type.')
-        X = X.copy()
+        if copy:
+            X = X.copy()
         if self.sk_date_column != self.DS and self.sk_date_column in X.columns:
             X = X.rename({self.sk_date_column: self.DS}, axis=1)
         if y is not None:
@@ -145,9 +160,23 @@ class SkProphet(Prophet):
                 X['y'] = self._as_np_vector(y)
         return super().fit(X, **fit_params)
 
-    def predict(self, X):
-        """Scikit learn's predict (returns predicted values)."""
-        X = X.copy()
+    def predict(self, X, copy=True):
+        """Scikit learn's predict (returns predicted values).
+
+        Parameters
+        ----------
+        X: pandas.DataFrame
+            Input data for predictions.
+        copy: Boolean
+            True to copy the input dataframe before working with it to avoid
+            modifying the original one.
+            If True is set, X should contain the `ds` and `y` columns for
+            prophet with those names.
+            If False is provided, the input data will be copied and the copy
+            modified if required.
+        """
+        if copy:
+            X = X.copy()
         if self.sk_date_column != self.DS and self.sk_date_column in X.columns:
             X = X.rename({self.sk_date_column: self.DS}, axis=1)
         predictions = super().predict(X)
@@ -155,11 +184,7 @@ class SkProphet(Prophet):
             predictions = predictions.yhat.values
         return predictions
 
-    def transform(self, X):
-        """Scikit learn's transform"""
-        return self.predict(X)
-
-    def get_params(self, deep=False):
+    def get_params(self, deep=True):
         """Scikit learn's get_params (returns the estimator's params)."""
         prophet_attrs = [
             attr for attr in signature(Prophet.__init__).parameters
@@ -170,11 +195,8 @@ class SkProphet(Prophet):
         prophet_params = {a: getattr(self, a, None) for a in prophet_attrs}
         sk_params = {a: getattr(self, a, None) for a in sk_attrs}
         if deep:
-            prophet_params['extra_regressors'] = deepcopy(
-                prophet_params['extra_regressors'])
-            sk_params['sk_extra_regressors'] = deepcopy(
-                sk_params['sk_extra_regressors'])
-            sk_params = deepcopy(sk_params['prophet_kwargs'])
+            sk_params = deepcopy(sk_params)
+            prophet_params = deepcopy(prophet_params)
         sk_params['prophet_kwargs'].update(prophet_params)
         return sk_params
 
@@ -251,7 +273,7 @@ class StepsSelectorEstimator(BaseEstimator):
         ----------
         estimator_class: Classer or Estimator Class or estimator instance
             Estimator class to use to fit, if an Estimator Class is provided
-            it will be wrapped with a metaestimator.Classer, if a instance
+            it will be wrapped with a metaestimator.Classer, if an instance
             is provided, its classed will be wrapped.
             examples:
             - Classer(sklearn.ensemble.RandomForestRegressor)
