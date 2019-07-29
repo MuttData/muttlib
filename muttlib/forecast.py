@@ -1,6 +1,7 @@
 """Module to give FBProphet a common interface to Sklearn and general utilities
 for forecasting problems like limiting the datasets to the last n days,
-allowing wider grid search for hyperparameters not available like default.
+allowing wider grid search for hyperparameters not available using standard
+FBProphet and Sklearn libraries.
 
 Classes:
   - SkProphet: a wrapper around FBProphet to provide a scikit learn compatible
