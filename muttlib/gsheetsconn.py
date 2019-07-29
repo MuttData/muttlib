@@ -10,7 +10,7 @@ from typing import List
 from typing import Any
 from pathlib import Path
 
-from utils import split_on_letter
+from muttlib.utils import split_on_letter
 
 logger = logging.getLogger(f'gsheetsconn.{__name__}')  # NOQA
 
