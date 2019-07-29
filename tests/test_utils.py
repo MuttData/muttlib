@@ -735,3 +735,19 @@ def test_dedup_list(example_input, expected):
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ('foo', ("foo",)),
+        ("a0aa", ('a', '0', 'aa')),
+        ("cccc", ("cccc",)),
+        ("1235556", ("1235556",)),
+        ("AAaa3333 AA fff", ('AAaa', '3333 ', 'AA', ' ', 'fff')),
+        ("AAaa3333  fff", ('AAaa', '3333  ', 'fff')),
+    ],
+)
+def test_split_on_letter(test_input, expected):
+    # Testing varous input strs to splitting
+    assert utils.split_on_letter(test_input) == expected
