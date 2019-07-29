@@ -11,4 +11,6 @@ test:
   - python -c 'from muttlib import ipynb_const, ipynb_utils'
   - pip install .[forecast]
   - python -c 'from muttlib import forecast'
+  - pip install .[gsheets]
+  - python -c 'from muttlib import gsheetsconn'
   - python setup.py test
