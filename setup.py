@@ -62,9 +62,7 @@ setuptools.setup(
             'mypy',
             'pylint',
         ],
-        'forecast': [
-            'fbprophet',
-            'scikit-learn'
-        ],
+        'forecast': ['fbprophet', 'scikit-learn'],
+        'gsheets': ['gspread_pandas'],
     },
 )
