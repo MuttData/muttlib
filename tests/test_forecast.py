@@ -228,6 +228,22 @@ class TestSkProphet(TestCase):
         self.assertEqual(len(p.sk_extra_regressors), 1)
         self.assertEqual(p.sk_extra_regressors[0]['name'], 'z')
 
+    def test_repr(self):
+        # Initialize
+        sk_date_column = 'date'
+        sk_yhat_only = False
+        sk_extra_regressors = [dict(name='x', mode='multiplicative')]
+        prophet_kwargs = {'daily_seasonality': True}
+        skprophet = SkProphet(
+            sk_date_column, sk_yhat_only, sk_extra_regressors, prophet_kwargs)
+        # Assert: do not assert prophet internal attributes
+        expected = (
+            'SkProphet('
+            'sk_date_column="date", '
+            'sk_yhat_only=False, '
+            'sk_extra_regressors=')
+        self.assertEqual(str(skprophet)[:len(expected)], expected)
+
     @staticmethod
     def _get_dataset():
         n = 60
@@ -374,6 +390,22 @@ class TestStepsSelectorEstimator(TestCase):
         self.assertEqual(params['estimator_kwargs'], estimator_kwargs)
         self.assertEqual(params['sort_col'], sort_col)
 
+    def test_repr(self):
+        # Initialize
+        estimator_class = LinearRegression
+        amount_of_steps = 30
+        estimator_kwargs = {'fit_intercept': False}
+        sort_col = 'date'
+        steps_estimator = StepsSelectorEstimator(
+            estimator_class, amount_of_steps, estimator_kwargs, sort_col)
+        # Assert
+        expected = (
+            'StepsSelectorEstimator('
+            'estimator_class=Classer(LinearRegression), '
+            'amount_of_steps=30, '
+            'estimator_kwargs={\'fit_intercept\': False})')
+        self.assertEqual(str(steps_estimator), expected)
+
 
 class TestClasser(TestCase):
 
@@ -415,6 +447,10 @@ class TestClasser(TestCase):
         classer_a = Classer(LinearRegression)
         classer_b = Classer.from_obj(LinearRegression())
         self.assertEqual(classer_a, classer_b)
+
+    def test_repr(self):
+        classer_a = Classer(LinearRegression)
+        self.assertEqual(str(classer_a), 'Classer(LinearRegression)')
 
 
 if __name__ == '__main__':

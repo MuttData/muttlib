@@ -254,11 +254,11 @@ class SkProphet(Prophet):
         """Text representation of the object to look it nicely in the
         interpreter.
         """
-        return (('%s(sk_date_column="%s", sk_yhat_only=%s, '
-                 'sk_extra_regressors=%s, prophet_kwargs=%s)') %
-                (self.__class__.__name__, self.sk_date_column,
-                 self.sk_yhat_only, self.extra_regressors,
-                 self.prophet_kwargs))
+        return (f'{self.__class__.__name__}('
+                f'sk_date_column="{self.sk_date_column}", '
+                f'sk_yhat_only={self.sk_yhat_only}, '
+                f'sk_extra_regressors={self.extra_regressors}'
+                f'prophet_kwargs={self.prophet_kwargs})')
 
     __str__ = __repr__
 
@@ -344,8 +344,10 @@ class StepsSelectorEstimator(BaseEstimator):
         """Text representation of the object to look it nicely in the
         interpreter.
         """
-        args = ','.join('%s=%s' % kwarg for kwarg in self.get_params().items())
-        return '%s(%s)' % (self.__class__.__name__, args)
+        return (f'{self.__class__.__name__}('
+                f'estimator_class={Classer.from_obj(self.estimator_class)}, '
+                f'amount_of_steps={self.amount_of_steps}, '
+                f'estimator_kwargs={self.estimator_kwargs})')
 
     __str__ = __repr__
 
@@ -390,6 +392,6 @@ class Classer:
         """Text representation of the object to look it nicely in the
         interpreter.
         """
-        return '%s(%s)' % (self.__class__.__name__, self._class.__name__)
+        return f'{self.__class__.__name__}({self._class.__name__})'
 
     __str__ = __repr__
