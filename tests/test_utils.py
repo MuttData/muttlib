@@ -44,8 +44,8 @@ def test_dict_to_namedtuple(test_input, expected):
     assert namedtuple('mr', 'meeseeks')(test_input) == expected
 
 
-def test_create_dict_id():
-    assert '96107c8ce8' == utils.create_dict_id({'meeseeks': 'look at me'})
+def test_get_obj_hash():
+    assert '96107c8ce8' == utils.get_obj_hash({'meeseeks': 'look at me'})
 
 
 def test_get_ordered_factor_levels():

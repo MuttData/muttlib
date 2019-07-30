@@ -346,8 +346,8 @@ def get_first_fortnight_last_day(ds):
     return last_sunday_first_fortnight
 
 
-def create_dict_id(d, length=10):
-    """Return SHAKE 256 hash from dict.
+def get_obj_hash(d, length=10):
+    """Return SHAKE 256 hash from hashable obj.
 
     Args:
         d: dict containing all necesssary data
