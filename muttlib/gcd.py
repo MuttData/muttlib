@@ -3,6 +3,18 @@ Greatest Common Divisor module.
 
 Holds various widely used and tested classes along different projects.
 Same with abstract + base classes with different responsibilities.
+
+
+Example using timeRangeConf:
+
+> from muttlib.gcd import TimeRangeConfiguration
+> import pandas as pd
+> end_date = pd.to_datetime('2019-07-01')
+> trc = TimeRangeConfiguration(end_date, 365*4, 365, 'M')
+>
+> print(trc.start_date, trc.end_date, trc.future_date, trc.is_monthly())
+2015-07-02 00:00:00 2019-07-01 00:00:00 2020-06-30 00:00:00 True
+
 """
 from muttlib.utils import create_forecaster_dates
 from sklearn.base import BaseEstimator
