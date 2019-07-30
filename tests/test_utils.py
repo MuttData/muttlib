@@ -749,5 +749,38 @@ def test_dedup_list(example_input, expected):
     ],
 )
 def test_split_on_letter(test_input, expected):
-    # Testing varous input strs to splitting
+    # Testing various input strs to splitting
     assert utils.split_on_letter(test_input) == expected
+
+
+@pytest.mark.parametrize(
+    "ed, tw, fw, expected",
+    [
+        (
+            '2019-10-25',
+            2,
+            3,
+            (
+                pd.Timestamp('2019-10-23'),
+                datetime.datetime(2019, 10, 25),
+                pd.Timestamp('2019-10-28'),
+            ),
+        ),
+        (
+            '2018-01-01',
+            60,
+            30,
+            (
+                pd.Timestamp('2017-11-02'),
+                datetime.datetime(2018, 1, 1),
+                pd.Timestamp('2018-01-31'),
+            ),
+        ),
+        # will fail due to raise on negative windows
+        pytest.param('2019-10-25', -2, 1, (1, 1, 1), marks=pytest.mark.xfail),
+        pytest.param('2019-10-25', 2, -1, (1, 1, 1), marks=pytest.mark.xfail),
+    ],
+)
+def test_create_forecaster_dates(ed, tw, fw, expected):
+    # Testing various input dates and windows
+    assert utils.create_forecaster_dates(ed, tw, fw) == expected

@@ -819,3 +819,25 @@ def dedup_list(li: list):
 def split_on_letter(s):
     """Split string on groups of letters"""
     return tuple(filter(None, re.split(r'([aA-zZ]+)', s)))
+
+
+def create_forecaster_dates(end_date, forecast_train_window, forecast_future_window):
+    """Process and correct all respective dates for forecaster.
+
+    Args:
+        end_date (datetime): The end date with hour precision.
+        forecast_train_window (int): The window days for past data.
+        forecast_future_window (int): The window days for future predictions.
+
+    Returns:
+        (datetime, datetime, datetime): Truple with start, end and future dates.
+    """
+    if not all([forecast_future_window > 0, forecast_train_window >= 0]):
+        raise ValueError(
+            f"Future ('{forecast_future_window}') or train "
+            f"('{forecast_train_window}') windows are not geq 0."
+        )
+    end_date = str_to_datetime(end_date) if isinstance(end_date, str) else end_date
+    start_date = end_date - pd.offsets.Day(forecast_train_window)
+    future_date = end_date + pd.offsets.Day(forecast_future_window)
+    return start_date, end_date, future_date
