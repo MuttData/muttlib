@@ -2,10 +2,11 @@
 Google Sheets <> Pandas connector
 
 Remember it is crucial that you acquire correct Google Cloud Platform credentials
-to interact with GSheets and GDrive APIs with authorization. See the README.md for
-more details.
+to interact with GSheets and GDrive APIs with authorization. This come in the form of a
+json file whose path needs to be passed to this during initialization.
+See the README.md for more details on how to acquire one.
 
-A full round trip of how this module operates scan be seen here:
+A full round trip of how this module operates scan be seen as follows:
 
 > import pandas as pd
 > ​from muttlib import gsheetsconn
