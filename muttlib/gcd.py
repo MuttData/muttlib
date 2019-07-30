@@ -13,7 +13,7 @@ class AttributeHelperMixin(BaseEstimator):
     """Helper mixing to handle params, metrics and artifacts of processing steps.
 
     This mixing relieves the step of knowning how to log metrics and artifacts
-    and allows the possibility of having differnt backends (instead of just mlflow).
+    and allows the possibility of having different backends (instead of just mlflow).
     """
 
     def _get_init(self, n, v):
@@ -154,3 +154,61 @@ class TimeRangeConfiguration(AttributeHelperMixin):
 
     def is_monthly(self):
         return self.time_granularity == self.MONTHLY_TIME_GRANULARITY
+
+
+class BaseStrategyBuilder:
+    """Abstract class to implement strategies.
+
+    Attributes:
+        name (str): Name to be matched by the subclass.
+    """
+
+    name = None
+
+    def __init__(self, name):
+        self.name = name
+
+    @classmethod
+    def accept(cls, name):
+        """Check if this class name matches with the one given.
+
+        Returns
+            True if `cls.name == name` False otherwise.
+        """
+        return cls.name == name
+
+    @classmethod
+    def soft_accept(cls, name):
+        """Check if this class name matches by an alternative criteria.
+
+        Use this to implement partial name matchings for example.
+
+        Returns
+            True if class matches the given criteria.
+        """
+        return cls.accept(name)
+
+    @classmethod
+    def build(cls, name):
+        """Find matching subclass and instance it.
+
+        This method calls the `accept` method of each subclass to find the one by name.
+        If None is found the same is done with `soft_accept`.
+        If this also fails the current class will be instantiated.
+        """
+        scs = cls.__subclasses__()
+
+        scl_hard = [sc for sc in scs if sc.accept(name)]
+        scl_soft = [sc for sc in scs if sc.soft_accept(name)]
+        for scl in [scl_hard, scl_soft]:
+            if len(scl) > 1:
+                raise ValueError(
+                    f"Multiple subclasses matched {name}. Check your namings."
+                )
+            if len(scl) == 1:
+                sc = scl[0](name)
+                break
+        else:
+            sc = cls
+
+        return sc(name)
