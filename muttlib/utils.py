@@ -10,7 +10,7 @@ import sys
 
 from collections import OrderedDict, deque, namedtuple
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, date
 from functools import wraps
 from pathlib import Path
 from typing import List, Union
@@ -837,6 +837,14 @@ def create_forecaster_dates(end_date, forecast_train_window, forecast_future_win
             f"Future ('{forecast_future_window}') or train "
             f"('{forecast_train_window}') windows are not geq 0."
         )
+
+    if not (
+        isinstance(end_date, str)
+        or isinstance(end_date, date)
+        or isinstance(end_date, pd.Timestamp)
+    ):
+        raise TypeError("`end_date` arg must be date-like or string typed")
+
     end_date = str_to_datetime(end_date) if isinstance(end_date, str) else end_date
     start_date = end_date - pd.offsets.Day(forecast_train_window)
     future_date = end_date + pd.offsets.Day(forecast_future_window)
