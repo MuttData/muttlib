@@ -42,17 +42,6 @@ def test_no_value():
             pd.to_datetime('2019-07-31'),
             'monthly',
         ),
-        pytest.param(
-            pd.to_datetime('2019-06-01'),
-            -2,
-            -1,
-            'H',
-            0,
-            pd.Timestamp("'2019-04-02"),
-            pd.to_datetime('2019-06-08'),
-            'hourly',
-            marks=pytest.raises(ValueError, match="*geq*"),
-        ),
     ],
 )
 def test_time_range_configuration_init(ed, twin, fwin, tg, ehour, sd, fd, tn):
@@ -62,3 +51,8 @@ def test_time_range_configuration_init(ed, twin, fwin, tg, ehour, sd, fd, tn):
     assert trc.future_date == fd
     assert trc.time_granularity == tg
     assert trc.time_granularity_name == tn
+
+
+def test_time_range_configuration_init_error():
+    with pytest.raises(ValueError):
+        TimeRangeConfiguration(pd.to_datetime('2019-06-01'), -2, -1, 'H')
