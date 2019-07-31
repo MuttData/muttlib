@@ -20,16 +20,45 @@ def test_no_value():
 
 
 @pytest.mark.parametrize(
-    "sd, ed, fd",
+    "ed, twin, fwin, tg, ehour, sd, fd, tn",
     [
         (
-            pd.Timestamp("'2019-04-02"),
             pd.to_datetime('2019-06-01'),
+            60,
+            7,
+            'H',
+            0,
+            pd.Timestamp("'2019-04-02"),
             pd.to_datetime('2019-06-08'),
-        )
+            'hourly',
+        ),
+        (
+            pd.to_datetime('2019-06-01'),
+            60,
+            60,
+            'M',
+            0,
+            pd.Timestamp("'2019-04-02"),
+            pd.to_datetime('2019-07-31'),
+            'monthly',
+        ),
+        pytest.param(
+            pd.to_datetime('2019-06-01'),
+            -2,
+            -1,
+            'H',
+            0,
+            pd.Timestamp("'2019-04-02"),
+            pd.to_datetime('2019-06-08'),
+            'hourly',
+            marks=pytest.raises(ValueError, match="*geq*"),
+        ),
     ],
 )
-def test_correct_dates(trange_conf, sd, ed, fd):  # pylint: disable=redefined-outer-name
-    assert trange_conf.start_date == sd
-    assert trange_conf.end_date == ed
-    assert trange_conf.future_date == fd
+def test_time_range_configuration_init(ed, twin, fwin, tg, ehour, sd, fd, tn):
+    trc = TimeRangeConfiguration(ed, twin, fwin, tg, end_hour=ehour)
+    assert trc.end_date == ed
+    assert trc.start_date == sd
+    assert trc.future_date == fd
+    assert trc.time_granularity == tg
+    assert trc.time_granularity_name == tn
