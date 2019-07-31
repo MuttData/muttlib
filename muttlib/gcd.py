@@ -27,7 +27,36 @@ class AttributeHelperMixin(BaseEstimator):
     and allows the possibility of having different backends (instead of just mlflow).
     """
 
-    def _get_init(self, name, val):
+class AttributeHelperMixin(BaseEstimator):
+    """Helper mixing to handle params, metrics and artifacts from processing steps.
+
+    This mixing relieves the step of knowning how to log metrics and artifacts
+    and allows the possibility of having different backends (instead of just mlflow).
+
+    NOTE/TODO:
+    - Currently `log_metric` differs from mlflow in that there can only be one value of each.
+      mlflow in constrast logs each value with a timestamp. This could be a problem in some
+      applications such as logging during trainig.
+      Proper mlflow backend implementation is needed to solve this.
+    """
+    def __init__(self):
+        self._artifacts = []
+        self._metrics = {}
+
+    def log_artifact(self, path):
+        self._artifacts.append(path)
+
+    def get_artifacts(self):
+        return self._artifacts
+
+    def log_metrics(self, d):
+        self._metrics.update(d)
+
+    def log_metric(self, k, v):
+        self.log_metrics({k: v})
+
+    def get_metrics(self):
+        return self._metrics
         """
         Initialize instance attrs on the fly.
 
