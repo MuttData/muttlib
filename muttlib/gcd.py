@@ -28,9 +28,15 @@ class AttributeHelperMixin(BaseEstimator):
     """
 
     def _get_init(self, name, val):
-        """Initialize instance vars on the fly.
+        """
+        Initialize instance attrs on the fly.
 
-        Not nice but removes the need of cooperation from subclasses.
+        Args:
+            name (str): Attribute's name.
+            val (dict, list): Desired attr value to set.
+
+        Notes:
+            Not nice but removes the need of cooperation from subclasses.
         """
         if not hasattr(self, name):
             setattr(self, name, val)
@@ -86,15 +92,20 @@ class TimeRangeConfiguration(AttributeHelperMixin):
         time_granularity,
         end_hour=0,
     ):
-        """Initialize instance.
+        """
+        Initialize.
 
+        Args:
             end_date (datetime): End of the data to train.
-            forecast_train_window (int): Number of days used for training.
-            forecast_future_window (int): Number for the forecast.
+            forecast_train_window (int): Number of days previous to the `end_date`,
+                used for training.
+            forecast_future_window (int): Positive number of future days for
+                the forecast interval. Note this is anchored from the `end_date` arg.
             time_granularity (string): String values defining a time frequency
-                such as 'H' or 'D'.
+                such as 'H', 'D', 'M', etc.
 
-        Ref: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+        Ref:
+            https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
         """
         sd, ed, fd = create_forecaster_dates(
             end_date, forecast_train_window, forecast_future_window
