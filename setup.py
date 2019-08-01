@@ -62,5 +62,9 @@ setuptools.setup(
             'mypy',
             'pylint',
         ],
+        'forecast': [
+            'fbprophet',
+            'scikit-learn'
+        ],
     },
 )
