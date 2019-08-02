@@ -1,5 +1,8 @@
 [flake8]
 
+per-file-ignores =
+    tests/*.py:D103, D100
+
 ignore =
     E203, # Whitespace before ':'
     E402, # Import not at top of file
