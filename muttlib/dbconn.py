@@ -5,6 +5,7 @@ import shutil
 from functools import wraps
 from time import sleep
 from urllib.parse import urlparse
+from contextlib import contextmanager
 
 import pandas as pd
 import progressbar
@@ -12,6 +13,8 @@ import pyarrow.parquet as pq
 from pandas.io.json import json_normalize
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import DeferredReflection
 
 import muttlib.utils as utils
 
@@ -61,6 +64,47 @@ def _parse_sql_statement_decorator(func):
         return func(self, *args, **kwargs)
 
     return wrapper
+
+
+def bring_table_group_metadata(engine, source_schema_cls=None):
+    """Bring metadata definitions to local schema.
+
+    Reflect external tables.
+
+    Args:
+        engine (sqlalchemy.engine.base.Engine): engine connection to db.
+        source_schema_cls (SQ table): SqlAlchemy valid-like table, declared or deferred.
+
+    Ref:
+    - https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/
+    api.html#sqlalchemy.ext.declarative.DeferredReflection
+    """
+    if source_schema_cls:
+        for cls in source_schema_cls.mro()[1:]:
+            if hasattr(cls, 'prepare'):
+                deferred_cls = cls
+                break
+    else:
+        deferred_cls = DeferredReflection
+
+    deferred_cls.prepare(engine)
+
+
+@contextmanager
+def session_scope(engine, **session_kw):
+    """Provide a transactional scope around a series of operations."""
+    Session = sessionmaker(bind=engine)
+    sess = Session(**session_kw)
+    bring_table_group_metadata(sess.connection())
+    try:
+        yield sess
+        sess.commit()
+    except Exception as err:
+        logger.exception(err)
+        sess.rollback()
+        raise
+    finally:
+        sess.close()
 
 
 class BaseClient:
@@ -145,7 +189,7 @@ class PgClient(BaseClient):
 
 
 class SQLiteClient(BaseClient):
-    """Create SQLite DB client"""
+    """Create SQLite DB client."""
 
     def __init__(self, dialect='sqlite', **kwargs):
         super().__init__(dialect=dialect, **kwargs)
@@ -189,8 +233,11 @@ class OracleClient(BaseClient):
         Fix columns case and cast CLOBs to VARCHAR o avoid slow inserts.
 
         Ref:
-        - https://stackoverflow.com/questions/42727990/speed-up-to-sql-when-writing-pandas-dataframe-to-oracle-database-using-sqlalch
-        - https://docs.sqlalchemy.org/en/latest/dialects/oracle.html#fine-grained-control-over-cx-oracle-data-binding-and-performance-with-setinputsizes
+        - https://stackoverflow.com/questions/42727990/
+        speed-up-to-sql-when-writing-pandas-dataframe-to-oracle-database-using-sqlalch
+        - https://docs.sqlalchemy.org/en/latest/dialects/
+        oracle.html#fine-grained-control-over-cx-oracle-data-
+        binding-and-performance-with-setinputsizes
         """
         # TODO: Validate types here?
 
@@ -588,7 +635,7 @@ class MongoClient:
         if db is None:
             db = self._connect()
         collection = db[collection]
-        find_func = getattr(collection, 'find')
+        find_func = getattr(collection, 'find')  # noqa: B009
         res = find_func(query, fields)
         if limit > 0:
             res = res.limit(limit)
