@@ -820,7 +820,7 @@ def dedup_list(li: list):
     return new_list
 
 def get_matching_columns(cols, regex_list):
-    """Match a list of columns with a nuber of regexes."""
+    """Match a list of columns with a number of regexes."""
     ret = []
     for regex in regex_list:
         regex = re.compile(regex)
@@ -838,4 +838,3 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     if exclude_regexes:
         ret.difference_update(get_matching_columns(cols, exclude_regexes))
     return sorted(list(ret))
-
