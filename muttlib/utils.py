@@ -830,7 +830,7 @@ def get_matching_columns(cols, regex_list):
 
 def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
     """Filter list by inclusion and exclusion regexes."""
-    if len(cols) == 0:
+    if not cols:
         raise ValueError(f"`cols` argument must be a non-empty list")
     else:
         if include_regexes is None:
