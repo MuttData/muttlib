@@ -196,7 +196,7 @@ def df_read_multi(fn, index_col=False, quoting=0):
     elif ext in ['pickle', 'pkl']:
         return pd.read_pickle(fn)
     else:
-         ValueError(f"File format '{ext}' not supported!")
+         raise ValueError(f"File format '{ext}' not supported!")
 
 
 def df_to_multi(df, fn, index=False, quoting=csv.QUOTE_NONNUMERIC):
