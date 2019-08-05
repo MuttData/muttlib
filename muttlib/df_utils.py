@@ -8,9 +8,13 @@ from pandas.core.groupby.generic import SeriesGroupBy
 
 logger = logging.getLogger(f'df_utils.{__name__}')
 
+SPECIAL_SERIES_AGGREGATIONS = {
+    # Map name to aggr operation
+    'count_nulls': lambda x: x.isnull().sum()
+}
 VALID_SERIES_AGGREGATION_NAMES = [
     a for a in SeriesGroupBy.__dict__.keys() if not a.startswith('_')
-]
+] + list(SPECIAL_SERIES_AGGREGATIONS)
 
 # # Data Quality Checkers
 
@@ -95,14 +99,17 @@ def check_column_all_aggregated_within_range(
     if not isinstance(agg_col, str):
         raise ValueError(f"`agg_col` is not of string-type. Value passed was {agg_col}")
 
+    # case of special aggregation operations, convert to appropriate lambda func
+    if agg_op in SPECIAL_SERIES_AGGREGATIONS:
+        agg_op = SPECIAL_SERIES_AGGREGATIONS[agg_op]
+
     agg_comparisons = (
         df.groupby(grp_cols)[agg_col].agg(agg_op).between(min_tol, max_tol)
     )
-    # agg_comparisons = Series(agg_values)
 
     rv = agg_comparisons.all()
     message = (
-        f"There were {agg_comparisons.sum()} cases correctly within range over "
-        f"a total of {len(agg_comparisons)} groups."
+        f"There were {agg_comparisons.sum()} groups within tolerated ranges over "
+        f"a total of {agg_comparisons.size} groups."
     )
     return rv, message
