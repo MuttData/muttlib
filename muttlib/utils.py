@@ -818,3 +818,26 @@ def dedup_list(li: list):
         if val not in new_list:
             new_list.append(val)
     return new_list
+
+def get_matching_columns(cols, regex_list):
+    """Match a list of columns with a number of regexes."""
+    ret = []
+    for regex in regex_list:
+        regex = re.compile(regex)
+        ret += filter(regex.search, cols)
+    return ret
+
+
+def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
+    """Filter list by inclusion and exclusion regexes."""
+    if not cols:
+        raise ValueError(f"`cols` argument must be a non-empty list")
+    if include_regexes is None:
+        ret = cols
+    else:
+        ret = get_matching_columns(cols, include_regexes)
+    ret = set(ret)
+    if exclude_regexes:
+        ret.difference_update(get_matching_columns(cols, exclude_regexes))
+
+    return sorted(list(ret))
