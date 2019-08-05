@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+pytest-runner = "*"
+muttlib = {editable = true,git = "https://gitlab.com/mutt_data/muttlib.git",ref = "forecasts"}
+fbprophet = "*"
+sklearn = "*"
+feather-format = "*"
+pylint = "*"
+flake8 = "*"
+flake8-bugbear = "*"
+pre-commit = "*"
+black = "*"
+mypy = "*"
+feather = "*"
+flake8-docstrings = "*"
+
+[requires]
+python_version = "3.7"
