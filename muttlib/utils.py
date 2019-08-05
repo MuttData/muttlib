@@ -196,7 +196,7 @@ def df_read_multi(fn, index_col=False, quoting=0):
     elif ext in ['pickle', 'pkl']:
         return pd.read_pickle(fn)
     else:
-         raise ValueError(f"File format '{ext}' not supported!")
+        raise ValueError(f"File format '{ext}' not supported!")
 
 
 def df_to_multi(df, fn, index=False, quoting=csv.QUOTE_NONNUMERIC):
@@ -832,13 +832,12 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     """Filter list by inclusion and exclusion regexes."""
     if not cols:
         raise ValueError(f"`cols` argument must be a non-empty list")
+    if include_regexes is None:
+        ret = cols
     else:
-        if include_regexes is None:
-            ret = cols
-        else:
-            ret = get_matching_columns(cols, include_regexes)
-        ret = set(ret)
-        if exclude_regexes:
-            ret.difference_update(get_matching_columns(cols, exclude_regexes))
+        ret = get_matching_columns(cols, include_regexes)
+    ret = set(ret)
+    if exclude_regexes:
+        ret.difference_update(get_matching_columns(cols, exclude_regexes))
 
     return sorted(list(ret))

@@ -758,7 +758,7 @@ def test_get_include_exclude_columns(
 
 @pytest.mark.parametrize(
     "cols, include_regexes, exclude_regexes, expected_error",
-    [([], ['alpha'], ['bravo'], ValueError)]  # empty cols_list
+    [([], ['alpha'], ['bravo'], ValueError)]
 )
 def test_get_include_exclude_columns_empty_cols_list(
     cols, include_regexes, exclude_regexes, expected_error
