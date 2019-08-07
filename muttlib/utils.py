@@ -49,6 +49,7 @@ def is_readable_path(str_or_path):
     Returns:
         (bool): A bool indicating whether or not str_or_path corresponds to a
         readable file.
+
     """
     try:
         f = open(str_or_path)
@@ -119,7 +120,7 @@ def local_df_cache(
     orig_cache_opts = locals()
 
     def wrap(func):
-        """Do dummy docstring."""
+        """Do dummy docstring."""  # noqa: D202
 
         @wraps(func)
         def wrapped_f(*args, **kwargs):
@@ -224,7 +225,7 @@ def dict_to_namedtuple(name, d):
 
 
 def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
-    """Converts a deque to an ordered dictionary using GEO ordered levels."""
+    """Convert a deque to an ordered dictionary using GEO ordered levels."""
     orde = OrderedDict()  # type: ignore # noqa
     d = deepcopy(double_linked_list)
     while len(d) > 0:
@@ -236,7 +237,7 @@ def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
 
 
 def wrap_list_values_quotes(lis):
-    """Wraps all values in a list with single quotes."""
+    """Wrap all values in a list with single quotes."""
     return [f"'{val}'" for val in lis]
 
 
@@ -467,7 +468,7 @@ def hash_str(s, length=8):
 
 
 def setup_logging(log_config, logger_name='root', level='INFO'):
-    """Setup logging config."""
+    """Do setup logging config."""
     log_config['loggers'][logger_name]['level'] = level
     logging.config.dictConfig(log_config)
 
@@ -540,6 +541,7 @@ def render_jinja_template(path_or_str, jparams={}):
         the path's location, if the arg is an existing file-path.
         We do not use `pat.exists()` method as it breaks for long enough strings
         (which might be queries)!
+
     """
     # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
     #  share a method that checks is_valid_path()
@@ -614,8 +616,8 @@ def str_normalize_pandas(data, str_replace_kws=None):
     data (pd.DataFrame, pd.Series): containing the data. Might or not have string
         columns
     str_replace_kws (dict): contains pandas str.replace method kwargs
-    """
 
+    """
     if isinstance(data, pd.DataFrame):
         obj_cols = data.select_dtypes(include=[pd.np.object]).columns
         for col in obj_cols:
@@ -647,15 +649,19 @@ def str_normalize_pandas(data, str_replace_kws=None):
 def df_optimize_float_types(
     df, type_mappings={"float64": "float16", "float32": "float16"}
 ):
-    """Cast dataframe columns to more memory friendly types.
+    """
+    Cast dataframe columns to more memory friendly types.
 
-    WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
+    Notes:
+        WARNING: Type conversion leads to a loss in accuracy and
+        possible overflow of the target type.
     Eg:
     >>> n = 2**128
     >>> np.float64(n), np.float32(n)
     (3.402823669209385e+38, inf)
+
     """
-    new_dtypes = {c: type_mappings.get(t.name, t) for c, t in df.dtypes.iteritems()}
+    new_dtypes = {c: type_mappings.get(t.name, t) for c, t in df.dtypes.items()}
     df = df.astype(new_dtypes, copy=False)
     return df
 
@@ -666,14 +672,15 @@ def df_replace_empty_strs_null(df):
     if str_cols:
         logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
         for col in str_cols:
-            df[col].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
+            df[col] = df[col].replace(r'^\s*$', pd.np.nan, regex=True)
     return df
 
 
 def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     """Drop null columns in df, for null share over a certain threshold."""
     # Note: Pandas treats string columns as `object` data types.
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    # Warning this function modifies the passed df.
+    # If you dont want this you should use df.copy()
     logger.debug(
         f'Dropping columns with null ratio greater than {max_null_prop:.2%}...'
     )
@@ -697,7 +704,8 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
 
 def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
     """Drop low variance cols."""
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    # Warning this function modifies the passed df.
+    # If you dont want this you should use df.copy()
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
@@ -713,8 +721,14 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
 def df_drop_corr(
     df, target_col, max_corr=0.3, protected_cols=[], frac=0.2, random_state=None
 ):
-    """Drop high correlated to-target cols."""
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    """
+    Drop high correlated to-target cols.
+
+    Notes:
+    Warning this function modifies the passed df.
+    If you dont want this you should use df.copy()
+
+    """
     assert target_col in df.columns
 
     corr_df = df.sample(frac=frac, random_state=random_state).corr()
@@ -768,8 +782,14 @@ def df_encode_categorical_dummies(
 
 
 def df_drop_single_factor_level(df):
-    """Drop categorical columns with null or 1 level."""
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    """
+    Drop categorical columns with null or 1 level.
+
+    Notes:
+        Warning this function modifies the passed df.
+        If you dont want this you should use df.copy()
+
+    """
     cat_cols = df_get_typed_cols(df, col_type='cat')
     cols_to_drop = []
     for c in cat_cols:
@@ -787,11 +807,12 @@ def df_drop_single_factor_level(df):
 
 def dedup_list(li: list):
     """
-    Deduplicates list while preserving order.
+    Deduplicate list while preserving order.
 
     Note:
         Not the same as `list(set(li))`.
-        Copied from https://stackoverflow.com/questions/31479188/quickest-way-to-dedupe-list-in-dict
+        Copied from
+        https://stackoverflow.com/questions/31479188/quickest-way-to-dedupe-list-in-dict
 
     Args:
         li (list): list of elements. Can be empty.
@@ -805,6 +826,7 @@ def dedup_list(li: list):
 
         >>> dedup_list([])
         []
+
     """
     assert isinstance(
         li, list
@@ -817,7 +839,7 @@ def dedup_list(li: list):
 
 
 def split_on_letter(s):
-    """Split string on groups of letters"""
+    """Do split string on groups of letters."""
     return tuple(filter(None, re.split(r'([aA-zZ]+)', s)))
 
 
@@ -831,6 +853,7 @@ def create_forecaster_dates(end_date, forecast_train_window, forecast_future_win
 
     Returns:
         (datetime, datetime, datetime): Truple with start, end and future dates.
+
     """
     if not all([forecast_future_window > 0, forecast_train_window >= 0]):
         raise ValueError(
@@ -849,3 +872,27 @@ def create_forecaster_dates(end_date, forecast_train_window, forecast_future_win
     start_date = end_date - pd.offsets.Day(forecast_train_window)
     future_date = end_date + pd.offsets.Day(forecast_future_window)
     return start_date, end_date, future_date
+
+
+def get_matching_columns(cols, regex_list):
+    """Match a list of columns with a number of regexes."""
+    ret = []
+    for regex in regex_list:
+        regex = re.compile(regex)
+        ret += filter(regex.search, cols)
+    return ret
+
+
+def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
+    """Filter list by inclusion and exclusion regexes."""
+    if not cols:
+        raise ValueError(f"`cols` argument must be a non-empty list")
+    if include_regexes is None:
+        ret = cols
+    else:
+        ret = get_matching_columns(cols, include_regexes)
+    ret = set(ret)
+    if exclude_regexes:
+        ret.difference_update(get_matching_columns(cols, exclude_regexes))
+
+    return sorted(list(ret))

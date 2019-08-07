@@ -255,7 +255,8 @@ def test_get_semi_month_pay_days():
 
 def test_df_info_to_str():
     # Almost the same `test_info_memory`:
-    # https://github.com/pandas-dev/pandas/blob/4edf938aedf55b9e6fbfb3199f70f857e8ec7e41/pandas/tests/frame/test_repr_info.py#L209
+    # https://github.com/pandas-dev/pandas/blob/
+    # 4edf938aedf55b9e6fbfb3199f70f857e8ec7e41/pandas/tests/frame/test_repr_info.py#L209
     df = pd.DataFrame({'B': [25, 94, 57, 62, 70]}, columns=['B'])
     result = utils.df_info_to_str(df)
     byt = float(df.memory_usage().sum())
@@ -328,7 +329,8 @@ def test_make_dirs(tmpdir):
 
 
 def test_df_read_multi(tmpdir):
-    # I should refactor this test with a list or something using functools import partial for the csv case
+    # I should refactor this test with a list or
+    # something using functools import partial for the csv case
     p = tmpdir.mkdir("sub")
     df_test = pd.DataFrame(
         np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c']
@@ -730,6 +732,58 @@ def test_dedup_list(example_input, expected):
     assert utils.dedup_list(example_input) == expected
     with pytest.raises(AssertionError):
         utils.dedup_list("a")
+
+
+@pytest.mark.parametrize(
+    "regex, cols_list_test, expected",
+    [
+        ([r'ah'], ['a', 'al', 'alp', 'alph', 'alpha', 'alp_ha'], []),
+        ([r'rav'], ['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'], ['brav', 'bravo']),
+    ],
+)
+def test_get_matching_columns(cols_list_test, regex, expected):
+    assert utils.get_matching_columns(cols_list_test, regex) == expected
+
+
+@pytest.mark.parametrize(
+    "cols, include_regexes, exclude_regexes, expected",
+    [
+        (
+            ['a', 'al', 'alp', 'alph', 'alpha', 'alp_ha'],
+            ['lph'],
+            ['_'],
+            ['alph', 'alpha'],
+        ),
+        (
+            ['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'],
+            ['bra'],
+            ['o'],
+            ['bra', 'brav'],
+        ),
+        (
+            ['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'],
+            ['b'],
+            ['b'],
+            [],
+        ),  # regexes overlap
+    ],
+)
+def test_get_include_exclude_columns(cols, include_regexes, exclude_regexes, expected):
+    assert (
+        utils.get_include_exclude_columns(cols, include_regexes, exclude_regexes)
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "cols, include_regexes, exclude_regexes, expected_error",
+    [([], ['alpha'], ['bravo'], ValueError)],
+)
+def test_get_include_exclude_columns_empty_cols_list(
+    cols, include_regexes, exclude_regexes, expected_error
+):
+    with pytest.raises(expected_error):
+        utils.get_include_exclude_columns(cols, include_regexes, exclude_regexes)
 
 
 # [WONT DO]
