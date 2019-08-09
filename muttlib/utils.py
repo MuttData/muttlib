@@ -355,7 +355,7 @@ def create_dict_id(d, length=10):
     """
     shake = hashlib.shake_256()
     shake.update(repr(d).encode('utf-8'))
-    return shake.hexdigest(int(length / 2))
+    return shake.hexdigest(int(length / 2))  # pylint: disable=too-many-function-args
 
 
 def query_yes_no(question, default='no'):
@@ -482,13 +482,9 @@ def df_info_to_str(df):
 class JinjaTemplateException(Exception):
     """Dummy doc."""
 
-    pass
-
 
 class BadInClauseException(JinjaTemplateException):
     """Dummy doc."""
-
-    pass
 
 
 def in_clause_requirement(obj):
@@ -818,6 +814,11 @@ def dedup_list(li: list):
         if val not in new_list:
             new_list.append(val)
     return new_list
+
+
+def split_on_letter(s):
+    """Split string on groups of letters"""
+    return tuple(filter(None, re.split(r'([aA-zZ]+)', s)))
 
 def get_matching_columns(cols, regex_list):
     """Match a list of columns with a number of regexes."""
