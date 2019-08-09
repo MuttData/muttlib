@@ -731,44 +731,75 @@ def test_dedup_list(example_input, expected):
     with pytest.raises(AssertionError):
         utils.dedup_list("a")
 
+
 @pytest.mark.parametrize(
     "regex, cols_list_test, expected",
     [
         ([r'ah'], ['a', 'al', 'alp', 'alph', 'alpha', 'alp_ha'], []),
         ([r'rav'], ['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'], ['brav', 'bravo']),
-    ]
+    ],
 )
 def test_get_matching_columns(cols_list_test, regex, expected):
     assert utils.get_matching_columns(cols_list_test, regex) == expected
 
+
 @pytest.mark.parametrize(
     "cols, include_regexes, exclude_regexes, expected",
     [
-        (['a', 'al', 'alp', 'alph', 'alpha', 'alp_ha'], ['lph'], ['_'], ['alph', 'alpha']),
-        (['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'], ['bra'], ['o'], ['bra', 'brav']),
-        (['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'], ['b'], ['b'], []),  # regexes overlap
-    ]
+        (
+            ['a', 'al', 'alp', 'alph', 'alpha', 'alp_ha'],
+            ['lph'],
+            ['_'],
+            ['alph', 'alpha'],
+        ),
+        (
+            ['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'],
+            ['bra'],
+            ['o'],
+            ['bra', 'brav'],
+        ),
+        (
+            ['b', 'br', 'bra', 'brav', 'bravo', 'bra_vo'],
+            ['b'],
+            ['b'],
+            [],
+        ),  # regexes overlap
+    ],
 )
-def test_get_include_exclude_columns(
-    cols, include_regexes, exclude_regexes, expected
-    ):
-    assert utils.get_include_exclude_columns(
-        cols, include_regexes, exclude_regexes
-        ) == expected
+def test_get_include_exclude_columns(cols, include_regexes, exclude_regexes, expected):
+    assert (
+        utils.get_include_exclude_columns(cols, include_regexes, exclude_regexes)
+        == expected
+    )
+
 
 @pytest.mark.parametrize(
     "cols, include_regexes, exclude_regexes, expected_error",
-    [([], ['alpha'], ['bravo'], ValueError)]
+    [([], ['alpha'], ['bravo'], ValueError)],
 )
 def test_get_include_exclude_columns_empty_cols_list(
     cols, include_regexes, exclude_regexes, expected_error
-    ):
+):
     with pytest.raises(expected_error):
-        utils.get_include_exclude_columns(
-            cols, include_regexes, exclude_regexes
-        )
+        utils.get_include_exclude_columns(cols, include_regexes, exclude_regexes)
 
 
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ('foo', ("foo",)),
+        ("a0aa", ('a', '0', 'aa')),
+        ("cccc", ("cccc",)),
+        ("1235556", ("1235556",)),
+        ("AAaa3333 AA fff", ('AAaa', '3333 ', 'AA', ' ', 'fff')),
+        ("AAaa3333  fff", ('AAaa', '3333  ', 'fff')),
+    ],
+)
+def test_split_on_letter(test_input, expected):
+    # Testing varous input strs to splitting
+    assert utils.split_on_letter(test_input) == expected
