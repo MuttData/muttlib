@@ -5,11 +5,21 @@ from muttlib.gcd import TimeRangeConfiguration
 
 
 @pytest.fixture
-def trange_conf():
-    """Setup code to create a TimeRangeConf object with daily granularity."""
+def daily_trc():
+    """Do code setup to create a TimeRangeConf object with daily granularity."""
     end_date = pd.to_datetime('2019-06-01')
     granularity = 'D'
     train_window, forecast_window = 60, 7
+    trc = TimeRangeConfiguration(end_date, train_window, forecast_window, granularity)
+    return trc
+
+
+@pytest.fixture
+def weekly_trc():
+    """Do code setup code to create a TimeRangeConf object with weekly granularity."""
+    end_date = pd.to_datetime('2019-06-01')
+    granularity = 'W'
+    train_window, forecast_window = 120, 21
     trc = TimeRangeConfiguration(end_date, train_window, forecast_window, granularity)
     return trc
 
@@ -26,7 +36,7 @@ def assert_not_all_except_true_one_attr(obj, attr_l, this_attr):
 
 
 @pytest.mark.parametrize(
-    "ed, twin, fwin, tg, ehour, sd, fd, tn",
+    "ed, twin, fwin, tg, ehour, ro_date, sd, fd, tn",
     [
         (
             pd.to_datetime('2019-06-01'),
@@ -34,8 +44,9 @@ def assert_not_all_except_true_one_attr(obj, attr_l, this_attr):
             7,
             'H',
             0,
-            pd.Timestamp("'2019-04-02"),
-            pd.to_datetime('2019-06-08'),
+            True,
+            pd.Timestamp("2019-04-02"),
+            pd.Timestamp('2019-06-08'),
             'hourly',
         ),
         (
@@ -44,24 +55,26 @@ def assert_not_all_except_true_one_attr(obj, attr_l, this_attr):
             60,
             'M',
             0,
-            pd.Timestamp("'2019-04-02"),
-            pd.to_datetime('2019-07-31'),
+            False,
+            pd.Timestamp("2019-04-02"),
+            pd.Timestamp('2019-07-31'),
             'monthly',
         ),
         (
             pd.to_datetime('2019-06-01'),
-            30,
-            15,
-            'D',
+            35,
+            21,
+            'W',
             0,
-            pd.Timestamp("'2019-05-02"),
-            pd.to_datetime('2019-06-16'),
-            'daily',
+            True,
+            pd.Timestamp("2019-04-22"),
+            pd.Timestamp('2019-06-17'),
+            'weekly',
         ),
     ],
 )
-def test_time_range_configuration_init(ed, twin, fwin, tg, ehour, sd, fd, tn):
-    trc = TimeRangeConfiguration(ed, twin, fwin, tg, end_hour=ehour)
+def test_time_range_configuration_init(ed, twin, fwin, tg, ehour, ro_date, sd, fd, tn):
+    trc = TimeRangeConfiguration(ed, twin, fwin, tg, ehour, ro_date)
     assert trc.end_date == ed
     assert trc.start_date == sd
     assert trc.future_date == fd
