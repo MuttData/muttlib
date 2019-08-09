@@ -135,8 +135,16 @@ shell at the time of `git commit` you'll then have to run `git commit` from with
 
 ### CI jobs
 
-The CI Jobs will run all the tests in the test dir for every push you make and if it fail it will disable the option to make a merge of that branch. 
-If your commit message contains [ci skip] or [skip ci], using any capitalization, the commit will be created but the pipeline will be skipped.
+By default, when creating new merge-requests to this lib, gitlab will spawn a
+CI job for every push done to the remote branch. This will install muttlib in a
+gitlab-provided docker-env that'll install all the extras specified in the
+`.gitlab-ci.yml` file.
+
+Then, the CI jobs will run a `setup.py test` for every push. If one test fails
+then that merge request's merge option will be disabled.  
+**Note**: If your commit message contains [ci skip] or [skip ci], without
+capitalization, the job will be skipped i.e. no CI job will be spawned for that
+push.
 
 Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer: `git push -o ci.skip`
 more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
