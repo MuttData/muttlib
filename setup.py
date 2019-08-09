@@ -32,8 +32,9 @@ setuptools.setup(
         'progressbar2',
         'pyarrow==0.13.0',
         'pyyaml',
-        'sqlalchemy',
+        'scikit-learn',
         'scipy',
+        'sqlalchemy',
     ],
     extras_require={
         'oracle': ['cx_Oracle'],
@@ -62,7 +63,7 @@ setuptools.setup(
             'mypy',
             'pylint',
         ],
-        'forecast': ['fbprophet', 'scikit-learn'],
+        'forecast': ['fbprophet'],
         'gsheets': ['gspread_pandas'],
     },
 )

@@ -44,8 +44,8 @@ def test_dict_to_namedtuple(test_input, expected):
     assert namedtuple('mr', 'meeseeks')(test_input) == expected
 
 
-def test_create_dict_id():
-    assert '96107c8ce8' == utils.create_dict_id({'meeseeks': 'look at me'})
+def test_get_obj_hash():
+    assert '96107c8ce8' == utils.get_obj_hash({'meeseeks': 'look at me'})
 
 
 def test_get_ordered_factor_levels():
@@ -801,5 +801,38 @@ def test_get_include_exclude_columns_empty_cols_list(
     ],
 )
 def test_split_on_letter(test_input, expected):
-    # Testing varous input strs to splitting
+    # Testing various input strs to splitting
     assert utils.split_on_letter(test_input) == expected
+
+
+@pytest.mark.parametrize(
+    "ed, tw, fw, expected",
+    [
+        (
+            '2019-10-25',
+            2,
+            3,
+            (
+                pd.Timestamp('2019-10-23'),
+                datetime.datetime(2019, 10, 25),
+                pd.Timestamp('2019-10-28'),
+            ),
+        ),
+        (
+            '2018-01-01',
+            60,
+            30,
+            (
+                pd.Timestamp('2017-11-02'),
+                datetime.datetime(2018, 1, 1),
+                pd.Timestamp('2018-01-31'),
+            ),
+        ),
+        # will fail due to raise on negative windows
+        pytest.param('2019-10-25', -2, 1, (1, 1, 1), marks=pytest.mark.xfail),
+        pytest.param('2019-10-25', 2, -1, (1, 1, 1), marks=pytest.mark.xfail),
+    ],
+)
+def test_create_forecaster_dates(ed, tw, fw, expected):
+    # Testing various input dates and windows
+    assert utils.create_forecaster_dates(ed, tw, fw) == expected
