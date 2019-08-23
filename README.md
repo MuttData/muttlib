@@ -12,7 +12,7 @@ Current modules:
 - `utils`: A single version of miscellaneous functions needed every now and then.
 - `ipynb_const` and `ipynb_utils`: Utilities when doing exploratory work (helpful for jupyter notebooks).
 - `gsheetsconn`: Module to make data interactions to/from Google Sheets <> Pandas.
-- `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks. 
+- `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks.
 
 ## Install
 
@@ -39,6 +39,7 @@ Misc DB suppoort for dbconn:
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[mysql]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
@@ -141,7 +142,7 @@ gitlab-provided docker-env that'll install all the extras specified in the
 `.gitlab-ci.yml` file.
 
 Then, the CI jobs will run a `setup.py test` for every push. If one test fails
-then that merge request's merge option will be disabled.  
+then that merge request's merge option will be disabled.
 **Note**: If your commit message contains [ci skip] or [skip ci], without
 capitalization, the job will be skipped i.e. no CI job will be spawned for that
 push.
@@ -153,12 +154,12 @@ more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
 # Google Sheets Credentials
 
 To use the client in `gsheetsconn.py` one must first get the appropriate credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
-**Important note**: to obtain the necessary credentials, one must first have a valid GCP account which implies that billing for that account is already enabled. Having a standalone @gmail.com email will generally not suffice. This reference may probably help: [on billing and accounts support for GCP](https://cloud.google.com/support/billing/). 
+**Important note**: to obtain the necessary credentials, one must first have a valid GCP account which implies that billing for that account is already enabled. Having a standalone @gmail.com email will generally not suffice. This reference may probably help: [on billing and accounts support for GCP](https://cloud.google.com/support/billing/).
 
 
 A good and simple step by step guide on how to get the Json file credentials can be seen in this [medium post](https://medium.com/@denisluiz/python-with-google-sheets-service-account-step-by-step-8f74c26ed28e). These credentials will be used by our client to read/write/edit files in Google Sheets.
 
-The general idea is that in GCP we need to create or use an existing project, then enable the Sheets and Drive APIs for the selected project and finally create new service-account credentials for your script. Download them in Json format and put them somewhere accessible to your script. 
+The general idea is that in GCP we need to create or use an existing project, then enable the Sheets and Drive APIs for the selected project and finally create new service-account credentials for your script. Download them in Json format and put them somewhere accessible to your script.
 There are other types of credentials but in this way we can have a server-side script that does not require explicit user consent to proceed with auth.
 
-**Important note**: the service-account credentials will effectively provide us with a google-valid email, whicih will act as the "user" editing/modifying/etc. the data in Google Sheets. This implies that this service email needs to have sufficient permissions to actually edit these files. In general, giving permissions to the needed sheets will suffice. 
+**Important note**: the service-account credentials will effectively provide us with a google-valid email, whicih will act as the "user" editing/modifying/etc. the data in Google Sheets. This implies that this service email needs to have sufficient permissions to actually edit these files. In general, giving permissions to the needed sheets will suffice.

@@ -40,6 +40,7 @@ setuptools.setup(
         'oracle': ['cx_Oracle'],
         'hive': ['pyhive'],
         'postgres': ['psycopg2'],
+        'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
         'ibis': ['ibis'],
