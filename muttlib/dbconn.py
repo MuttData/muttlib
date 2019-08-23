@@ -1,15 +1,15 @@
 """Module to get and use multiple Big Data DB connections."""
+from functools import wraps
 import logging
 import re
 import shutil
-from functools import wraps
 from time import sleep
 from urllib.parse import urlparse
 
 import pandas as pd
+from pandas.io.json import json_normalize
 import progressbar
 import pyarrow.parquet as pq
-from pandas.io.json import json_normalize
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
 
@@ -43,7 +43,7 @@ except ModuleNotFoundError:
 def _parse_sql_statement_decorator(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        args = list(args)
+        args = list(args)  # type: ignore
         sql = utils.path_or_string(args[0])
         format_params = kwargs.get('params', None)
         if format_params:
@@ -57,7 +57,7 @@ def _parse_sql_statement_decorator(func):
                     pass
 
         logger.debug(f"Running the following query: \n{sql}")
-        args[0] = sql
+        args[0] = sql  # type: ignore
         return func(self, *args, **kwargs)
 
     return wrapper
@@ -97,6 +97,7 @@ class BaseClient:
         return f'{dialect}://{login}@{host}/{self.database}'
 
     def get_engine(self, custom_uri=None, connect_args=None, echo=False):
+        """Create engine or return existing one."""
         connect_args = {} if connect_args is None else connect_args
         if not self._engine:
             db_uri = custom_uri or self._db_uri
@@ -115,11 +116,13 @@ class BaseClient:
 
     @_parse_sql_statement_decorator
     def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
+        """Execute sql statement."""
         if connection is None:
             connection = self._connect()
         return connection.execute(sql)
 
     def to_frame(self, *args, **kwargs):
+        """Return sql execution as Pandas dataframe."""
         cursor = self.execute(*args, **kwargs)
         if not cursor:
             return
@@ -131,6 +134,7 @@ class BaseClient:
         return df
 
     def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
+        """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
         connection = self._connect()
         with connection:
@@ -144,8 +148,15 @@ class PgClient(BaseClient):
         super().__init__(dialect=dialect, port=5432, **kwargs)
 
 
+class MySqlClient(BaseClient):
+    """Create MySql DB client."""
+
+    def __init__(self, dialect='mysql', driver='pymysql', **kwargs):
+        super().__init__(dialect=dialect, driver=driver, **kwargs)
+
+
 class SQLiteClient(BaseClient):
-    """Create SQLite DB client"""
+    """Create SQLite DB client."""
 
     def __init__(self, dialect='sqlite', **kwargs):
         super().__init__(dialect=dialect, **kwargs)
@@ -189,8 +200,8 @@ class OracleClient(BaseClient):
         Fix columns case and cast CLOBs to VARCHAR o avoid slow inserts.
 
         Ref:
-        - https://stackoverflow.com/questions/42727990/speed-up-to-sql-when-writing-pandas-dataframe-to-oracle-database-using-sqlalch
-        - https://docs.sqlalchemy.org/en/latest/dialects/oracle.html#fine-grained-control-over-cx-oracle-data-binding-and-performance-with-setinputsizes
+        - https://stackoverflow.com/questions/42727990/speed-up-to-sql-when-writing-pandas-dataframe-to-oracle-database-using-sqlalch # noqa
+        - https://docs.sqlalchemy.org/en/latest/dialects/oracle.html#fine-grained-control-over-cx-oracle-data-binding-and-performance-with-setinputsizes # noqa
         """
         # TODO: Validate types here?
 
@@ -239,12 +250,12 @@ class IbisClient:
 
     Notes
     --------
-    It is strongly advised to set the Impala Session option 'SYNC_DDL' to `True` when 
-    working with an Impala load-balancer. This will make the balancer sync the metadata 
-    to all other nodes after a DDL statement. 
-    When using the via_hdfs=True argument in the to_frame method, you should use a 
-    particular's node hostname or a IP since this argument generates the creation and 
-    deletion of a temp table and the needed DDL operations are much faster in this way. 
+    It is strongly advised to set the Impala Session option 'SYNC_DDL' to `True` when
+    working with an Impala load-balancer. This will make the balancer sync the metadata
+    to all other nodes after a DDL statement.
+    When using the via_hdfs=True argument in the to_frame method, you should use a
+    particular's node hostname or a IP since this argument generates the creation and
+    deletion of a temp table and the needed DDL operations are much faster in this way.
     If you need to point to a load balancer, remember to set SYNC_DDL as True.
 
     See also
@@ -537,6 +548,8 @@ class HiveDb:
 
 
 class SqlServerClient(BaseClient):
+    """SQLServer client."""
+
     def __init__(self, dialect='mssql', **kwargs):
         super().__init__(dialect=dialect, driver='pymssql', **kwargs)
         if self.database is None:
@@ -544,6 +557,8 @@ class SqlServerClient(BaseClient):
 
 
 class MongoClient:
+    """MongoDb client."""
+
     def __init__(
         self,
         username=None,
@@ -595,6 +610,7 @@ class MongoClient:
         return list(res)
 
     def to_frame(self, collection, query=None, fields=None, limit=0, no_id=False):
+        """Return query result as a Pandas dataframe."""
         cursor = self._find(collection, query=query, fields=fields, limit=limit)
         df = json_normalize(cursor)
         if no_id and not df.empty:
@@ -602,6 +618,7 @@ class MongoClient:
         return df
 
     def insert(self, collection, query=None, db=None):
+        """Insert query into collection."""
         if db is None:
             db = self._connect()
         collection = db[collection]
@@ -611,6 +628,7 @@ class MongoClient:
 
 ORACLE_DB_TYPE = 'oracle'
 POSTGRES_DB_TYPE = 'postgres'
+MYSQL_DB_TYPE = 'mysql'
 SQLSERVER_DB_TYPE = 'sql_server'
 HIVE_DB_TYPE = 'hive'
 MONGO_DB_TYPE = 'mongo'
@@ -618,6 +636,7 @@ MONGO_DB_TYPE = 'mongo'
 connectors = {
     ORACLE_DB_TYPE: OracleClient,
     POSTGRES_DB_TYPE: PgClient,
+    MYSQL_DB_TYPE: MySqlClient,
     SQLSERVER_DB_TYPE: SqlServerClient,
     HIVE_DB_TYPE: HiveDb,
     MONGO_DB_TYPE: MongoClient,
@@ -625,5 +644,6 @@ connectors = {
 
 
 def get_client(creds):
+    """Get a db client from a credentials dict."""
     db_type = creds.pop('db_type')
     return db_type, connectors[db_type](**creds)
