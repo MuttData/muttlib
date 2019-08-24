@@ -33,11 +33,20 @@ try:
 except ModuleNotFoundError:
     logger.warning("No Mongo support.")
 
-
 try:
     import ibis
 except ModuleNotFoundError:
     logger.warning("No Ibis support.")
+
+try:
+    import pymysql  # noqa: F401 # pylint:disable=unused-import
+except ModuleNotFoundError:
+    logger.warning("No MySql support.")
+
+try:
+    import psycopg2  # noqa: F401 # pylint:disable=unused-import
+except ModuleNotFoundError:
+    logger.warning("No Postgresql support.")
 
 
 def _parse_sql_statement_decorator(func):
@@ -603,7 +612,7 @@ class MongoClient:
         if db is None:
             db = self._connect()
         collection = db[collection]
-        find_func = getattr(collection, 'find')
+        find_func = getattr(collection, 'find')  # noqa
         res = find_func(query, fields)
         if limit > 0:
             res = res.limit(limit)
