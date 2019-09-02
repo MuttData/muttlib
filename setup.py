@@ -39,7 +39,7 @@ setuptools.setup(
     extras_require={
         'oracle': ['cx_Oracle'],
         'hive': ['pyhive'],
-        'postgres': ['psycopg2'],
+        'postgres': ['psycopg2-binary'],
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
