@@ -80,7 +80,7 @@ class BaseRun(AttributeHelperMixin):
     def _validate_attrs_types(self):
         """Validate construction attrs types."""
         self._check_type_attrs_l(dict, ['cli_args', 'confs'])
-        self._check_type_attrs_l(bool, ['do_plots', 'dry_run', 'use_mflow'])
+        self._check_type_attrs_l(bool, ['do_plots', 'dry_run', 'use_mlflow'])
         self._check_type_attrs_l(str, ['env', 'name'])
 
     def _validate_attrs_values(self):
