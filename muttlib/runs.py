@@ -40,8 +40,7 @@ class BaseRun(AttributeHelperMixin):
             time_range_conf (gcd.TimeRangeConfiguration): an instance of a
                 time-range-conf.
             cli_args (dict): Map of command-line-argument name to value.
-            cli_args (dict): Map of command-line-argument name to value.
-            confs_paths_d (dict): Map of command-line-argument name to value.
+            confs_paths_d (dict): Map of modules to their config files.
 
         Notes:
             Not nice but removes the need of cooperation from subclasses.
