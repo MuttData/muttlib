@@ -20,33 +20,33 @@ logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 try:
     import cx_Oracle
 except ModuleNotFoundError:
-    logger.warning("No Oracle support.")
+    logger.debug("No Oracle support.")
 
 try:
     from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
     from pyhive import hive
 except ModuleNotFoundError:
-    logger.warning("No Hive support.")
+    logger.debug("No Hive support.")
 
 try:
     import pymongo
 except ModuleNotFoundError:
-    logger.warning("No Mongo support.")
+    logger.debug("No Mongo support.")
 
 try:
     import ibis
 except ModuleNotFoundError:
-    logger.warning("No Ibis support.")
+    logger.debug("No Ibis support.")
 
 try:
     import pymysql  # noqa: F401 # pylint:disable=unused-import
 except ModuleNotFoundError:
-    logger.warning("No MySql support.")
+    logger.debug("No MySql support.")
 
 try:
     import psycopg2  # noqa: F401 # pylint:disable=unused-import
 except ModuleNotFoundError:
-    logger.warning("No Postgresql support.")
+    logger.debug("No Postgresql support.")
 
 
 def _parse_sql_statement_decorator(func):
