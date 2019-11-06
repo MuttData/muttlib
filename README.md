@@ -57,6 +57,12 @@ python setup.py test
 ```
 Note: Some extra deps might be needed. Those can be added with this `pip install -e .[ipynb-utils]`.
 
+Run all tests locally as CI:
+```
+gitlab-runner exec docker test
+```
+Note: This requires to install [gitlab-runner](https://docs.gitlab.com/runner/install/) (but not register) and docker.
+
 Run coverage:
 ```
 py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
