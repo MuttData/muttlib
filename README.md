@@ -47,7 +47,7 @@ pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 
 Install custom branch:
 ```
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib@AWESOME_FEATURE_BRANCH
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 # Testing
@@ -56,6 +56,12 @@ Run all tests:
 python setup.py test
 ```
 Note: Some extra deps might be needed. Those can be added with this `pip install -e .[ipynb-utils]`.
+
+Run all tests locally as CI:
+```
+gitlab-runner exec docker test
+```
+Note: This requires to install [gitlab-runner](https://docs.gitlab.com/runner/install/) (but not register) and docker.
 
 Run coverage:
 ```
