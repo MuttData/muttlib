@@ -47,7 +47,7 @@ pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 
 Install custom branch:
 ```
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib@AWESOME_FEATURE_BRANCH
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 # Testing
