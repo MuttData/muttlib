@@ -1,6 +1,7 @@
 """Module to get and use multiple Big Data DB connections."""
 from functools import wraps
 import logging
+from contextlib import closing
 import re
 import shutil
 from time import sleep
@@ -467,10 +468,10 @@ class HiveDb:
     """Create Hive DB Client."""
 
     def __init__(
-        self, host, port=None, auth='NOSASL', database='default', username=None
+        self, host, port=10_000, auth='NOSASL', database='default', username=None
     ):
         self.host = host
-        self.port = port if port is not None else 21050
+        self.port = port
         self.auth = auth
         self.database = database
         self.username = username
@@ -488,7 +489,9 @@ class HiveDb:
         conn = self._connect()
         return conn.cursor()
 
-    def execute(self, sql, params=None, show_progress=True, dry_run=False):
+    def execute(
+        self, sql, params=None, show_progress=True, dry_run=False, async_=False
+    ):
         """Execute sql statement."""
         sql = utils.path_or_string(sql)
         if params is not None:
@@ -505,7 +508,7 @@ class HiveDb:
             return
 
         cursor = self._cursor()
-        cursor.execute(sql, async_=True)
+        cursor.execute(sql, async_=async_)  # pylint:disable=unexpected-keyword-arg
 
         if show_progress:
             self._show_query_progress(cursor)
@@ -543,17 +546,17 @@ class HiveDb:
 
     def to_frame(self, *args, **kwargs):
         """Execute sql statement and return results as a Pandas dataframe."""
-        cursor = self.execute(*args, **kwargs)
-        if not cursor:
-            return
-        data = cursor.fetchall()
-        # TODO: Add variant that dumps per row rather than the whole thing
-        if data:
-            df = pd.DataFrame(data)
-            df.columns = [c[0] for c in cursor.description]
-        else:
-            df = pd.DataFrame()
-        return df
+        with closing(self.execute(*args, **kwargs)) as cursor:
+            if not cursor:
+                return
+            data = cursor.fetchall()
+            # TODO: Add variant that dumps per row rather than the whole thing
+            if data:
+                df = pd.DataFrame(data)
+                df.columns = [c[0] for c in cursor.description]
+            else:
+                df = pd.DataFrame()
+            return df
 
 
 class SqlServerClient(BaseClient):
