@@ -508,7 +508,7 @@ class HiveDb:
             return
 
         cursor = self._cursor()
-        cursor.execute(sql, async_=async_)  # pylint:disable=unexpected-keyword-arg
+        cursor.execute(sql, async_=async_)
 
         if show_progress:
             self._show_query_progress(cursor)
