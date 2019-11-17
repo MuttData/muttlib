@@ -38,7 +38,7 @@ setuptools.setup(
     ],
     extras_require={
         'oracle': ['cx_Oracle'],
-        'hive': ['pyhive'],
+        'hive': ['pyhive>=0.6.1'],
         'postgres': ['psycopg2-binary'],
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
