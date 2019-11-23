@@ -41,7 +41,7 @@ setuptools.setup(
         'hive': ['pyhive>=0.6.1'],
         'postgres': ['psycopg2-binary'],
         'mysql': ['pymysql'],
-        'sqlserver': ['pymssql'],
+        'sqlserver': ['pymssql<3.0'],
         'mongo': ['pymongo'],
         'ibis': ['ibis'],
         'ipynb-utils': [
