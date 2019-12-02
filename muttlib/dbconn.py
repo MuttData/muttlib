@@ -240,6 +240,8 @@ class IbisClient:
         Impala's HiveServer2 port
     username : str, optional
         LDAP user to authenticate
+    database : str, optional
+        Default database
     hdfs_host : str, optional
         Default host when using hdfs_client
     hdfs_port : int, optional
@@ -278,8 +280,9 @@ class IbisClient:
     def __init__(
         self,
         host,
-        port=None,
+        port=21050,
         username=None,
+        database=None,
         hdfs_host=None,
         hdfs_port=None,
         hdfs_username=None,
@@ -290,8 +293,9 @@ class IbisClient:
         options={'SYNC_DDL': True},
     ):
         self.host = host
-        self.port = port if port is not None else 21050
+        self.port = port
         self.username = username
+        self.database = database
         self.hdfs_host = hdfs_host
         self.hdfs_port = hdfs_port
         self.hdfs_username = hdfs_username
@@ -315,6 +319,7 @@ class IbisClient:
         client = ibis.impala.connect(
             host=self.host,
             port=self.port,
+            database=self.database,
             user=self.username,
             hdfs_client=self.hdfs_client,
             timeout=self._timeout,
@@ -549,11 +554,13 @@ class HiveDb:
         with closing(self.execute(*args, **kwargs)) as cursor:
             if not cursor:
                 return
-            data = cursor.fetchall()
+            data = cursor.fetchall()  # pylint: disable=no-member
             # TODO: Add variant that dumps per row rather than the whole thing
             if data:
                 df = pd.DataFrame(data)
-                df.columns = [c[0] for c in cursor.description]
+                df.columns = [
+                    c[0] for c in cursor.description  # pylint: disable=no-member
+                ]
             else:
                 df = pd.DataFrame()
             return df
