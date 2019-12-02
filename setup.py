@@ -43,7 +43,7 @@ setuptools.setup(
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
-        'ibis': ['ibis'],
+        'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'],
         'ipynb-utils': [
             'IPython',
             'jinja2',
