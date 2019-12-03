@@ -1,3 +1,4 @@
+
 """Module to give FBProphet a common interface to Sklearn and general utilities
 for forecasting problems like limiting the datasets to the last n days,
 allowing wider grid search for hyperparameters not available using standard
@@ -202,9 +203,31 @@ class SkProphet(Prophet):
         return sk_params
 
     def set_params(self, **params):
-        """Scikit learn's set_params (sets the parameters provided)."""
+        """Scikit learn's set_params (sets the parameters provided).
+        Note on prophet keyword arguments precedence; this applies:
+           _First, if some argument is explicitly provided, this value will be kept.
+           _If not, but provided inside a 'prophet_kwargs' dict, the last is kept.
+           _Lastly, if not provided in neither way but currently set, the value is not erased.
+        """
+        sk_kws = [
+            attr for attr in signature(self.__init__).parameters
+            if attr != 'self']
+        current_prophet_kws = getattr(self, 'prophet_kwargs', {})
+        explicit_prophet_kws = {}
+        args_passed_prophet_kws = {}
         for attr, value in params.items():
+            if attr == 'prophet_kwargs':
+                explicit_prophet_kws = value
+            elif attr not in sk_kws:
+                args_passed_prophet_kws[attr] = value
+            else:
+                setattr(self, attr, value)
+        prophet_kws = current_prophet_kws
+        prophet_kws.update(explicit_prophet_kws)
+        prophet_kws.update(args_passed_prophet_kws)
+        for attr, value in prophet_kws.items():
             setattr(self, attr, value)
+        setattr(self, 'prophet_kwargs', prophet_kws)
         self._set_my_extra_regressors()
         return self
 
