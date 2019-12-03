@@ -228,6 +228,18 @@ class TestSkProphet(TestCase):
         self.assertEqual(len(p.sk_extra_regressors), 1)
         self.assertEqual(p.sk_extra_regressors[0]['name'], 'z')
 
+    def test_prophet_kwargs_set_params(self):
+        prophet_original_pars = {'n_changepoints': 10}
+        m = SkProphet(prophet_kwargs=prophet_original_pars)
+        prophet_new_pars = {'prophet_kwargs': {'yearly_seasonality': 4},
+                            'n_changepoints': 2}
+        m.set_params(**prophet_new_pars)
+        expected_prophet_kwargs = {'yearly_seasonality': 4,
+                                   'n_changepoints': 2}
+        self.assertEqual(m.prophet_kwargs, expected_prophet_kwargs)
+        self.assertEqual(m.yearly_seasonality, 4)
+        self.assertEqual(m.n_changepoints, 2)
+        
     def test_repr(self):
         # Initialize
         sk_date_column = 'date'
