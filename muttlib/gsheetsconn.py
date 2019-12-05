@@ -143,6 +143,11 @@ class GSheetsClient:
                 f"Value passed was `{val}` which is not a valid type of cell location for GSheets."
             )
 
+    def _get_spreadsheet_url(self, spread):
+        base_url = spread._spread_metadata['spreadsheetUrl']
+        gid = spread._sheet_metadata['properties']['sheetId']
+        return f'{base_url}#gid={gid}'
+
     def to_frame(
         self,
         spreadsheet,
@@ -242,7 +247,9 @@ class GSheetsClient:
             fill_value=null_fill_value,
             **kwargs,
         )
+        sheet_url = self._get_spreadsheet_url(spread)
         logger.info(
             f"Inserted {df.size} values of a {df.shape} DataFrame into "
-            f"spreadsheet '{spreadsheet}'."
+            f"spreadsheet: {sheet_url}"
         )
+        return sheet_url
