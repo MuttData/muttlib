@@ -39,6 +39,7 @@ except ModuleNotFoundError:
 
 try:
     import ibis
+    import ibis.impala
 except ModuleNotFoundError:
     logger.debug("No Ibis support.")
 
