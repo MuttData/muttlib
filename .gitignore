@@ -1,3 +1,6 @@
+# gitlab-runner local dirs
+builds/
+
 # Coverage report
 cov_html/
 
@@ -120,6 +123,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Pipfiles
+
+Pipfile*
 
 ### Python Patch ###
 .venv/

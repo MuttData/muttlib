@@ -1,16 +1,17 @@
 """Module to get and use multiple Big Data DB connections."""
+from functools import wraps
 import logging
+from contextlib import closing
 import re
 import shutil
-from functools import wraps
 from time import sleep
 from urllib.parse import urlparse
 from contextlib import contextmanager
 
 import pandas as pd
+from pandas.io.json import json_normalize
 import progressbar
 import pyarrow.parquet as pq
-from pandas.io.json import json_normalize
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
 from sqlalchemy.orm import sessionmaker
@@ -23,30 +24,39 @@ logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 try:
     import cx_Oracle
 except ModuleNotFoundError:
-    logger.warning("No Oracle support.")
+    logger.debug("No Oracle support.")
 
 try:
     from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
     from pyhive import hive
 except ModuleNotFoundError:
-    logger.warning("No Hive support.")
+    logger.debug("No Hive support.")
 
 try:
     import pymongo
 except ModuleNotFoundError:
-    logger.warning("No Mongo support.")
-
+    logger.debug("No Mongo support.")
 
 try:
     import ibis
 except ModuleNotFoundError:
-    logger.warning("No Ibis support.")
+    logger.debug("No Ibis support.")
+
+try:
+    import pymysql  # noqa: F401 # pylint:disable=unused-import
+except ModuleNotFoundError:
+    logger.debug("No MySql support.")
+
+try:
+    import psycopg2  # noqa: F401 # pylint:disable=unused-import
+except ModuleNotFoundError:
+    logger.debug("No Postgresql support.")
 
 
 def _parse_sql_statement_decorator(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        args = list(args)
+        args = list(args)  # type: ignore
         sql = utils.path_or_string(args[0])
         format_params = kwargs.get('params', None)
         if format_params:
@@ -60,7 +70,7 @@ def _parse_sql_statement_decorator(func):
                     pass
 
         logger.debug(f"Running the following query: \n{sql}")
-        args[0] = sql
+        args[0] = sql  # type: ignore
         return func(self, *args, **kwargs)
 
     return wrapper
@@ -141,6 +151,7 @@ class BaseClient:
         return f'{dialect}://{login}@{host}/{self.database}'
 
     def get_engine(self, custom_uri=None, connect_args=None, echo=False):
+        """Create engine or return existing one."""
         connect_args = {} if connect_args is None else connect_args
         if not self._engine:
             db_uri = custom_uri or self._db_uri
@@ -159,11 +170,13 @@ class BaseClient:
 
     @_parse_sql_statement_decorator
     def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
+        """Execute sql statement."""
         if connection is None:
             connection = self._connect()
         return connection.execute(sql)
 
     def to_frame(self, *args, **kwargs):
+        """Return sql execution as Pandas dataframe."""
         cursor = self.execute(*args, **kwargs)
         if not cursor:
             return
@@ -175,6 +188,7 @@ class BaseClient:
         return df
 
     def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
+        """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
         connection = self._connect()
         with connection:
@@ -186,6 +200,13 @@ class PgClient(BaseClient):
 
     def __init__(self, dialect='postgresql', **kwargs):
         super().__init__(dialect=dialect, port=5432, **kwargs)
+
+
+class MySqlClient(BaseClient):
+    """Create MySql DB client."""
+
+    def __init__(self, dialect='mysql', driver='pymysql', **kwargs):
+        super().__init__(dialect=dialect, driver=driver, **kwargs)
 
 
 class SQLiteClient(BaseClient):
@@ -233,11 +254,8 @@ class OracleClient(BaseClient):
         Fix columns case and cast CLOBs to VARCHAR o avoid slow inserts.
 
         Ref:
-        - https://stackoverflow.com/questions/42727990/
-        speed-up-to-sql-when-writing-pandas-dataframe-to-oracle-database-using-sqlalch
-        - https://docs.sqlalchemy.org/en/latest/dialects/
-        oracle.html#fine-grained-control-over-cx-oracle-data-
-        binding-and-performance-with-setinputsizes
+        - https://stackoverflow.com/questions/42727990/speed-up-to-sql-when-writing-pandas-dataframe-to-oracle-database-using-sqlalch # noqa
+        - https://docs.sqlalchemy.org/en/latest/dialects/oracle.html#fine-grained-control-over-cx-oracle-data-binding-and-performance-with-setinputsizes # noqa
         """
         # TODO: Validate types here?
 
@@ -266,6 +284,8 @@ class IbisClient:
         Impala's HiveServer2 port
     username : str, optional
         LDAP user to authenticate
+    database : str, optional
+        Default database
     hdfs_host : str, optional
         Default host when using hdfs_client
     hdfs_port : int, optional
@@ -286,12 +306,12 @@ class IbisClient:
 
     Notes
     --------
-    It is strongly advised to set the Impala Session option 'SYNC_DDL' to `True` when 
-    working with an Impala load-balancer. This will make the balancer sync the metadata 
-    to all other nodes after a DDL statement. 
-    When using the via_hdfs=True argument in the to_frame method, you should use a 
-    particular's node hostname or a IP since this argument generates the creation and 
-    deletion of a temp table and the needed DDL operations are much faster in this way. 
+    It is strongly advised to set the Impala Session option 'SYNC_DDL' to `True` when
+    working with an Impala load-balancer. This will make the balancer sync the metadata
+    to all other nodes after a DDL statement.
+    When using the via_hdfs=True argument in the to_frame method, you should use a
+    particular's node hostname or a IP since this argument generates the creation and
+    deletion of a temp table and the needed DDL operations are much faster in this way.
     If you need to point to a load balancer, remember to set SYNC_DDL as True.
 
     See also
@@ -304,8 +324,9 @@ class IbisClient:
     def __init__(
         self,
         host,
-        port=None,
+        port=21050,
         username=None,
+        database=None,
         hdfs_host=None,
         hdfs_port=None,
         hdfs_username=None,
@@ -316,8 +337,9 @@ class IbisClient:
         options={'SYNC_DDL': True},
     ):
         self.host = host
-        self.port = port if port is not None else 21050
+        self.port = port
         self.username = username
+        self.database = database
         self.hdfs_host = hdfs_host
         self.hdfs_port = hdfs_port
         self.hdfs_username = hdfs_username
@@ -341,6 +363,7 @@ class IbisClient:
         client = ibis.impala.connect(
             host=self.host,
             port=self.port,
+            database=self.database,
             user=self.username,
             hdfs_client=self.hdfs_client,
             timeout=self._timeout,
@@ -494,10 +517,10 @@ class HiveDb:
     """Create Hive DB Client."""
 
     def __init__(
-        self, host, port=None, auth='NOSASL', database='default', username=None
+        self, host, port=10_000, auth='NOSASL', database='default', username=None
     ):
         self.host = host
-        self.port = port if port is not None else 21050
+        self.port = port
         self.auth = auth
         self.database = database
         self.username = username
@@ -515,7 +538,9 @@ class HiveDb:
         conn = self._connect()
         return conn.cursor()
 
-    def execute(self, sql, params=None, show_progress=True, dry_run=False):
+    def execute(
+        self, sql, params=None, show_progress=True, dry_run=False, async_=False
+    ):
         """Execute sql statement."""
         sql = utils.path_or_string(sql)
         if params is not None:
@@ -532,7 +557,7 @@ class HiveDb:
             return
 
         cursor = self._cursor()
-        cursor.execute(sql, async_=True)
+        cursor.execute(sql, async_=async_)
 
         if show_progress:
             self._show_query_progress(cursor)
@@ -570,20 +595,24 @@ class HiveDb:
 
     def to_frame(self, *args, **kwargs):
         """Execute sql statement and return results as a Pandas dataframe."""
-        cursor = self.execute(*args, **kwargs)
-        if not cursor:
-            return
-        data = cursor.fetchall()
-        # TODO: Add variant that dumps per row rather than the whole thing
-        if data:
-            df = pd.DataFrame(data)
-            df.columns = [c[0] for c in cursor.description]
-        else:
-            df = pd.DataFrame()
-        return df
+        with closing(self.execute(*args, **kwargs)) as cursor:
+            if not cursor:
+                return
+            data = cursor.fetchall()  # pylint: disable=no-member
+            # TODO: Add variant that dumps per row rather than the whole thing
+            if data:
+                df = pd.DataFrame(data)
+                df.columns = [
+                    c[0] for c in cursor.description  # pylint: disable=no-member
+                ]
+            else:
+                df = pd.DataFrame()
+            return df
 
 
 class SqlServerClient(BaseClient):
+    """SQLServer client."""
+
     def __init__(self, dialect='mssql', **kwargs):
         super().__init__(dialect=dialect, driver='pymssql', **kwargs)
         if self.database is None:
@@ -591,6 +620,8 @@ class SqlServerClient(BaseClient):
 
 
 class MongoClient:
+    """MongoDb client."""
+
     def __init__(
         self,
         username=None,
@@ -642,6 +673,7 @@ class MongoClient:
         return list(res)
 
     def to_frame(self, collection, query=None, fields=None, limit=0, no_id=False):
+        """Return query result as a Pandas dataframe."""
         cursor = self._find(collection, query=query, fields=fields, limit=limit)
         df = json_normalize(cursor)
         if no_id and not df.empty:
@@ -649,6 +681,7 @@ class MongoClient:
         return df
 
     def insert(self, collection, query=None, db=None):
+        """Insert query into collection."""
         if db is None:
             db = self._connect()
         collection = db[collection]
@@ -658,6 +691,7 @@ class MongoClient:
 
 ORACLE_DB_TYPE = 'oracle'
 POSTGRES_DB_TYPE = 'postgres'
+MYSQL_DB_TYPE = 'mysql'
 SQLSERVER_DB_TYPE = 'sql_server'
 HIVE_DB_TYPE = 'hive'
 MONGO_DB_TYPE = 'mongo'
@@ -665,6 +699,7 @@ MONGO_DB_TYPE = 'mongo'
 connectors = {
     ORACLE_DB_TYPE: OracleClient,
     POSTGRES_DB_TYPE: PgClient,
+    MYSQL_DB_TYPE: MySqlClient,
     SQLSERVER_DB_TYPE: SqlServerClient,
     HIVE_DB_TYPE: HiveDb,
     MONGO_DB_TYPE: MongoClient,
@@ -672,5 +707,6 @@ connectors = {
 
 
 def get_client(creds):
+    """Get a db client from a credentials dict."""
     db_type = creds.pop('db_type')
     return db_type, connectors[db_type](**creds)

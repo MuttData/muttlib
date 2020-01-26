@@ -38,11 +38,12 @@ setuptools.setup(
     ],
     extras_require={
         'oracle': ['cx_Oracle'],
-        'hive': ['pyhive'],
-        'postgres': ['psycopg2'],
+        'hive': ['pyhive>=0.6.1'],
+        'postgres': ['psycopg2-binary'],
+        'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
-        'ibis': ['ibis'],
+        'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'],
         'ipynb-utils': [
             'IPython',
             'jinja2',
