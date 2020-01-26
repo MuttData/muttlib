@@ -22,6 +22,12 @@ Base lib:
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 ```
 
+Parquet and Feather support:
+
+```
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[pyarrow]
+```
+
 IPython utils:
 
 ```
@@ -34,7 +40,7 @@ Forecast:
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[forecast]
 ```
 
-Misc DB suppoort for dbconn:
+Misc DB support for dbconn:
 ```
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
@@ -80,17 +86,6 @@ python -c 'from muttlib import dbconn, utils'
 
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
 python -c 'from muttlib import ipynb_const, ipynb_utils'
-```
-
-Misc DB support for dbconn:
-
-```commandline
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 ```
 
 ## Pre-Commit for Version Control Integration
