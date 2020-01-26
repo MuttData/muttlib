@@ -30,7 +30,6 @@ setuptools.setup(
         'jinja2',
         'pandas',
         'progressbar2',
-        'pyarrow==0.13.0',
         'pyyaml',
         'scikit-learn',
         'scipy',
@@ -43,7 +42,7 @@ setuptools.setup(
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
-        'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'],
+        'ibis': ['ibis', 'ibis-framework[impala]', 'impyla', 'pyarrow==0.13.0'],
         'ipynb-utils': [
             'IPython',
             'jinja2',
