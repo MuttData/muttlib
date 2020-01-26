@@ -68,5 +68,6 @@ setuptools.setup(
         ],
         'forecast': ['fbprophet'],
         'gsheets': ['gspread_pandas'],
+        'runs': ['mlflow'],
     },
 )

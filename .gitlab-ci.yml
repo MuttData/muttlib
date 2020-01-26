@@ -15,4 +15,6 @@ test:
   - python -c 'from muttlib import gsheetsconn'
   - pip install .[gcd]
   - python -c 'from muttlib import gcd'
+  - pip install .[runs]
+  - python -c 'from muttlib import runs'
   - python setup.py test

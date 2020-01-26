@@ -6,12 +6,15 @@ import re
 import shutil
 from time import sleep
 from urllib.parse import urlparse
+from contextlib import contextmanager
 
 import pandas as pd
 from pandas.io.json import json_normalize
 import progressbar
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import DeferredReflection
 
 import muttlib.utils as utils
 
@@ -71,6 +74,47 @@ def _parse_sql_statement_decorator(func):
         return func(self, *args, **kwargs)
 
     return wrapper
+
+
+def bring_table_group_metadata(engine, source_schema_cls=None):
+    """Bring metadata definitions to local schema.
+
+    Reflect external tables.
+
+    Args:
+        engine (sqlalchemy.engine.base.Engine): engine connection to db.
+        source_schema_cls (SQ table): SqlAlchemy valid-like table, declared or deferred.
+
+    Ref:
+    - https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/
+    api.html#sqlalchemy.ext.declarative.DeferredReflection
+    """
+    if source_schema_cls:
+        for cls in source_schema_cls.mro()[1:]:
+            if hasattr(cls, 'prepare'):
+                deferred_cls = cls
+                break
+    else:
+        deferred_cls = DeferredReflection
+
+    deferred_cls.prepare(engine)
+
+
+@contextmanager
+def session_scope(engine, **session_kw):
+    """Provide a transactional scope around a series of operations."""
+    Session = sessionmaker(bind=engine)
+    sess = Session(**session_kw)
+    bring_table_group_metadata(sess.connection())
+    try:
+        yield sess
+        sess.commit()
+    except Exception as err:
+        logger.exception(err)
+        sess.rollback()
+        raise
+    finally:
+        sess.close()
 
 
 class BaseClient:
@@ -622,7 +666,7 @@ class MongoClient:
         if db is None:
             db = self._connect()
         collection = db[collection]
-        find_func = getattr(collection, 'find')  # noqa
+        find_func = getattr(collection, 'find')  # noqa: B009
         res = find_func(query, fields)
         if limit > 0:
             res = res.limit(limit)
