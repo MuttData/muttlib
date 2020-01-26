@@ -24,7 +24,8 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     setup_requires=['pytest-runner', 'wheel'],
-    tests_require=["pytest", "pytest-cov", "pytest-html"],
+    pyarrow_dep=["pyarrow==0.13.0"],
+    tests_require=["pytest", "pytest-cov", "pytest-html"] + pyarrow_dep,
     test_suite='test',
     install_requires=[
         'jinja2',
@@ -36,13 +37,14 @@ setuptools.setup(
         'sqlalchemy',
     ],
     extras_require={
+        'pyarrow': pyarrow_dep,
         'oracle': ['cx_Oracle'],
         'hive': ['pyhive>=0.6.1'],
         'postgres': ['psycopg2-binary'],
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
-        'ibis': ['ibis', 'ibis-framework[impala]', 'impyla', 'pyarrow==0.13.0'],
+        'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
         'ipynb-utils': [
             'IPython',
             'jinja2',
