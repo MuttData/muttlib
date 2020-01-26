@@ -6,6 +6,8 @@ import muttlib
 with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
+pyarrow_dep = ["pyarrow==0.13.0"]
+
 setuptools.setup(
     name='muttlib',
     version=muttlib.__version__,
@@ -24,7 +26,6 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     setup_requires=['pytest-runner', 'wheel'],
-    pyarrow_dep=["pyarrow==0.13.0"],
     tests_require=["pytest", "pytest-cov", "pytest-html"] + pyarrow_dep,
     test_suite='test',
     install_requires=[
