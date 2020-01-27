@@ -10,7 +10,6 @@ from urllib.parse import urlparse
 import pandas as pd
 from pandas.io.json import json_normalize
 import progressbar
-import pyarrow.parquet as pq
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
 
@@ -36,6 +35,7 @@ except ModuleNotFoundError:
 
 try:
     import ibis
+    import pyarrow.parquet as pq
 except ModuleNotFoundError:
     logger.debug("No Ibis support.")
 
