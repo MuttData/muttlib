@@ -47,11 +47,9 @@ from muttlib.utils import split_on_letter
 logger = logging.getLogger(f'gsheetsconn.{__name__}')  # NOQA
 
 try:
-    import gspread_pandas  # noqa: F401 # pylint: disable=unused-import
+    from gspread_pandas import Spread, conf as gconf  # noqa: F401 # pylint: disable=unused-import
 except ModuleNotFoundError:
     logger.warning("No GSpread support.")
-
-from gspread_pandas import Spread, conf as gconf
 
 
 class GSheetsClient:
