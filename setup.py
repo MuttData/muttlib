@@ -66,7 +66,7 @@ setuptools.setup(
             'mypy',
             'pylint',
         ],
-        'forecast': ['fbprophet'],
+        'forecast': ['holidays>=0.9.5,<0.10.1', 'fbprophet'],
         'gsheets': ['gspread_pandas'],
     },
 )
