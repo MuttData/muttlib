@@ -30,7 +30,7 @@ setuptools.setup(
     test_suite='test',
     install_requires=[
         'jinja2',
-        'pandas',
+        'pandas>=1.0.0',
         'progressbar2',
         'pyyaml',
         'scikit-learn',
