@@ -266,7 +266,9 @@ def test_df_info_to_str():
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 5 entries, 0 to 4
     Data columns (total 1 columns):
-    B    5 non-null int64
+     #   Column  Non-Null Count  Dtype
+    ---  ------  --------------  -----
+     0   B       5 non-null      int64
     dtypes: int64(1)
     memory usage: {byt} bytes
     """

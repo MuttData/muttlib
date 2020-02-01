@@ -30,7 +30,7 @@ setuptools.setup(
     test_suite='test',
     install_requires=[
         'jinja2',
-        'pandas',
+        'pandas>=1.0.0',
         'progressbar2',
         'pyyaml',
         'scikit-learn',
@@ -66,7 +66,7 @@ setuptools.setup(
             'mypy',
             'pylint',
         ],
-        'forecast': ['fbprophet'],
+        'forecast': ['holidays>=0.9.5,<0.10.1', 'fbprophet'],
         'gsheets': ['gspread_pandas'],
     },
 )
