@@ -225,7 +225,7 @@ class GSheetsClient:
                 dumping the data.
             worksheet (str, int): Optional, name or index of Worksheet.
                 number of col to be set as index.
-            preclean_sheet (int): Optional, to clean previous data in worksheet or not.
+            preclean_sheet (bool): Optional, to clean previous data in worksheet or not.
             null_fill_value (str): Optional, the value representing nulls in data.
         """
         spread = self.get_spreadsheet(spreadsheet, worksheet)
