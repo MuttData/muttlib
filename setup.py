@@ -7,6 +7,7 @@ with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
 pyarrow_dep = ["pyarrow==0.13.0"]
+holidays_dep = ['holidays>=0.9.5,<0.10.1']
 
 setuptools.setup(
     name='muttlib',
@@ -26,7 +27,7 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     setup_requires=['pytest-runner', 'wheel'],
-    tests_require=["pytest", "pytest-cov", "pytest-html"] + pyarrow_dep,
+    tests_require=["pytest", "pytest-cov", "pytest-html"] + pyarrow_dep + holidays_dep,
     test_suite='test',
     install_requires=[
         'jinja2',
@@ -66,7 +67,7 @@ setuptools.setup(
             'mypy',
             'pylint',
         ],
-        'forecast': ['holidays>=0.9.5,<0.10.1', 'fbprophet'],
+        'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],
     },
 )
