@@ -1,5 +1,7 @@
 # muttlib 🐶📚
 
+[![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)
+
 Library with helper code to start a project by [Mutt Data](https://muttdata.ai/).
 
 Current modules:
@@ -151,6 +153,8 @@ push.
 Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer: `git push -o ci.skip`
 more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
 `IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
+
+**Important note on coverage:** A regex that captures the otuput from `pytest-cov` has been set from Settings -> CI/CD -> General Pipelines -> Test coverage parsing
 
 # Google Sheets Credentials
 
