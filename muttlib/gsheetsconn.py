@@ -242,7 +242,7 @@ class GSheetsClient:
             fill_value=null_fill_value,
             **kwargs,
         )
-        sheet_url = spread.url
+        sheet_url = f"{spread.url}#gid={spread.sheet.id}"
         logger.info(
             f"Inserted {df.size} values of a {df.shape} DataFrame into "
             f"spreadsheet: {sheet_url}"
