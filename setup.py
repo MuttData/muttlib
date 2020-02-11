@@ -69,5 +69,6 @@ setuptools.setup(
         ],
         'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],
+        'association': ['matplotlib', 'pandas ', 'scipy', 'seaborn '],
     },
 )
