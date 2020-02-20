@@ -20,7 +20,7 @@ Current modules:
 
 Base lib:
 
-```commandline
+```bash
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 ```
 
@@ -58,7 +58,7 @@ Install custom branch:
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
-# Testing
+## Testing
 Run all tests:
 ```
 python setup.py test
@@ -78,10 +78,23 @@ py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov
 
 That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
 
+## Docs
+muttlib uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's docs from docstrings. Pushing all the docs is too cumbersome. You can generate them locally like so:
+
+```bash
+pip install .[dev]
+cd docs
+make html
+```
+
+And open `docs/build/html/index.html` on your browser of choice.
+
+Alternatively you can see the docs for the `master` branch [here.](https://mutt_data.gitlab.io/muttlib/index.html)
+
 
 ## Dirty Dry-run (done dirt cheap)
 
-```commandline
+```bash
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 
 python -c 'from muttlib import dbconn, utils'
@@ -101,7 +114,7 @@ binaries:
 
 The easiest way to set this up is by first installing `pipx` with
 
-```commandline
+```bash
 pip3 install --user pipx
 pipx ensurepath
 ```
@@ -109,7 +122,7 @@ pipx ensurepath
 and then use `pipx` to actually install the `pre-commit` binary along the linters and
 formatters globally:
 
-```commandline
+```bash
 pipx install pre-commit --verbose
 pipx install flake8 --spec git+https://github.com/PyCQA/flake8 --verbose
 pipx inject flake8 flake8-bugbear flake8-docstrings --verbose
@@ -128,7 +141,7 @@ The binaries are also listed as `dev` packages in `setup.py`. Therefore you can
 alternatively install `muttlib` locally in a virtual environment using `pipenv`. To do
 that first clone the repo, `cd` into this `muttlib` folder and then run
 
-```commandline
+```bash
 pipenv install -e .[dev] --skip-lock
 ```
 

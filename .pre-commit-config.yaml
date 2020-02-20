@@ -6,18 +6,22 @@ repos:
       entry: black
       language: system
       types: [python]
+      exclude: docs/*
     - id: flake8
       name: flake8
       entry: flake8
       language: system
       types: [python]
+      exclude: docs/*
     - id: mypy
       name: mypy
       entry: mypy
       language: system
       types: [python]
+      exclude: docs/*
     - id: pylint
       name: pylint
       entry: pylint
       language: system
       types: [python]
+      exclude: docs/*
