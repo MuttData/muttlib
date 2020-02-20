@@ -66,6 +66,10 @@ setuptools.setup(
             'black',
             'mypy',
             'pylint',
+            'bump',
+            'sphinx',
+            'sphinx_rtd_theme',
+            'm2r'
         ],
         'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],

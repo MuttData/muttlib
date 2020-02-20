@@ -129,15 +129,15 @@ class SkProphet(Prophet):
             It is expected to have a column with datetime values named as
             *self.sk_date_column*.
         y: None or str or (list, tuple, numpy.ndarray, pandas.Series/DataFrame)
-            The label values to fit. If y is:
-            * None: the column 'y' should be contained in X.
-            * str: the name of the column to use in X.
-            * list, tuple, ndarray, etc: the values to fit.
-              If the values have two dimensions (a matrix instead of a vector)
-              the first column will be used.
-              E.g.: [1, 3] -> [1, 3] will be used.
-              E.g.: [[1], [3]] -> [1, 3] will be used.
-              E.g.: [[1, 2], [3, 4]] -> [1, 3] will be used.
+           The label values to fit. If y is:
+             - None: the column 'y' should be contained in X.
+             - str: the name of the column to use in X.
+             - list, tuple, ndarray, etc: the values to fit.
+               If the values have two dimensions (a matrix instead of a vector)
+               the first column will be used.
+               E.g.: [1, 3] -> [1, 3] will be used.
+               E.g.: [[1], [3]] -> [1, 3] will be used.
+               E.g.: [[1, 2], [3, 4]] -> [1, 3] will be used.
         copy: Boolean
             True to copy the input dataframe before working with it to avoid
             modifying the original one.
@@ -205,9 +205,9 @@ class SkProphet(Prophet):
     def set_params(self, **params):
         """Scikit learn's set_params (sets the parameters provided).
         Note on prophet keyword arguments precedence; this applies:
-           _First, if some argument is explicitly provided, this value will be kept.
-           _If not, but provided inside a 'prophet_kwargs' dict, the last is kept.
-           _Lastly, if not provided in neither way but currently set, the value is not erased.
+        - First, if some argument is explicitly provided, this value will be kept.
+        - If not, but provided inside a 'prophet_kwargs' dict, the last is kept.
+        - Lastly, if not provided in neither way but currently set, the value is not erased.
         """
         sk_kws = [
             attr for attr in signature(self.__init__).parameters
