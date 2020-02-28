@@ -35,7 +35,6 @@ except ModuleNotFoundError:
 
 try:
     import ibis
-    import ibis.config as cf
     import pyarrow.parquet as pq
 except ModuleNotFoundError:
     logger.debug("No Ibis support.")
@@ -290,7 +289,9 @@ class IbisClient:
         hdfs_database=None,
         max_retries=5,
         max_backoff=64,
-        timeout=120,
+        temp_db=None,
+        temp_hdfs_path=None,
+        timeout=None,
         options={'SYNC_DDL': True},
     ):
         self.host = host
@@ -311,11 +312,11 @@ class IbisClient:
         # user that cannot write to `/tmp/ibis`)
         # See https://stackoverflow.com/a/47543691/2149400
         if temp_db is not None or temp_hdfs_path is not None:
-            with cf.config_prefix('impala'):
+            with ibis.config.config_prefix('impala'):
                 if temp_db is not None:
-                    cf.set_option('temp_db', temp_db)
+                    ibis.config.set_option('temp_db', temp_db)
                 if temp_hdfs_path is not None:
-                    cf.set_option('temp_hdfs_path', temp_hdfs_path)
+                    ibis.config.set_option('temp_hdfs_path', temp_hdfs_path)
 
     def _connect(self):
         if (
