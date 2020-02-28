@@ -15,10 +15,6 @@ from sqlalchemy.types import VARCHAR
 
 import muttlib.utils as utils
 
-from pyhive import hive
-import ibis
-import ibis.config as cf
-
 logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 
 try:
@@ -39,6 +35,7 @@ except ModuleNotFoundError:
 
 try:
     import ibis
+    import ibis.config as cf
     import pyarrow.parquet as pq
 except ModuleNotFoundError:
     logger.debug("No Ibis support.")
