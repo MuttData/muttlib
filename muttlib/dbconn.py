@@ -19,34 +19,34 @@ logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 
 try:
     import cx_Oracle
-except ModuleNotFoundError:
+except ImportError:
     logger.debug("No Oracle support.")
 
 try:
     from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
     from pyhive import hive
-except ModuleNotFoundError:
+except ImportError:
     logger.debug("No Hive support.")
 
 try:
     import pymongo
-except ModuleNotFoundError:
+except ImportError:
     logger.debug("No Mongo support.")
 
 try:
     import ibis
     import pyarrow.parquet as pq
-except ModuleNotFoundError:
+except ImportError:
     logger.debug("No Ibis support.")
 
 try:
     import pymysql  # noqa: F401 # pylint:disable=unused-import
-except ModuleNotFoundError:
+except ImportError:
     logger.debug("No MySql support.")
 
 try:
     import psycopg2  # noqa: F401 # pylint:disable=unused-import
-except ModuleNotFoundError:
+except ImportError:
     logger.debug("No Postgresql support.")
 
 
