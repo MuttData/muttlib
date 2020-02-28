@@ -289,7 +289,9 @@ class IbisClient:
         hdfs_database=None,
         max_retries=5,
         max_backoff=64,
-        timeout=120,
+        temp_db=None,
+        temp_hdfs_path=None,
+        timeout=None,
         options={'SYNC_DDL': True},
     ):
         self.host = host
@@ -305,6 +307,16 @@ class IbisClient:
         self._max_backoff = max_backoff
         self._timeout = timeout
         self.options = options
+
+        # Override ibis default tmp db and location (when using a non-root/admin
+        # user that cannot write to `/tmp/ibis`)
+        # See https://stackoverflow.com/a/47543691/2149400
+        if temp_db is not None or temp_hdfs_path is not None:
+            with ibis.config.config_prefix('impala'):
+                if temp_db is not None:
+                    ibis.config.set_option('temp_db', temp_db)
+                if temp_hdfs_path is not None:
+                    ibis.config.set_option('temp_hdfs_path', temp_hdfs_path)
 
     def _connect(self):
         if (
