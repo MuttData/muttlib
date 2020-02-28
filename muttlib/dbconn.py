@@ -306,6 +306,16 @@ class IbisClient:
         self._timeout = timeout
         self.options = options
 
+        # Override ibis default tmp db and location (when using a non-root/admin
+        # user that cannot write to `/tmp/ibis`)
+        # See https://stackoverflow.com/a/47543691/2149400
+        if temp_db is not None or temp_hdfs_path is not None:
+            with cf.config_prefix('impala'):
+                if temp_db is not None:
+                    cf.set_option('temp_db', temp_db)
+                if temp_hdfs_path is not None:
+                    cf.set_option('temp_hdfs_path', temp_hdfs_path)
+
     def _connect(self):
         if (
             self.hdfs_host is not None
