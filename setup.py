@@ -31,7 +31,7 @@ setuptools.setup(
     test_suite='test',
     install_requires=[
         'jinja2',
-        'pandas>=1.0.0',
+        'pandas==0.25.3',
         'progressbar2',
         'pyyaml',
         'scikit-learn',
@@ -69,7 +69,7 @@ setuptools.setup(
             'bump',
             'sphinx',
             'sphinx_rtd_theme',
-            'm2r'
+            'm2r',
         ],
         'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],
