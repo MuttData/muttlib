@@ -20,9 +20,15 @@ import matplotlib
 
 import muttlib.utils as utils
 
+logger = logging.getLogger(f'ipynb_utils.{__name__}')
 
 # Special back-end set to have the ipynb **not** use tkinter
-matplotlib.use('TkAgg')
+current_backend = matplotlib.get_backend()
+if current_backend != 'TkAgg':
+    logger.warning(
+        f"You are currently using {current_backend} as your Matplotlib backend. "
+        "This lib currently recommends using TkAgg for correctly visualizing its plots."
+    )
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
@@ -33,8 +39,6 @@ import matplotlib.dates as mdates  # NOQA
 
 # Cleanear matplotlib formatting
 from matplotlib import ticker  # NOQA
-
-logger = logging.getLogger(f'ipynb_utils.{__name__}')
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
