@@ -873,3 +873,91 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
         ret.difference_update(get_matching_columns(cols, exclude_regexes))
 
     return sorted(list(ret))
+
+
+def dataframe_diff(df_x,df_y,key):
+    """
+    Compute diff between 2 dataframes taking their columns in common as key.
+    Args:
+        - df_x (DataFrame object): first df
+        - df_y (DataFrame object): second df
+        - key (list of string): list of column name taken as key 
+    
+    
+    Returns a tuple that contains the difference and additional data.
+    """
+    set_x=['df_x' for i in range(len(df_x))]
+    df_x['sets']=set_x
+    set_y=['df_y' for i in range(len(df_y))]
+    df_y['sets']=set_y
+    columns=list(df_x.columns)
+    columns.remove('sets')
+    df_concat=pd.concat([df_x,df_y]).drop_duplicates(subset=columns,keep=False).reset_index(drop=True)
+    df_set1=df_concat[df_concat['sets']=='df_x']
+    df_set2=df_concat[df_concat['sets']=='df_y']
+    df_merged=pd.merge(df_set1, df_set2, on=key)
+    nonkey=set(columns)- set(key)
+    list_diff=[]
+    for i in range(len(df_merged)):
+        for col in nonkey:
+            if df_merged.iloc[i][col + '_x'] != df_merged.iloc[i][col + '_y']:
+                list_diff.append(list(df_merged.iloc[i][key + [col + '_x',col + '_y']]) + [col])
+    df_diff=pd.DataFrame(list_diff,columns=key + ['value' + '_x','value' + '_y' ,'column_name'] )
+    df_additional = pd.concat([df_x,df_y]).drop_duplicates(subset=key,keep=False).reset_index(drop=True)
+    df_x.drop(['sets'],axis=1,inplace=True)
+    df_y.drop(['sets'],axis=1,inplace=True)
+    return df_diff,df_additional
+
+
+def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params, filter_flag_more_deviation=False):
+    """
+    It generates the differentials between tables. 
+    
+    Args:
+        extract_first_df_fn (function): Function that returns grouped dataframe with row_count column.
+        extract_second_df_fn (function): Function that returns grouped dataframe with row_count column.
+        params (dictionary): helper dict that contains the following structure:
+            - key_col: column name to take as key (to join and sort)
+            - first_suffix: suffix to name row_count column
+            - second_suffix: suffix to name row_count column
+            - other params: such as condition of query, or name of database, table, etc.. in order to use in the
+            sql template, python function, etc.
+        filter_flag_more_deviation (bool): Flag that indicates if transform function should filter or not data 
+        if the data has deviation greater than specified value (threshold)
+    Returns:
+        DataFrame: Result df with deviations
+    """
+
+    first_df = extract_first_df_fn(params)
+    
+    second_df = extract_second_df_fn(params)
+    
+
+    df_merged = first_df.merge(
+        second_df, how="left", on=[params["key_col"]], suffixes=(params["first_suffix"], params["second_suffix"])
+    ).fillna(value=0)
+    df_merged["diff"] = df_merged[f"row_count{params['first_suffix']}"] - (df_merged[f"row_count{params['second_suffix']}"])
+    df_merged["diff_%"] = round(
+        (
+            (df_merged[f"row_count{params['first_suffix']}"] - (df_merged[f"row_count{params['second_suffix']}"]))
+            / df_merged[f"row_count{params['first_suffix']}"]
+        )
+        * 100,
+        2,
+    )
+
+    if filter_flag_more_deviation:
+        df_merged = df_merged[
+            ~df_merged["diff_%"].between(-1, 1, inclusive=False)
+        ]
+    df_merged = df_merged[
+        [
+            "date_col",
+            f"row_count{params['first_suffix']}",
+            f"row_count{params['second_suffix']}",
+            "diff",
+            "diff_%",
+        ]
+    ]
+
+    return df_merged.sort_values([params["key_col"]], ascending=True).reset_index(drop=True)
