@@ -917,6 +917,20 @@ def test_additional_case_second_output():
     rv = utils.dataframe_diff(df_x,df_y,['date_col'])
     assert_frame_equal(rv[1], second_rv_mock)
 
+def test_first_output_diff_diferent_df_reverse_case():
+    df_x = get_first_df()
+    df_y = get_second_df()
+    rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
+    rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
+    assert((list(rv[0].value_x) == list(rv_reverse[0].value_y)) &  (list(rv[0].value_y) == list(rv_reverse[0].value_x)) )
+
+def test_second_output_diff_diferent_df_reverse_case():
+    df_x = get_first_df()
+    df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
+    rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
+    rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
+    assert_frame_equal(rv[1][['date_col', 'row_count']], rv_reverse[1][['date_col', 'row_count']])
+
 def test_len_dev_log_normal_case():
     assert(len(utils.compute_differences_tables(get_first_df, get_second_df, params) == 4))
 
