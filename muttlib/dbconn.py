@@ -15,7 +15,7 @@ from sqlalchemy.types import VARCHAR
 
 import muttlib.utils as utils
 
-logger = logging.getLogger(f"dbconn.{__name__}")  # NOQA
+logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 
 try:
     import cx_Oracle
@@ -55,7 +55,7 @@ def _parse_sql_statement_decorator(func):
     def wrapper(self, *args, **kwargs):
         args = list(args)  # type: ignore
         sql = utils.path_or_string(args[0])
-        format_params = kwargs.get("params", None)
+        format_params = kwargs.get('params', None)
         if format_params:
             try:
                 sql = sql.format(**format_params)
@@ -104,7 +104,7 @@ class BaseClient:
             f"{self.username}{f':{self.password}' if self.password is not None else ''}"
         )
         host = f"{self.host}{f':{self.port}' if self.port is not None else ''}"
-        return f"{dialect}://{login}@{host}/{self.database}"
+        return f'{dialect}://{login}@{host}/{self.database}'
 
     def get_engine(self, custom_uri=None, connect_args=None, echo=False):
         """Create engine or return existing one."""
@@ -119,7 +119,7 @@ class BaseClient:
 
     @staticmethod
     def _cursor_columns(cursor):
-        if hasattr(cursor, "keys"):
+        if hasattr(cursor, 'keys'):
             return cursor.keys()
         else:
             return [c[0] for c in cursor.description]
@@ -143,7 +143,7 @@ class BaseClient:
             df = pd.DataFrame()
         return df
 
-    def insert_from_frame(self, df, table, if_exists="append", index=False, **kwargs):
+    def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
         """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
         connection = self._connect()
@@ -154,32 +154,32 @@ class BaseClient:
 class PgClient(BaseClient):
     """Create Postgres DB client."""
 
-    def __init__(self, dialect="postgresql", **kwargs):
+    def __init__(self, dialect='postgresql', **kwargs):
         super().__init__(dialect=dialect, port=5432, **kwargs)
 
 
 class MySqlClient(BaseClient):
     """Create MySql DB client."""
 
-    def __init__(self, dialect="mysql", driver="pymysql", **kwargs):
+    def __init__(self, dialect='mysql', driver='pymysql', **kwargs):
         super().__init__(dialect=dialect, driver=driver, **kwargs)
 
 
 class SQLiteClient(BaseClient):
     """Create SQLite DB client."""
 
-    def __init__(self, dialect="sqlite", **kwargs):
+    def __init__(self, dialect='sqlite', **kwargs):
         super().__init__(dialect=dialect, **kwargs)
 
     def _connect(self):
-        db_uri = f"{self.dialect}:///{self.database}"
+        db_uri = f'{self.dialect}:///{self.database}'
         return self.get_engine(custom_uri=db_uri).connect()
 
 
 class OracleClient(BaseClient):
     """Create Oracle DB client."""
 
-    def __init__(self, dialect="oracle", schema=None, **kwargs):
+    def __init__(self, dialect='oracle', schema=None, **kwargs):
         super().__init__(dialect=dialect, **kwargs)
         self.schema = schema
 
@@ -188,11 +188,11 @@ class OracleClient(BaseClient):
         dsn = cx_Oracle.makedsn(  # pylint: disable=I1101
             self.host, self.port, service_name=self.database
         )
-        db_uri = f"{self.dialect}://{self.username}:{self.password}@{dsn}"
+        db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
         return db_uri
 
     def _connect(self):
-        connect_args = {"encoding": "UTF-8", "nencoding": "UTF-8"}
+        connect_args = {'encoding': 'UTF-8', 'nencoding': 'UTF-8'}
         conn = self.get_engine(connect_args=connect_args).connect()
         if self.schema is not None:
             conn.connection.current_schema = self.schema
@@ -218,7 +218,7 @@ class OracleClient(BaseClient):
         if fix_clobs:
             dtyp = {
                 c: VARCHAR(df[c].str.len().max())
-                for c in df.columns[df.dtypes == "object"].tolist()
+                for c in df.columns[df.dtypes == 'object'].tolist()
             }
         else:
             dtyp = df.dtypes
@@ -292,7 +292,7 @@ class IbisClient:
         temp_db=None,
         temp_hdfs_path=None,
         timeout=None,
-        options={"SYNC_DDL": True},
+        options={'SYNC_DDL': True},
     ):
         self.host = host
         self.port = port
@@ -312,11 +312,11 @@ class IbisClient:
         # user that cannot write to `/tmp/ibis`)
         # See https://stackoverflow.com/a/47543691/2149400
         if temp_db is not None or temp_hdfs_path is not None:
-            with ibis.config.config_prefix("impala"):
+            with ibis.config.config_prefix('impala'):
                 if temp_db is not None:
-                    ibis.config.set_option("temp_db", temp_db)
+                    ibis.config.set_option('temp_db', temp_db)
                 if temp_hdfs_path is not None:
-                    ibis.config.set_option("temp_hdfs_path", temp_hdfs_path)
+                    ibis.config.set_option('temp_hdfs_path', temp_hdfs_path)
 
     def _connect(self):
         if (
@@ -365,7 +365,7 @@ class IbisClient:
             if cache_dir is None:
                 raise ValueError("No local dir to save hdfs files was specified!")
 
-            tmp_table = f"{table_prefix}_tmp_{utils.hash_str(sql)}"
+            tmp_table = f'{table_prefix}_tmp_{utils.hash_str(sql)}'
             local_tmp_table_dir = cache_dir / tmp_table
             if refresh_cache:
                 shutil.rmtree(local_tmp_table_dir, ignore_errors=True)
@@ -449,9 +449,9 @@ class IbisClient:
         thoroughly downloaded.
         """
         hdfs_files = (
-            client.table(f"{self.hdfs_database}.{tmp_table}").files()["Path"].tolist()
+            client.table(f'{self.hdfs_database}.{tmp_table}').files()['Path'].tolist()
         )
-        hdfs_dir = urlparse(hdfs_files[0]).path.rsplit("/", 1)[0]
+        hdfs_dir = urlparse(hdfs_files[0]).path.rsplit('/', 1)[0]
         logger.debug(f"Downloading data from {hdfs_dir}...")
         if not local_tmp_dir.exists():
             utils.make_dirs(local_tmp_dir)
@@ -465,7 +465,7 @@ class IbisClient:
             except Exception as e:
                 logger.error(e)
 
-            all_globs = local_tmp_dir.glob("*")  # We only check depth = 0
+            all_globs = local_tmp_dir.glob('*')  # We only check depth = 0
             parquet_files = [f for f in all_globs if f.is_file()]
             if len(parquet_files) > 0:
                 # Check if parquets were downloaded to the local tmp table dir
@@ -485,7 +485,7 @@ class HiveDb:
     """Create Hive DB Client."""
 
     def __init__(
-        self, host, port=10_000, auth="NOSASL", database="default", username=None
+        self, host, port=10_000, auth='NOSASL', database='default', username=None
     ):
         self.host = host
         self.port = port
@@ -555,7 +555,7 @@ class HiveDb:
         if not logs:
             return progress
         log = logs[offset]
-        m = re.search(r"\((\d+).*?(\d+)\)", log)
+        m = re.search(r'\((\d+).*?(\d+)\)', log)
         if m:
             progress, total = m.groups()
             progress = int(progress) / int(total)
@@ -581,8 +581,8 @@ class HiveDb:
 class SqlServerClient(BaseClient):
     """SQLServer client."""
 
-    def __init__(self, dialect="mssql", **kwargs):
-        super().__init__(dialect=dialect, driver="pymssql", **kwargs)
+    def __init__(self, dialect='mssql', **kwargs):
+        super().__init__(dialect=dialect, driver='pymssql', **kwargs)
         if self.database is None:
             raise ValueError("Database argument is not optional!")
 
@@ -611,17 +611,17 @@ class MongoClient:
         self.replica_set = replica_set
 
     def _build_conn_uri(self):
-        uri = "mongodb://"
+        uri = 'mongodb://'
         if self.username is not None:
-            uri += f"{self.username}"
+            uri += f'{self.username}'
         if self.password is not None:
-            uri += f":{self.password}@"
+            uri += f':{self.password}@'
         if self.replica_set is None:
-            uri += f"{self.host}:{self.port}"
+            uri += f'{self.host}:{self.port}'
         else:
             uri += ",".join(self.seeds)
-        uri += f"/{self.database}"
-        uri += f"?replicaSet={self.replica_set}" if self.replica_set is not None else ""
+        uri += f'/{self.database}'
+        uri += f'?replicaSet={self.replica_set}' if self.replica_set is not None else ''
         return uri
 
     def _connect(self, custom_uri=None):
@@ -634,7 +634,7 @@ class MongoClient:
         if db is None:
             db = self._connect()
         collection = db[collection]
-        find_func = getattr(collection, "find")  # noqa
+        find_func = getattr(collection, 'find')  # noqa
         res = find_func(query, fields)
         if limit > 0:
             res = res.limit(limit)
@@ -645,7 +645,7 @@ class MongoClient:
         cursor = self._find(collection, query=query, fields=fields, limit=limit)
         df = json_normalize(cursor)
         if no_id and not df.empty:
-            del df["_id"]
+            del df['_id']
         return df
 
     def insert(self, collection, query=None, db=None):
@@ -657,13 +657,13 @@ class MongoClient:
         return insert_id
 
 
-ORACLE_DB_TYPE = "oracle"
-POSTGRES_DB_TYPE = "postgres"
-MYSQL_DB_TYPE = "mysql"
-SQLSERVER_DB_TYPE = "sql_server"
-HIVE_DB_TYPE = "hive"
-MONGO_DB_TYPE = "mongo"
-IBIS_DB_TYPE = "ibis"
+ORACLE_DB_TYPE = 'oracle'
+POSTGRES_DB_TYPE = 'postgres'
+MYSQL_DB_TYPE = 'mysql'
+SQLSERVER_DB_TYPE = 'sql_server'
+HIVE_DB_TYPE = 'hive'
+MONGO_DB_TYPE = 'mongo'
+IBIS_DB_TYPE = 'ibis'
 
 connectors = {
     ORACLE_DB_TYPE: OracleClient,
@@ -678,5 +678,5 @@ connectors = {
 
 def get_client(creds):
     """Get a db client from a credentials dict."""
-    db_type = creds.pop("db_type")
+    db_type = creds.pop('db_type')
     return db_type, connectors[db_type](**creds)
