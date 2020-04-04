@@ -145,9 +145,9 @@ def process_new_files_parallel(proc_func, in_dir, workers=None, only_ready=False
     By default the number of workers is equal to the number of cores.
 
     TODO:
-    - Add selector for pool type (process or thread). Threads would be the
-      preffered option if proc_func frees the GIL either by using Numba or
-      Cython.
+      - Add selector for pool type (process or thread). Threads would be the
+        preffered option if proc_func frees the GIL either by using Numba or
+        Cython.
     """
     if workers is None:
         workers = cpu_count()

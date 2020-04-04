@@ -16,3 +16,17 @@ test:
   - pip install .[gcd]
   - python -c 'from muttlib import gcd'
   - python setup.py test
+
+pages:
+  stage: deploy
+  script:
+  - pip install .[dev]
+  - cd docs
+  - make html
+  - cd ..
+  - mv docs/build/html/ public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
