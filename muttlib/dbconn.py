@@ -663,6 +663,7 @@ MYSQL_DB_TYPE = 'mysql'
 SQLSERVER_DB_TYPE = 'sql_server'
 HIVE_DB_TYPE = 'hive'
 MONGO_DB_TYPE = 'mongo'
+IBIS_DB_TYPE = 'ibis'
 
 connectors = {
     ORACLE_DB_TYPE: OracleClient,
@@ -671,6 +672,7 @@ connectors = {
     SQLSERVER_DB_TYPE: SqlServerClient,
     HIVE_DB_TYPE: HiveDb,
     MONGO_DB_TYPE: MongoClient,
+    IBIS_DB_TYPE: IbisClient,
 }
 
 
