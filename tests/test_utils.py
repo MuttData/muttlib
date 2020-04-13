@@ -36,6 +36,8 @@ def get_second_df_diff_deviations_functions(params=None):
     }
     return pd.DataFrame(data2)
 
+# ------
+
 @pytest.mark.parametrize(
     "test_input,expected",
     [
@@ -932,10 +934,10 @@ def test_second_output_diff_diferent_df_reverse_case():
     assert_frame_equal(rv[1][['date_col', 'row_count']], rv_reverse[1][['date_col', 'row_count']])
 
 def test_len_dev_log_normal_case():
-    assert(len(utils.compute_differences_tables(get_first_df, get_second_df, params) == 4))
+    assert(len(utils.compute_differences_tables(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, params) == 4))
 
 def test_dev_log_normal_case():
-    assert_frame_equal(utils.compute_differences_tables(get_first_df, get_second_df, params), pd.DataFrame({'date_col': {0: '2020-11-11',
+    assert_frame_equal(utils.compute_differences_tables(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, params), pd.DataFrame({'date_col': {0: '2020-11-11',
         1: '2020-11-12',
         2: '2020-11-13',
         3: '2020-11-14'},
