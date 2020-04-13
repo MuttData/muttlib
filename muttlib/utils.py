@@ -923,7 +923,7 @@ def dataframe_diff(df_x,df_y,key):
     return df_diff, df_additional
 
 
-def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params, filter_flag_more_deviation=False):
+def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params, other_params=None, filter_flag_more_deviation=False):
     """
     It generates the differentials between tables. 
     
@@ -947,9 +947,9 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
             - diff_% (float): diff in percentage units
     """
 
-    first_df = extract_first_df_fn(params)
+    first_df = extract_first_df_fn(other_params)
     
-    second_df = extract_second_df_fn(params)
+    second_df = extract_second_df_fn(other_params)
     
 
     df_merged = first_df.merge(
