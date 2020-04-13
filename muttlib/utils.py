@@ -918,7 +918,7 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
         extract_first_df_fn (function): Function that returns grouped dataframe with row_count column.
         extract_second_df_fn (function): Function that returns grouped dataframe with row_count column.
         params (dictionary): helper dict that contains the following structure:
-            - key_col: column name to take as key (to join and sort)
+            - key_col: list of column names to take as key (to join and sort)
             - first_suffix: suffix to name row_count column
             - second_suffix: suffix to name row_count column
             - other params: such as condition of query, or name of database, table, etc.. in order to use in the
@@ -935,7 +935,7 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
     
 
     df_merged = first_df.merge(
-        second_df, how="left", on=[params["key_col"]], suffixes=(params["first_suffix"], params["second_suffix"])
+        second_df, how="left", on=params["key_col"], suffixes=(params["first_suffix"], params["second_suffix"])
     ).fillna(value=0)
     df_merged["diff"] = df_merged[f"row_count{params['first_suffix']}"] - (df_merged[f"row_count{params['second_suffix']}"])
     df_merged["diff_%"] = round(
@@ -952,8 +952,7 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
             ~df_merged["diff_%"].between(-1, 1, inclusive=False)
         ]
     df_merged = df_merged[
-        [
-            "date_col",
+        params["key_col"]+[
             f"row_count{params['first_suffix']}",
             f"row_count{params['second_suffix']}",
             "diff",
@@ -961,4 +960,4 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
         ]
     ]
 
-    return df_merged.sort_values([params["key_col"]], ascending=True).reset_index(drop=True)
+    return df_merged.sort_values(params["key_col"], ascending=True).reset_index(drop=True)

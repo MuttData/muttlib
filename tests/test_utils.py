@@ -15,7 +15,7 @@ from pandas._testing import assert_frame_equal
 ## MOCKS FOR DIFF DATAFRAME AND DEVIATION_LOG
 
 params = {
-    "key_col": "date_col",
+    "key_col": ["date_col"],
     "first_suffix": "_first",
     "second_suffix": "_second",
 }
