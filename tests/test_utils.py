@@ -867,21 +867,21 @@ def test_create_forecaster_dates(ed, tw, fw, expected):
     assert utils.create_forecaster_dates(ed, tw, fw) == expected
 
 def test_same_dataframe():
-    df_x=get_first_df()
-    df_y=get_first_df()
+    df_x=get_first_df_diff_deviations_functions()
+    df_y=get_first_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x,df_y,['date_col'])
     assert len(rv[0]) == 0 & len(rv[1]) == 0
 
 
 def test_diff_diferent_df_without_add():
-    df_x = get_first_df()
-    df_y = get_second_df()
+    df_x = get_first_df_diff_deviations_functions()
+    df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     assert(len(rv[1]) == 0) 
 
 def test_first_output_diff_diferent_df_without_add():
-    df_x = get_first_df()
-    df_y = get_second_df()
+    df_x = get_first_df_diff_deviations_functions()
+    df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     first_rv_mock = pd.DataFrame({'date_col': {0: '2020-11-11',
       1: '2020-11-12',
@@ -896,7 +896,7 @@ def test_first_output_diff_diferent_df_without_add():
     assert_frame_equal(rv[0], first_rv_mock)
 
 def test_additional_case_first_output():
-    df_x=get_first_df()
+    df_x=get_first_df_diff_deviations_functions()
     df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
     first_rv_mock = pd.DataFrame({'date_col': {0: '2020-11-11',
       1: '2020-11-12',
@@ -912,7 +912,7 @@ def test_additional_case_first_output():
     assert_frame_equal(rv[0], first_rv_mock)
 
 def test_additional_case_second_output():
-    df_x=get_first_df()
+    df_x=get_first_df_diff_deviations_functions()
     df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
 
     second_rv_mock = pd.DataFrame({'date_col': {0: '2020-11-15'}, 'row_count': {0: 10}, 'sets': {0: 'df_y'}})
@@ -920,14 +920,14 @@ def test_additional_case_second_output():
     assert_frame_equal(rv[1], second_rv_mock)
 
 def test_first_output_diff_diferent_df_reverse_case():
-    df_x = get_first_df()
-    df_y = get_second_df()
+    df_x = get_first_df_diff_deviations_functions()
+    df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
     assert((list(rv[0].value_x) == list(rv_reverse[0].value_y)) &  (list(rv[0].value_y) == list(rv_reverse[0].value_x)) )
 
 def test_second_output_diff_diferent_df_reverse_case():
-    df_x = get_first_df()
+    df_x = get_first_df_diff_deviations_functions()
     df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
