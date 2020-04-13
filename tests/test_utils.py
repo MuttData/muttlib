@@ -21,7 +21,7 @@ params = {
 }
 
 
-def get_first_df(params=None):
+def get_first_df_diff_deviations_functions(params=None):
     data1 = {
         "date_col": ["2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14"],
         "row_count": [20, 100, 10, 1],
@@ -29,7 +29,7 @@ def get_first_df(params=None):
     return pd.DataFrame(data1)
 
 
-def get_second_df(params=None):
+def get_second_df_diff_deviations_functions(params=None):
     data2 = {
         "date_col": ["2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14"],
         "row_count": [10, 20, 20, 10],
