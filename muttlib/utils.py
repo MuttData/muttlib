@@ -875,14 +875,15 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     return sorted(list(ret))
 
 
-def dataframe_diff(df_x,df_y,key):
+def dataframe_diff(df_x,df_y,key, right_suffix = "_x", left_suffix = "_y"):
     """
     Compute diff between 2 dataframes taking their columns in common as key.
     Args:
         - df_x (DataFrame object): first df
         - df_y (DataFrame object): second df
         - key (list of string): list of column name taken as key 
-    
+        - right_suffix (string): suffix for the right side dataframe
+        - left_suffix (string): suffix for the left side dataframe
     
     Returns a tuple that contains the difference and additional data.
 
@@ -900,23 +901,23 @@ def dataframe_diff(df_x,df_y,key):
     Plz, see the following link for more information about this function!    
     Source: https://github.com/yogiadi/dataframe_diff/blob/master/dataframe_diff/dataframe_diff.py
     """
-    set_x = ['df_x' for i in range(len(df_x))]
+    set_x = [f"df{right_suffix}" for i in range(len(df_x))]
     df_x['sets'] = set_x
-    set_y = ['df_y' for i in range(len(df_y))]
+    set_y = [f"df{left_suffix}"  for i in range(len(df_y))]
     df_y['sets'] = set_y
     columns = list(df_x.columns)
     columns.remove('sets')
     df_concat = pd.concat([df_x,df_y]).drop_duplicates(subset=columns,keep=False).reset_index(drop=True)
-    df_set1 = df_concat[df_concat['sets']=='df_x']
-    df_set2 = df_concat[df_concat['sets']=='df_y']
+    df_set1 = df_concat[df_concat['sets']==f"df{right_suffix}"]
+    df_set2 = df_concat[df_concat['sets']==f"df{left_suffix}"]
     df_merged = pd.merge(df_set1, df_set2, on = key)
     nonkey = set(columns)- set(key)
     list_diff = []
     for i in range(len(df_merged)):
         for col in nonkey:
-            if df_merged.iloc[i][col + '_x'] != df_merged.iloc[i][col + '_y']:
-                list_diff.append(list(df_merged.iloc[i][key + [col + '_x',col + '_y']]) + [col])
-    df_diff = pd.DataFrame(list_diff,columns= key + ['value' + '_x','value' + '_y' ,'column_name'] )
+            if df_merged.iloc[i][col + right_suffix] != df_merged.iloc[i][col + left_suffix]:
+                list_diff.append(list(df_merged.iloc[i][key + [col + right_suffix,col + left_suffix]]) + [col])
+    df_diff = pd.DataFrame(list_diff,columns= key + ['value' + right_suffix,'value' + left_suffix,'column_name'] )
     df_additional = pd.concat([df_x,df_y]).drop_duplicates(subset=key,keep=False).reset_index(drop=True)
     df_x.drop(['sets'],axis=1,inplace=True)
     df_y.drop(['sets'],axis=1,inplace=True)
