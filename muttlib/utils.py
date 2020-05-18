@@ -937,7 +937,7 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, key_co
         queries_params (dict): such as condition of query, or name of database, table, etc.. in order to use in the sql template, python function, etc.
         filter_flag_more_deviation (bool): Flag that indicates if transform function should filter or not data 
         if the data has deviation greater than specified value (threshold)
-        threshold (int): value that determines filtering of data.
+        threshold (float): value that determines filtering of data.
 
     Returns:
         DataFrame: Result df with deviations. This df contains the followings columns as result:
