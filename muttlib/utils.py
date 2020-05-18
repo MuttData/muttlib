@@ -924,20 +924,20 @@ def dataframe_diff(df_x,df_y,key, right_suffix = "_x", left_suffix = "_y"):
     return df_diff, df_additional
 
 
-def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params, other_params=None, filter_flag_more_deviation=False):
+def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, key_cols, first_suffix, second_suffix, queries_params=None, filter_flag_more_deviation=False, threshold=1):
     """
     It generates the differentials between tables. 
     
     Args:
         extract_first_df_fn (callable): Callable that returns grouped dataframe with row_count column.
         extract_second_df_fn (callable): Callable that returns grouped dataframe with row_count column.
-        params (dictionary): helper dict that contains the following structure:
-            - key_col: list of column names to take as key (to join and sort)
-            - first_suffix: suffix to name row_count column
-            - second_suffix: suffix to name row_count column
-        other_params (dict): such as condition of query, or name of database, table, etc.. in order to use in the sql template, python function, etc.
+        key_cols (list of strings): list of column names to take as key (to join and sort)
+        first_suffix (string): suffix to name row_count column
+        second_suffix (string): suffix to name row_count column
+        queries_params (dict): such as condition of query, or name of database, table, etc.. in order to use in the sql template, python function, etc.
         filter_flag_more_deviation (bool): Flag that indicates if transform function should filter or not data 
         if the data has deviation greater than specified value (threshold)
+        threshold (int): value that determines filtering of data.
 
     Returns:
         DataFrame: Result df with deviations. This df contains the followings columns as result:
@@ -948,19 +948,19 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
             - diff_% (float): diff in percentage units
     """
 
-    first_df = extract_first_df_fn(other_params)
+    first_df = extract_first_df_fn(queries_params)
     
-    second_df = extract_second_df_fn(other_params)
+    second_df = extract_second_df_fn(queries_params)
     
 
     df_merged = first_df.merge(
-        second_df, how="left", on=params["key_col"], suffixes=(params["first_suffix"], params["second_suffix"])
+        second_df, how="left", on=key_cols, suffixes=(first_suffix, second_suffix)
     ).fillna(value=0)
-    df_merged["diff"] = df_merged[f"row_count{params['first_suffix']}"] - (df_merged[f"row_count{params['second_suffix']}"])
+    df_merged["diff"] = df_merged[f"row_count{first_suffix}"] - (df_merged[f"row_count{second_suffix}"])
     df_merged["diff_%"] = round(
         (
-            (df_merged[f"row_count{params['first_suffix']}"] - (df_merged[f"row_count{params['second_suffix']}"]))
-            / df_merged[f"row_count{params['first_suffix']}"]
+            (df_merged[f"row_count{first_suffix}"] - (df_merged[f"row_count{second_suffix}"]))
+            / df_merged[f"row_count{first_suffix}"]
         )
         * 100,
         2,
@@ -968,15 +968,15 @@ def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, params
 
     if filter_flag_more_deviation:
         df_merged = df_merged[
-            ~df_merged["diff_%"].between(-1, 1, inclusive=False)
+            ~df_merged["diff_%"].between(-threshold, threshold, inclusive=False)
         ]
     df_merged = df_merged[
-        params["key_col"]+[
-            f"row_count{params['first_suffix']}",
-            f"row_count{params['second_suffix']}",
+        key_cols+[
+            f"row_count{first_suffix}",
+            f"row_count{second_suffix}",
             "diff",
             "diff_%",
         ]
     ]
 
-    return df_merged.sort_values(params["key_col"], ascending=True).reset_index(drop=True)
+    return df_merged.sort_values(key_cols, ascending=True).reset_index(drop=True)
