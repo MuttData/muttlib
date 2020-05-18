@@ -14,11 +14,7 @@ from pandas._testing import assert_frame_equal
 
 ## MOCKS FOR DIFF DATAFRAME AND DEVIATION_LOG
 
-params = {
-    "key_col": ["date_col"],
-    "first_suffix": "_first",
-    "second_suffix": "_second",
-}
+
 
 
 def get_first_df_diff_deviations_functions(params=None):
@@ -873,13 +869,13 @@ def test_same_dataframe():
     assert len(rv[0]) == 0 & len(rv[1]) == 0
 
 
-def test_diff_diferent_df_without_add():
+def test_diff_different_df_without_add():
     df_x = get_first_df_diff_deviations_functions()
     df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     assert(len(rv[1]) == 0) 
 
-def test_first_output_diff_diferent_df_without_add():
+def test_first_output_diff_different_df_without_add():
     df_x = get_first_df_diff_deviations_functions()
     df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
@@ -933,11 +929,12 @@ def test_second_output_diff_diferent_df_reverse_case():
     rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
     assert_frame_equal(rv[1][['date_col', 'row_count']], rv_reverse[1][['date_col', 'row_count']])
 
+
 def test_len_dev_log_normal_case():
-    assert(len(utils.compute_differences_tables(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, params) == 4))
+    assert(len(utils.compute_differences_tables(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, ["date_col"], "_first", "_second") == 4))
 
 def test_dev_log_normal_case():
-    assert_frame_equal(utils.compute_differences_tables(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, params), pd.DataFrame({'date_col': {0: '2020-11-11',
+    assert_frame_equal(utils.compute_differences_tables(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, ["date_col"], "_first", "_second"), pd.DataFrame({'date_col': {0: '2020-11-11',
         1: '2020-11-12',
         2: '2020-11-13',
         3: '2020-11-14'},
