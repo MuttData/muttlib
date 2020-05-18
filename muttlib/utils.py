@@ -881,7 +881,7 @@ def dataframe_diff(df_x,df_y,key, right_suffix = "_x", left_suffix = "_y"):
     Args:
         - df_x (DataFrame object): first df
         - df_y (DataFrame object): second df
-        - key (list of string): list of column name taken as key 
+        - key (list of string): list of column names taken as keys
         - right_suffix (string): suffix for the right side dataframe
         - left_suffix (string): suffix for the left side dataframe
     
