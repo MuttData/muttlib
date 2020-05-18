@@ -875,7 +875,7 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     return sorted(list(ret))
 
 
-def dataframe_diff(df_x,df_y,key, right_suffix = "_x", left_suffix = "_y"):
+def dataframe_diff(df_x, df_y, key, right_suffix = "_x", left_suffix = "_y"):
     """
     Compute diff between 2 dataframes taking their columns in common as key.
     Args:
@@ -898,8 +898,7 @@ def dataframe_diff(df_x,df_y,key, right_suffix = "_x", left_suffix = "_y"):
         - other columns in common between df_x and df_y that contain additional changes
         - sets: contains the name of df where the change is produced (df_x or df_y)
 
-    Plz, see the following link for more information about this function!    
-    Source: https://github.com/yogiadi/dataframe_diff/blob/master/dataframe_diff/dataframe_diff.py
+    Reference: https://github.com/yogiadi/dataframe_diff/blob/master/dataframe_diff/dataframe_diff.py
     """
     set_x = [f"df{right_suffix}" for i in range(len(df_x))]
     df_x['sets'] = set_x
@@ -924,9 +923,9 @@ def dataframe_diff(df_x,df_y,key, right_suffix = "_x", left_suffix = "_y"):
     return df_diff, df_additional
 
 
-def compute_differences_tables(extract_first_df_fn, extract_second_df_fn, key_cols, first_suffix, second_suffix, queries_params=None, filter_flag_more_deviation=False, threshold=1):
+def compute_differences_dataframes(extract_first_df_fn, extract_second_df_fn, key_cols, first_suffix, second_suffix, queries_params=None, filter_flag_more_deviation=False, threshold=1):
     """
-    It generates the differentials between tables. 
+    It generates the differentials between dataframes. 
     
     Args:
         extract_first_df_fn (callable): Callable that returns grouped dataframe with row_count column.
