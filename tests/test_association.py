@@ -4,7 +4,7 @@ from unittest import TestCase, main
 
 import pandas as pd
 
-from medical.association import cramers_corrected_stat_heatmap, greedy_select
+from muttlib.association import cramers_corrected_stat_heatmap, greedy_select
 
 
 class TestAssociation(TestCase):
