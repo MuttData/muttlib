@@ -154,8 +154,8 @@ class BaseClient:
 class PgClient(BaseClient):
     """Create Postgres DB client."""
 
-    def __init__(self, dialect='postgresql', **kwargs):
-        super().__init__(dialect=dialect, port=5432, **kwargs)
+    def __init__(self, dialect='postgresql', port=5432, **kwargs):
+        super().__init__(dialect=dialect, port=port, **kwargs)
 
 
 class MySqlClient(BaseClient):
@@ -289,7 +289,9 @@ class IbisClient:
         hdfs_database=None,
         max_retries=5,
         max_backoff=64,
-        timeout=120,
+        temp_db=None,
+        temp_hdfs_path=None,
+        timeout=None,
         options={'SYNC_DDL': True},
     ):
         self.host = host
@@ -305,6 +307,16 @@ class IbisClient:
         self._max_backoff = max_backoff
         self._timeout = timeout
         self.options = options
+
+        # Override ibis default tmp db and location (when using a non-root/admin
+        # user that cannot write to `/tmp/ibis`)
+        # See https://stackoverflow.com/a/47543691/2149400
+        if temp_db is not None or temp_hdfs_path is not None:
+            with ibis.config.config_prefix('impala'):
+                if temp_db is not None:
+                    ibis.config.set_option('temp_db', temp_db)
+                if temp_hdfs_path is not None:
+                    ibis.config.set_option('temp_hdfs_path', temp_hdfs_path)
 
     def _connect(self):
         if (
@@ -651,6 +663,7 @@ MYSQL_DB_TYPE = 'mysql'
 SQLSERVER_DB_TYPE = 'sql_server'
 HIVE_DB_TYPE = 'hive'
 MONGO_DB_TYPE = 'mongo'
+IBIS_DB_TYPE = 'ibis'
 
 connectors = {
     ORACLE_DB_TYPE: OracleClient,
@@ -659,6 +672,7 @@ connectors = {
     SQLSERVER_DB_TYPE: SqlServerClient,
     HIVE_DB_TYPE: HiveDb,
     MONGO_DB_TYPE: MongoClient,
+    IBIS_DB_TYPE: IbisClient,
 }
 
 
