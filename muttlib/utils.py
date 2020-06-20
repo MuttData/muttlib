@@ -923,17 +923,16 @@ def dataframe_diff(df_x, df_y, key, right_suffix = "_x", left_suffix = "_y"):
     return df_diff, df_additional
 
 
-def compute_differences_dataframes(extract_first_df_fn, extract_second_df_fn, key_cols, first_suffix, second_suffix, queries_params=None, filter_flag_more_deviation=False, threshold=1):
+def compute_differences_dataframes(first_df, second_df, key_cols, first_suffix, second_suffix, filter_flag_more_deviation=False, threshold=1):
     """
     It generates the differentials between dataframes. 
     
     Args:
-        extract_first_df_fn (callable): Callable that returns grouped dataframe with row_count column.
-        extract_second_df_fn (callable): Callable that returns grouped dataframe with row_count column.
+        first_df (pandas.DataFrame): First dataframe to be taken to compute differences.
+        second_df (pandas.DataFrame): Second dataframe to be taken to compute differences.
         key_cols (list of strings): list of column names to take as key (to join and sort)
         first_suffix (string): suffix to name row_count column
         second_suffix (string): suffix to name row_count column
-        queries_params (dict): such as condition of query, or name of database, table, etc.. in order to use in the sql template, python function, etc.
         filter_flag_more_deviation (bool): Flag that indicates if transform function should filter or not data 
         if the data has deviation greater than specified value (threshold)
         threshold (float): value that determines filtering of data.
@@ -946,10 +945,6 @@ def compute_differences_dataframes(extract_first_df_fn, extract_second_df_fn, ke
             - diff (int): difference between row_count of first df and row_count of second df 
             - diff_% (float): diff in percentage units
     """
-
-    first_df = extract_first_df_fn(queries_params)
-    
-    second_df = extract_second_df_fn(queries_params)
     
 
     df_merged = first_df.merge(

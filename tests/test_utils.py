@@ -931,10 +931,10 @@ def test_second_output_diff_diferent_df_reverse_case():
 
 
 def test_len_dev_log_normal_case():
-    assert(len(utils.compute_differences_dataframes(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, ["date_col"], "_first", "_second") == 4))
+    assert(len(utils.compute_differences_dataframes(get_first_df_diff_deviations_functions(), get_second_df_diff_deviations_functions(), ["date_col"], "_first", "_second") == 4))
 
 def test_dev_log_normal_case():
-    assert_frame_equal(utils.compute_differences_dataframes(get_first_df_diff_deviations_functions, get_second_df_diff_deviations_functions, ["date_col"], "_first", "_second"), pd.DataFrame({'date_col': {0: '2020-11-11',
+    assert_frame_equal(utils.compute_differences_dataframes(get_first_df_diff_deviations_functions(), get_second_df_diff_deviations_functions(), ["date_col"], "_first", "_second"), pd.DataFrame({'date_col': {0: '2020-11-11',
         1: '2020-11-12',
         2: '2020-11-13',
         3: '2020-11-14'},
