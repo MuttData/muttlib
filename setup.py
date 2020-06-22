@@ -69,7 +69,7 @@ setuptools.setup(
             'bump',
             'sphinx',
             'sphinx_rtd_theme',
-            'm2r'
+            'm2r @ git+https://github.com/crossnox/m2r@dev#egg=m2r',
         ],
         'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],
