@@ -460,7 +460,7 @@ class IbisClient:
         for i in range(1, self._max_retries + 1):
             try:  # try/except to download data, catch exception and retry
                 client.hdfs.get(
-                    hdfs_dir, local_path=local_tmp_dir, overwrite=True, verbose=3
+                    hdfs_dir, local_path=local_tmp_dir.parent, overwrite=True, verbose=3
                 )
             except Exception as e:
                 logger.error(e)
