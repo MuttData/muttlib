@@ -1,4 +1,3 @@
-
 from concurrent.futures import ProcessPoolExecutor
 import glob
 import logging
@@ -26,7 +25,13 @@ class RenameByResult:
     Rename input file based on the value passed to set_result at exit.
     """
 
-    def __init__(self, fn, ready_prefix=READY_PREFIX, done_prefix=DONE_PREFIX, fail_prefix=FAIL_PREFIX):
+    def __init__(
+        self,
+        fn,
+        ready_prefix=READY_PREFIX,
+        done_prefix=DONE_PREFIX,
+        fail_prefix=FAIL_PREFIX,
+    ):
         """Setup."""
         self.fn = fn
         self.ready_prefix = ready_prefix
@@ -42,9 +47,9 @@ class RenameByResult:
             self.fail_fn = f'{self.fail_prefix}_{self.base_fn}'
             raise FileNotReady()
         else:
-            self.clean_fn = self.base_fn[len(self.ready_prefix) + 1:]
-        self.done_fn = self.done_prefix + self.base_fn[len(self.ready_prefix):]
-        self.fail_fn = self.fail_prefix + self.base_fn[len(self.ready_prefix):]
+            self.clean_fn = self.base_fn[len(self.ready_prefix) + 1 :]
+        self.done_fn = self.done_prefix + self.base_fn[len(self.ready_prefix) :]
+        self.fail_fn = self.fail_prefix + self.base_fn[len(self.ready_prefix) :]
         self.t0 = time.time()
         return self
 
@@ -115,7 +120,7 @@ class DummyPoolExecutor:
             """Set dummy future result with given arg."""
             self.result = result
 
-        def result():
+        def result(self):
             """Emulate concurrent.futures.Future().result."""
             return self.result
 
@@ -137,7 +142,9 @@ class DummyPoolExecutor:
         return self.DummyFuture(fn(*args, **kwargs))
 
 
-def process_new_files_parallel(proc_func, in_dir, workers=None, only_ready=False,**extra_data):
+def process_new_files_parallel(
+    proc_func, in_dir, workers=None, only_ready=False, **extra_data
+):
     """Process files that match ready prefix in parallel.
 
     Process files that match ready prefix the given function and rename them

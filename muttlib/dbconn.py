@@ -415,18 +415,35 @@ class IbisClient:
                 self.execute(client, drop_stmt)
 
                 logger.debug(f"Creating {tmp_table}...")
-                create_stmt = f"""
-                CREATE TABLE IF NOT EXISTS {self.hdfs_database}.{tmp_table}
+                create_sql = """
+                CREATE TABLE IF NOT EXISTS {{hdfs_database}}.{{tmp_table}}
                 STORED AS parquet AS
-                SELECT * FROM (\n{sql}\n LIMIT 1) AS aux_{tmp_table}
+                SELECT * FROM (\n{{sql}}\n LIMIT 1) AS aux_{{tmp_table}}
                 """
+                create_stmt = utils.render_jinja_template(
+                    create_sql,
+                    jparams={
+                        'hdfs_database': self.hdfs_database,
+                        'tmp_table': tmp_table,
+                        'sql': sql,
+                    },
+                )
+
                 self.execute(client, create_stmt)
 
                 logger.debug(f"Populating {tmp_table}...")
-                insert_stmt = f"""
-                INSERT OVERWRITE {self.hdfs_database}.{tmp_table}
-                SELECT * FROM (\n{sql}\n) AS aux_{tmp_table}
+                insert_sql = """
+                INSERT OVERWRITE {{hdfs_database}}.{{tmp_table}}
+                SELECT * FROM (\n{{sql}}\n) AS aux_{{tmp_table}}
                 """
+                insert_stmt = utils.render_jinja_template(
+                    insert_sql,
+                    jparams={
+                        'hdfs_database': self.hdfs_database,
+                        'tmp_table': tmp_table,
+                        'sql': sql,
+                    },
+                )
                 self.execute(client, insert_stmt)
                 return
 

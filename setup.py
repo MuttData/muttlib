@@ -1,4 +1,4 @@
-"""Muttlib setup file."""
+'''Muttlib setup file.'''
 import setuptools
 
 import muttlib
@@ -6,15 +6,15 @@ import muttlib
 with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
-pyarrow_dep = ["pyarrow==0.13.0"]
+pyarrow_dep = ['pyarrow==0.13.0']
 holidays_dep = ['holidays>=0.9.5,<0.10.1']
 
 setuptools.setup(
     name='muttlib',
     version=muttlib.__version__,
     author='Mutt Data',
-    home_page="https://gitlab.com/mutt_data/muttlib/",
-    keywords="data pandas spark data-analysis database data-munging",
+    home_page='https://gitlab.com/mutt_data/muttlib/',
+    keywords='data pandas spark data-analysis database data-munging',
     author_email='info@muttdata.ai',
     description='Collection of helper modules by Mutt Data.',
     long_description=long_description,
@@ -26,9 +26,7 @@ setuptools.setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    setup_requires=['pytest-runner', 'wheel'],
-    tests_require=["pytest", "pytest-cov", "pytest-html"] + pyarrow_dep + holidays_dep,
-    test_suite='test',
+    setup_requires=['wheel'],
     install_requires=[
         'jinja2',
         'pandas>=1.0.0',
@@ -59,18 +57,30 @@ setuptools.setup(
             'textwrap3',
         ],
         'dev': [
-            'pre-commit',
-            'flake8',
             'flake8-bugbear',
             'flake8-docstrings',
-            'black',
-            'mypy',
-            'pylint',
             'bump',
             'sphinx',
             'sphinx_rtd_theme',
             'm2r @ git+https://github.com/crossnox/m2r@dev#egg=m2r',
+            'pre-commit==2.2.0',
+            'isort==4.3.21',
+            'black==19.10b0',
+            'mypy==0.770',
+            'flake8==3.7.8',
+            'pylint==2.4.4',
+            'nox',
         ],
+        'test': [
+            'nox',
+            'pytest',
+            'pytest-xdist',
+            'pytest-cov',
+            'pytest-html',
+            'hypothesis',
+        ]
+        + pyarrow_dep
+        + holidays_dep,
         'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],
     },

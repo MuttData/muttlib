@@ -1,4 +1,3 @@
-
 """Module to give FBProphet a common interface to Sklearn and general utilities
 for forecasting problems like limiting the datasets to the last n days,
 allowing wider grid search for hyperparameters not available using standard
@@ -91,8 +90,13 @@ class SkProphet(Prophet):
 
     DS = 'ds'
 
-    def __init__(self, sk_date_column=DS, sk_yhat_only=True,
-                 sk_extra_regressors=[], prophet_kwargs={}):
+    def __init__(
+        self,
+        sk_date_column=DS,
+        sk_yhat_only=True,
+        sk_extra_regressors=[],
+        prophet_kwargs={},
+    ):
         """Scikit learn compatible interface for FBProphet.
 
         Parameters
@@ -149,8 +153,7 @@ class SkProphet(Prophet):
             Keyword arguments to forward to Prophet's fit.
         """
         if not isinstance(X, pd.DataFrame):
-            raise TypeError(
-                'Arg "X" passed can only be of pandas.DataFrame type.')
+            raise TypeError('Arg "X" passed can only be of pandas.DataFrame type.')
         if copy:
             X = X.copy()
         if self.sk_date_column != self.DS and self.sk_date_column in X.columns:
@@ -189,11 +192,11 @@ class SkProphet(Prophet):
     def get_params(self, deep=True):
         """Scikit learn's get_params (returns the estimator's params)."""
         prophet_attrs = [
-            attr for attr in signature(Prophet.__init__).parameters
-            if attr != 'self']
+            attr for attr in signature(Prophet.__init__).parameters if attr != 'self'
+        ]
         sk_attrs = [
-            attr for attr in signature(self.__init__).parameters
-            if attr != 'self']
+            attr for attr in signature(self.__init__).parameters if attr != 'self'
+        ]
         prophet_params = {a: getattr(self, a, None) for a in prophet_attrs}
         sk_params = {a: getattr(self, a, None) for a in sk_attrs}
         if deep:
@@ -210,8 +213,8 @@ class SkProphet(Prophet):
         - Lastly, if not provided in neither way but currently set, the value is not erased.
         """
         sk_kws = [
-            attr for attr in signature(self.__init__).parameters
-            if attr != 'self']
+            attr for attr in signature(self.__init__).parameters if attr != 'self'
+        ]
         current_prophet_kws = getattr(self, 'prophet_kwargs', {})
         explicit_prophet_kws = {}
         args_passed_prophet_kws = {}
@@ -247,7 +250,8 @@ class SkProphet(Prophet):
                     'Invalid extra_regressor in SkProphet.'
                     'Extra regressors must be strings or dicts with '
                     '{name: *column_name*, prior_scale: _, standardize: _, '
-                    'mode: _}')
+                    'mode: _}'
+                )
 
     def _as_np_vector(self, y):
         """Ensures a list, tuple, pandas.Series, pandas.DataFrame
@@ -278,19 +282,21 @@ class SkProphet(Prophet):
         """Text representation of the object to look it nicely in the
         interpreter.
         """
-        return (f'{self.__class__.__name__}('
-                f'sk_date_column="{self.sk_date_column}", '
-                f'sk_yhat_only={self.sk_yhat_only}, '
-                f'sk_extra_regressors={self.extra_regressors}'
-                f'prophet_kwargs={self.prophet_kwargs})')
+        return (
+            f'{self.__class__.__name__}('
+            f'sk_date_column="{self.sk_date_column}", '
+            f'sk_yhat_only={self.sk_yhat_only}, '
+            f'sk_extra_regressors={self.extra_regressors}'
+            f'prophet_kwargs={self.prophet_kwargs})'
+        )
 
     __str__ = __repr__
 
 
 class StepsSelectorEstimator(BaseEstimator):
-
-    def __init__(self, estimator_class, amount_of_steps, estimator_kwargs={},
-                 sort_col='date'):
+    def __init__(
+        self, estimator_class, amount_of_steps, estimator_kwargs={}, sort_col='date'
+    ):
         """An estimator that only uses a certain amount of rows on fit.
 
         Parameters
@@ -334,7 +340,7 @@ class StepsSelectorEstimator(BaseEstimator):
         """
         if self.sort_col in X.columns:
             X = X.sort_values(self.sort_col, axis=0)
-        index_to_drop = X.iloc[:-self.amount_of_steps].index
+        index_to_drop = X.iloc[: -self.amount_of_steps].index
         y = y.drop(index_to_drop).reset_index(drop=True)
         X = X.drop(index_to_drop).reset_index(drop=True)
         self._estimator.fit(X, y)
@@ -353,7 +359,8 @@ class StepsSelectorEstimator(BaseEstimator):
             'estimator_class': self.estimator_class,
             'amount_of_steps': self.amount_of_steps,
             'sort_col': self.sort_col,
-            'estimator_kwargs': kwargs}
+            'estimator_kwargs': kwargs,
+        }
 
     def set_params(self, **params):
         """Sets the estimator's params to **params."""
@@ -368,16 +375,17 @@ class StepsSelectorEstimator(BaseEstimator):
         """Text representation of the object to look it nicely in the
         interpreter.
         """
-        return (f'{self.__class__.__name__}('
-                f'estimator_class={Classer.from_obj(self.estimator_class)}, '
-                f'amount_of_steps={self.amount_of_steps}, '
-                f'estimator_kwargs={self.estimator_kwargs})')
+        return (
+            f'{self.__class__.__name__}('
+            f'estimator_class={Classer.from_obj(self.estimator_class)}, '
+            f'amount_of_steps={self.amount_of_steps}, '
+            f'estimator_kwargs={self.estimator_kwargs})'
+        )
 
     __str__ = __repr__
 
 
 class Classer:
-
     def __init__(self, EstimatorClass):
         """Wraps an EstimatorClass to avoid sklearn.base.clone exploting when
         called against an EstimatorClass during grid search of metaestimators.
@@ -409,8 +417,7 @@ class Classer:
 
     def __eq__(self, other):
         """Equality checks inner class wrapped."""
-        return (self.__class__ == other.__class__ and
-                self._class == other._class)
+        return self.__class__ == other.__class__ and self._class == other._class
 
     def __repr__(self):
         """Text representation of the object to look it nicely in the
