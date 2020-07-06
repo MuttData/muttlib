@@ -15,7 +15,21 @@ test:
   - python -c 'from muttlib import gsheetsconn'
   - pip install .[gcd]
   - python -c 'from muttlib import gcd'
-  - python setup.py test
+  - pip install nox
+  - nox --sessions tests
+
+
+lint:
+  script:
+    - pip install nox
+    - nox --sessions cop
+
+
+bandit:
+  script:
+    - pip install nox
+    - nox --sessions bandit
+
 
 pages:
   stage: deploy
