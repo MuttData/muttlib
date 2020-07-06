@@ -14,7 +14,7 @@ We expect everyone contributing to muttlib to follow this principle. Be kind, do
 ## Issues
 
 ### Feature requests
-To ask for new functionalities or improvements on muttlib, please head over to the [issues tracker](https://gitlab.com/mutt_data/muttlib/issues) and open a new issue with the label `feature-request` attached to it. 
+To ask for new functionalities or improvements on muttlib, please head over to the [issues tracker](https://gitlab.com/mutt_data/muttlib/issues) and open a new issue with the label `feature-request` attached to it.
 
 A brief description of the desired functionality should be included; use cases and examples are welcome too, for a better understanding of the request.
 
@@ -22,9 +22,9 @@ Feel free to [open a new MR](#mrs) for it!
 
 
 ### Bug reporting
-To report a bug, please check there is no previous related issue on the [issues tracker](https://gitlab.com/mutt_data/muttlib/issues) and then open a new issue with the `bug` label attached to it if there were none which addressed it. 
+To report a bug, please check there is no previous related issue on the [issues tracker](https://gitlab.com/mutt_data/muttlib/issues) and then open a new issue with the `bug` label attached to it if there were none which addressed it.
 
-A MWE example of the bug should be provided to allow the person working on fixing it to save time reproducing and debugging it. Also, it should act as a test to check if whichever changes are made do effectively fix it. [MRs are welcome](#mrs) to fix them! 
+A MWE example of the bug should be provided to allow the person working on fixing it to save time reproducing and debugging it. Also, it should act as a test to check if whichever changes are made do effectively fix it. [MRs are welcome](#mrs) to fix them!
 
 
 #### Security issues
@@ -41,7 +41,7 @@ git clone git@gitlab.com:mutt_data/muttlib.git
 Then install all `dev` dependencies:
 ```bash
 cd muttlib
-pip install .[dev] 
+pip install .[dev]
 ```
 
 #### pre-commit
@@ -58,8 +58,8 @@ If you installed the [pre-commit hooks](#pre-commit) you shouldn't worry too muc
 
 - [black](https://github.com/psf/black): An opinionated code formatting tool that ensures consistency across all projects using it
 - [flake8](https://github.com/PyCQA/flake8): a tool to enforce style guide
-- [mypy](https://github.com/python/mypy): a static type checker for Python 
-- [pylint](https://github.com/PyCQA/pylint): a source code, bug and quality checker 
+- [mypy](https://github.com/python/mypy): a static type checker for Python
+- [pylint](https://github.com/PyCQA/pylint): a source code, bug and quality checker
 
 #### Docstrings
 We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.html) or [google style](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings) docstring formatting. It's usually good to include the following docstrings:
@@ -122,7 +122,7 @@ RFC stands for **R**equest **f**or **C**omments. It means you consider the issue
 Gitlab CI/CD jobs are configured on [.gitlab-ci.yml](https://gitlab.com/mutt_data/muttlib/-/blob/master/.gitlab-ci.yml). An overview of current jobs:
 
 #### Test
-[Regression testing](https://en.wikipedia.org/wiki/Regression_testing) to ensure new changes have not broken previously working features 
+[Regression testing](https://en.wikipedia.org/wiki/Regression_testing) to ensure new changes have not broken previously working features
 
 ### README
 Relevant changes (e.g. new modules) should be included in the README.
@@ -135,4 +135,4 @@ Relevant changes (e.g. new modules) should be included in the README.
 | ---------- | ----------- | ------ |
 | bug | Bugs report or suspected bugs | [search](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=bug)|
 |feature-request|Request for new features to add to muttlib|[search](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=feature-request)|
- 
+

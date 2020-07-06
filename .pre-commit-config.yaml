@@ -1,4 +1,9 @@
 repos:
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v2.4.0
+    hooks:
+    - id: trailing-whitespace
+    - id: requirements-txt-fixer
 -   repo: local
     hooks:
     - id: black
@@ -7,21 +12,44 @@ repos:
       language: system
       types: [python]
       exclude: docs/*
-    - id: flake8
-      name: flake8
-      entry: flake8
-      language: system
-      types: [python]
-      exclude: docs/*
+    # - id: flake8
+    #   name: flake8
+    #   entry: flake8
+    #   language: system
+    #   types: [python]
+    #   exclude: docs/*
     - id: mypy
       name: mypy
       entry: mypy
       language: system
       types: [python]
       exclude: docs/*
-    - id: pylint
-      name: pylint
-      entry: pylint
+    # - id: pylint
+    #   name: pylint
+    #   entry: pylint
+    #   language: system
+    #   types: [python]
+    #   exclude: docs/*
+-   repo: local
+    hooks:
+    - id: pytest
+      name: pytest
       language: system
+      entry: nox --session tests
       types: [python]
-      exclude: docs/*
+      stages: [push]
+      pass_filenames: false
+    - id: linter
+      name: linter
+      language: system
+      entry: nox --session cop
+      types: [python]
+      stages: [push]
+      pass_filenames: false
+    - id: bandit
+      name: bandit
+      language: system
+      entry: nox --session bandit
+      types: [python]
+      stages: [push]
+      pass_filenames: false

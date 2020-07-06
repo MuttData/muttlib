@@ -133,7 +133,7 @@ pipx install pylint --verbose
 
 Once that's done, `cd` into the repo where `.pre-commit-config.yaml` exists, run
 `pre-commit install` and you are good to go: every time you do a `git commit` it will run
-the `pre-commit` hooks defined in `.pre-commit-config.yaml`.
+the `pre-commit` hooks defined in `.pre-commit-config.yaml`. You can also install a pre-push hook with `pre-commit install -t pre-push`, which will additionally run all pytest tests before pushing.
 
 ### Local install of binaries
 

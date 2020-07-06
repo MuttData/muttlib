@@ -75,7 +75,7 @@ def local_df_cache(
     use_cache=False,
     refresh_cache=False,
     cache_fn='cache_file',
-    cache_dir='/tmp/',
+    cache_dir='/tmp/',  # nosec
     cache_format='pickle',
     cache_hit_msg='Reading cached data from file: ',
     cache_miss_msg='Cache missing for file: ',
@@ -513,6 +513,7 @@ def format_in_clause(iterable):
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
+        autoescape=True,
         line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
         trim_blocks=kwargs.pop('trim_blocks', True),
         lstrip_blocks=kwargs.pop('lstrip_blocks', True),

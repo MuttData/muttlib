@@ -88,7 +88,7 @@ def ab_split(id_obj, salt, control_group_size: float):
     is between 0 and 1. This sets how big the control group is in perc.
     """
     test_id = str(id_obj) + '-' + str(salt)
-    test_id_digest = md5(test_id.encode('ascii')).hexdigest()
+    test_id_digest = md5(test_id.encode('ascii')).hexdigest()  # nosec
     test_id_first_digits = test_id_digest[:6]
     test_id_last_int = int(test_id_first_digits, 16)
     split = test_id_last_int / 0xFFFFFF
