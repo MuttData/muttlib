@@ -15,8 +15,6 @@ from pandas._testing import assert_frame_equal
 ## MOCKS FOR DIFF DATAFRAME AND DEVIATION_LOG
 
 
-
-
 def get_first_df_diff_deviations_functions(params=None):
     data1 = {
         "date_col": ["2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14"],
@@ -32,7 +30,9 @@ def get_second_df_diff_deviations_functions(params=None):
     }
     return pd.DataFrame(data2)
 
+
 # ------
+
 
 @pytest.mark.parametrize(
     "test_input,expected",
@@ -862,10 +862,11 @@ def test_create_forecaster_dates(ed, tw, fw, expected):
     # Testing various input dates and windows
     assert utils.create_forecaster_dates(ed, tw, fw) == expected
 
+
 def test_same_dataframe():
-    df_x=get_first_df_diff_deviations_functions()
-    df_y=get_first_df_diff_deviations_functions()
-    rv = utils.dataframe_diff(df_x,df_y,['date_col'])
+    df_x = get_first_df_diff_deviations_functions()
+    df_y = get_first_df_diff_deviations_functions()
+    rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     assert len(rv[0]) == 0 & len(rv[1]) == 0
 
 
@@ -873,72 +874,157 @@ def test_diff_different_df_without_add():
     df_x = get_first_df_diff_deviations_functions()
     df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
-    assert(len(rv[1]) == 0) 
+    assert len(rv[1]) == 0
+
 
 def test_first_output_diff_different_df_without_add():
     df_x = get_first_df_diff_deviations_functions()
     df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
-    first_rv_mock = pd.DataFrame({'date_col': {0: '2020-11-11',
-      1: '2020-11-12',
-      2: '2020-11-13',
-      3: '2020-11-14'},
-     'value_x': {0: 20, 1: 100, 2: 10, 3: 1},
-     'value_y': {0: 10, 1: 20, 2: 20, 3: 10},
-     'column_name': {0: 'row_count',
-      1: 'row_count',
-      2: 'row_count',
-      3: 'row_count'}})
+    first_rv_mock = pd.DataFrame(
+        {
+            'date_col': {
+                0: '2020-11-11',
+                1: '2020-11-12',
+                2: '2020-11-13',
+                3: '2020-11-14',
+            },
+            'value_x': {0: 20, 1: 100, 2: 10, 3: 1},
+            'value_y': {0: 10, 1: 20, 2: 20, 3: 10},
+            'column_name': {
+                0: 'row_count',
+                1: 'row_count',
+                2: 'row_count',
+                3: 'row_count',
+            },
+        }
+    )
     assert_frame_equal(rv[0], first_rv_mock)
+
 
 def test_additional_case_first_output():
-    df_x=get_first_df_diff_deviations_functions()
-    df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
-    first_rv_mock = pd.DataFrame({'date_col': {0: '2020-11-11',
-      1: '2020-11-12',
-      2: '2020-11-13',
-      3: '2020-11-14'},
-     'value_x': {0: 20, 1: 100, 2: 10, 3: 1},
-     'value_y': {0: 10, 1: 20, 2: 20, 3: 10},
-     'column_name': {0: 'row_count',
-      1: 'row_count',
-      2: 'row_count',
-      3: 'row_count'}})
-    rv = utils.dataframe_diff(df_x,df_y,['date_col'])
+    df_x = get_first_df_diff_deviations_functions()
+    df_y = pd.DataFrame(
+        {
+            'date_col': [
+                '2020-11-11',
+                '2020-11-12',
+                '2020-11-13',
+                '2020-11-14',
+                '2020-11-15',
+            ],
+            'row_count': [10, 20, 20, 10, 10],
+        }
+    )
+    first_rv_mock = pd.DataFrame(
+        {
+            'date_col': {
+                0: '2020-11-11',
+                1: '2020-11-12',
+                2: '2020-11-13',
+                3: '2020-11-14',
+            },
+            'value_x': {0: 20, 1: 100, 2: 10, 3: 1},
+            'value_y': {0: 10, 1: 20, 2: 20, 3: 10},
+            'column_name': {
+                0: 'row_count',
+                1: 'row_count',
+                2: 'row_count',
+                3: 'row_count',
+            },
+        }
+    )
+    rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     assert_frame_equal(rv[0], first_rv_mock)
 
-def test_additional_case_second_output():
-    df_x=get_first_df_diff_deviations_functions()
-    df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
 
-    second_rv_mock = pd.DataFrame({'date_col': {0: '2020-11-15'}, 'row_count': {0: 10}, 'sets': {0: 'df_y'}})
-    rv = utils.dataframe_diff(df_x,df_y,['date_col'])
+def test_additional_case_second_output():
+    df_x = get_first_df_diff_deviations_functions()
+    df_y = pd.DataFrame(
+        {
+            'date_col': [
+                '2020-11-11',
+                '2020-11-12',
+                '2020-11-13',
+                '2020-11-14',
+                '2020-11-15',
+            ],
+            'row_count': [10, 20, 20, 10, 10],
+        }
+    )
+
+    second_rv_mock = pd.DataFrame(
+        {'date_col': {0: '2020-11-15'}, 'row_count': {0: 10}, 'sets': {0: 'df_y'}}
+    )
+    rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     assert_frame_equal(rv[1], second_rv_mock)
+
 
 def test_first_output_diff_diferent_df_reverse_case():
     df_x = get_first_df_diff_deviations_functions()
     df_y = get_second_df_diff_deviations_functions()
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
-    assert((list(rv[0].value_x) == list(rv_reverse[0].value_y)) &  (list(rv[0].value_y) == list(rv_reverse[0].value_x)) )
+    assert (list(rv[0].value_x) == list(rv_reverse[0].value_y)) & (
+        list(rv[0].value_y) == list(rv_reverse[0].value_x)
+    )
+
 
 def test_second_output_diff_diferent_df_reverse_case():
     df_x = get_first_df_diff_deviations_functions()
-    df_y=pd.DataFrame({'date_col':['2020-11-11', '2020-11-12', '2020-11-13', '2020-11-14', '2020-11-15'], 'row_count':[10, 20, 20, 10, 10]})
+    df_y = pd.DataFrame(
+        {
+            'date_col': [
+                '2020-11-11',
+                '2020-11-12',
+                '2020-11-13',
+                '2020-11-14',
+                '2020-11-15',
+            ],
+            'row_count': [10, 20, 20, 10, 10],
+        }
+    )
     rv = utils.dataframe_diff(df_x, df_y, ['date_col'])
     rv_reverse = utils.dataframe_diff(df_y, df_x, ['date_col'])
-    assert_frame_equal(rv[1][['date_col', 'row_count']], rv_reverse[1][['date_col', 'row_count']])
+    assert_frame_equal(
+        rv[1][['date_col', 'row_count']], rv_reverse[1][['date_col', 'row_count']]
+    )
 
 
 def test_len_dev_log_normal_case():
-    assert(len(utils.compute_differences_dataframes(get_first_df_diff_deviations_functions(), get_second_df_diff_deviations_functions(), ["date_col"], "_first", "_second") == 4))
+    assert len(
+        utils.compute_differences_dataframes(
+            get_first_df_diff_deviations_functions(),
+            get_second_df_diff_deviations_functions(),
+            ["date_col"],
+            "_first",
+            "_second",
+        )
+        == 4
+    )
+
 
 def test_dev_log_normal_case():
-    assert_frame_equal(utils.compute_differences_dataframes(get_first_df_diff_deviations_functions(), get_second_df_diff_deviations_functions(), ["date_col"], "_first", "_second"), pd.DataFrame({'date_col': {0: '2020-11-11',
-        1: '2020-11-12',
-        2: '2020-11-13',
-        3: '2020-11-14'},
-        'row_count_first': {0: 20, 1: 100, 2: 10, 3: 1},
-        'row_count_second': {0: 10, 1: 20, 2: 20, 3: 10},
-        'diff': {0: 10, 1: 80, 2: -10, 3: -9},
-        'diff_%': {0: 50.0, 1: 80.0, 2: -100.0, 3: -900.0}}))
+    assert_frame_equal(
+        utils.compute_differences_dataframes(
+            get_first_df_diff_deviations_functions(),
+            get_second_df_diff_deviations_functions(),
+            ["date_col"],
+            "_first",
+            "_second",
+        ),
+        pd.DataFrame(
+            {
+                'date_col': {
+                    0: '2020-11-11',
+                    1: '2020-11-12',
+                    2: '2020-11-13',
+                    3: '2020-11-14',
+                },
+                'row_count_first': {0: 20, 1: 100, 2: 10, 3: 1},
+                'row_count_second': {0: 10, 1: 20, 2: 20, 3: 10},
+                'diff': {0: 10, 1: 80, 2: -10, 3: -9},
+                'diff_%': {0: 50.0, 1: 80.0, 2: -100.0, 3: -900.0},
+            }
+        ),
+    )

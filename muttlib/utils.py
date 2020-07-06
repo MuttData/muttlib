@@ -876,7 +876,7 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     return sorted(list(ret))
 
 
-def dataframe_diff(df_x, df_y, key, right_suffix = "_x", left_suffix = "_y"):
+def dataframe_diff(df_x, df_y, key, right_suffix="_x", left_suffix="_y"):
     """
     Compute diff between 2 dataframes taking their columns in common as key.
     Args:
@@ -885,7 +885,7 @@ def dataframe_diff(df_x, df_y, key, right_suffix = "_x", left_suffix = "_y"):
         - key (list of string): list of column names taken as keys
         - right_suffix (string): suffix for the right side dataframe
         - left_suffix (string): suffix for the left side dataframe
-    
+
     Returns a tuple that contains the difference and additional data.
 
     First df contains the following columns:
@@ -893,7 +893,7 @@ def dataframe_diff(df_x, df_y, key, right_suffix = "_x", left_suffix = "_y"):
         - value_x: different value of x side
         - value_y: different value of y side
         - column_name: contains the name of column where the change is produced
-    
+
     Second df contains the following columns:
         - key: list of columns taken as group columns
         - other columns in common between df_x and df_y that contain additional changes
@@ -903,38 +903,65 @@ def dataframe_diff(df_x, df_y, key, right_suffix = "_x", left_suffix = "_y"):
     """
     set_x = [f"df{right_suffix}" for i in range(len(df_x))]
     df_x['sets'] = set_x
-    set_y = [f"df{left_suffix}"  for i in range(len(df_y))]
+    set_y = [f"df{left_suffix}" for i in range(len(df_y))]
     df_y['sets'] = set_y
     columns = list(df_x.columns)
     columns.remove('sets')
-    df_concat = pd.concat([df_x,df_y]).drop_duplicates(subset=columns,keep=False).reset_index(drop=True)
-    df_set1 = df_concat[df_concat['sets']==f"df{right_suffix}"]
-    df_set2 = df_concat[df_concat['sets']==f"df{left_suffix}"]
-    df_merged = pd.merge(df_set1, df_set2, on = key)
-    nonkey = set(columns)- set(key)
+    df_concat = (
+        pd.concat([df_x, df_y])
+        .drop_duplicates(subset=columns, keep=False)
+        .reset_index(drop=True)
+    )
+    df_set1 = df_concat[df_concat['sets'] == f"df{right_suffix}"]
+    df_set2 = df_concat[df_concat['sets'] == f"df{left_suffix}"]
+    df_merged = pd.merge(df_set1, df_set2, on=key)
+    nonkey = set(columns) - set(key)
     list_diff = []
     for i in range(len(df_merged)):
         for col in nonkey:
-            if df_merged.iloc[i][col + right_suffix] != df_merged.iloc[i][col + left_suffix]:
-                list_diff.append(list(df_merged.iloc[i][key + [col + right_suffix,col + left_suffix]]) + [col])
-    df_diff = pd.DataFrame(list_diff,columns= key + ['value' + right_suffix,'value' + left_suffix,'column_name'] )
-    df_additional = pd.concat([df_x,df_y]).drop_duplicates(subset=key,keep=False).reset_index(drop=True)
-    df_x.drop(['sets'],axis=1,inplace=True)
-    df_y.drop(['sets'],axis=1,inplace=True)
+            if (
+                df_merged.iloc[i][col + right_suffix]
+                != df_merged.iloc[i][col + left_suffix]
+            ):
+                list_diff.append(
+                    list(
+                        df_merged.iloc[i][key + [col + right_suffix, col + left_suffix]]
+                    )
+                    + [col]
+                )
+    df_diff = pd.DataFrame(
+        list_diff,
+        columns=key + ['value' + right_suffix, 'value' + left_suffix, 'column_name'],
+    )
+    df_additional = (
+        pd.concat([df_x, df_y])
+        .drop_duplicates(subset=key, keep=False)
+        .reset_index(drop=True)
+    )
+    df_x.drop(['sets'], axis=1, inplace=True)
+    df_y.drop(['sets'], axis=1, inplace=True)
     return df_diff, df_additional
 
 
-def compute_differences_dataframes(first_df, second_df, key_cols, first_suffix, second_suffix, filter_flag_more_deviation=False, threshold=1):
+def compute_differences_dataframes(
+    first_df,
+    second_df,
+    key_cols,
+    first_suffix,
+    second_suffix,
+    filter_flag_more_deviation=False,
+    threshold=1,
+):
     """
-    It generates the differentials between dataframes. 
-    
+    It generates the differentials between dataframes.
+
     Args:
         first_df (pandas.DataFrame): First dataframe to be taken to compute differences.
         second_df (pandas.DataFrame): Second dataframe to be taken to compute differences.
         key_cols (list of strings): list of column names to take as key (to join and sort)
         first_suffix (string): suffix to name row_count column
         second_suffix (string): suffix to name row_count column
-        filter_flag_more_deviation (bool): Flag that indicates if transform function should filter or not data 
+        filter_flag_more_deviation (bool): Flag that indicates if transform function should filter or not data
         if the data has deviation greater than specified value (threshold)
         threshold (float): value that determines filtering of data.
 
@@ -943,18 +970,22 @@ def compute_differences_dataframes(first_df, second_df, key_cols, first_suffix, 
             - params["key_col"] (list of string/int): list of column names to take as key.
             - row_count{params['first_suffix']} (int): row count of first df
             - row_count{params['second_suffix']} (int): row count of second df
-            - diff (int): difference between row_count of first df and row_count of second df 
+            - diff (int): difference between row_count of first df and row_count of second df
             - diff_% (float): diff in percentage units
     """
-    
 
     df_merged = first_df.merge(
         second_df, how="left", on=key_cols, suffixes=(first_suffix, second_suffix)
     ).fillna(value=0)
-    df_merged["diff"] = df_merged[f"row_count{first_suffix}"] - (df_merged[f"row_count{second_suffix}"])
+    df_merged["diff"] = df_merged[f"row_count{first_suffix}"] - (
+        df_merged[f"row_count{second_suffix}"]
+    )
     df_merged["diff_%"] = round(
         (
-            (df_merged[f"row_count{first_suffix}"] - (df_merged[f"row_count{second_suffix}"]))
+            (
+                df_merged[f"row_count{first_suffix}"]
+                - (df_merged[f"row_count{second_suffix}"])
+            )
             / df_merged[f"row_count{first_suffix}"]
         )
         * 100,
@@ -966,12 +997,8 @@ def compute_differences_dataframes(first_df, second_df, key_cols, first_suffix, 
             ~df_merged["diff_%"].between(-threshold, threshold, inclusive=False)
         ]
     df_merged = df_merged[
-        key_cols+[
-            f"row_count{first_suffix}",
-            f"row_count{second_suffix}",
-            "diff",
-            "diff_%",
-        ]
+        key_cols
+        + [f"row_count{first_suffix}", f"row_count{second_suffix}", "diff", "diff_%",]
     ]
 
     return df_merged.sort_values(key_cols, ascending=True).reset_index(drop=True)
