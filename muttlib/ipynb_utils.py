@@ -20,9 +20,15 @@ import matplotlib
 
 import muttlib.utils as utils
 
+logger = logging.getLogger(f'ipynb_utils.{__name__}')
 
 # Special back-end set to have the ipynb **not** use tkinter
-matplotlib.use('TkAgg')
+current_backend = matplotlib.get_backend()
+if current_backend != 'TkAgg':
+    logger.warning(
+        f"You are currently using {current_backend} as your Matplotlib backend. "
+        "This lib currently recommends using TkAgg for correctly visualizing its plots."
+    )
 import matplotlib.pyplot as plt  # NOQA
 
 # For nice df prints that can be copy pasted to chat services
@@ -33,8 +39,6 @@ import matplotlib.dates as mdates  # NOQA
 
 # Cleanear matplotlib formatting
 from matplotlib import ticker  # NOQA
-
-logger = logging.getLogger(f'ipynb_utils.{__name__}')
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -84,7 +88,7 @@ def ab_split(id_obj, salt, control_group_size: float):
     is between 0 and 1. This sets how big the control group is in perc.
     """
     test_id = str(id_obj) + '-' + str(salt)
-    test_id_digest = md5(test_id.encode('ascii')).hexdigest()
+    test_id_digest = md5(test_id.encode('ascii')).hexdigest()  # nosec
     test_id_first_digits = test_id_digest[:6]
     test_id_last_int = int(test_id_first_digits, 16)
     split = test_id_last_int / 0xFFFFFF

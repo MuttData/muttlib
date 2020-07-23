@@ -18,3 +18,32 @@ test:
   - pip install .[runs]
   - python -c 'from muttlib import runs'
   - python setup.py test
+  - pip install nox
+  - nox --sessions tests
+
+
+lint:
+  script:
+    - pip install nox
+    - nox --sessions cop
+
+
+bandit:
+  script:
+    - pip install nox
+    - nox --sessions bandit
+
+
+pages:
+  stage: deploy
+  script:
+  - pip install .[dev]
+  - cd docs
+  - make html
+  - cd ..
+  - mv docs/build/html/ public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
