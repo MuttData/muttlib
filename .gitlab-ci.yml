@@ -17,7 +17,6 @@ test:
   - python -c 'from muttlib import gcd'
   - pip install .[runs]
   - python -c 'from muttlib import runs'
-  - python setup.py test
   - pip install nox
   - nox --sessions tests
 
