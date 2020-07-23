@@ -11,7 +11,6 @@ from contextlib import contextmanager
 import pandas as pd
 from pandas.io.json import json_normalize
 import progressbar
-import pyarrow.parquet as pq
 from sqlalchemy import create_engine
 from sqlalchemy.types import VARCHAR
 from sqlalchemy.orm import sessionmaker
@@ -40,6 +39,7 @@ except ModuleNotFoundError:
 try:
     import ibis
     import ibis.impala
+    import pyarrow.parquet as pq
 except ModuleNotFoundError:
     logger.debug("No Ibis support.")
 
