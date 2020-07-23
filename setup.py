@@ -83,5 +83,6 @@ setuptools.setup(
         + holidays_dep,
         'forecast': ['fbprophet'] + holidays_dep,
         'gsheets': ['gspread_pandas'],
+        'runs': ['mlflow'],
     },
 )
