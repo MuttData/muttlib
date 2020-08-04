@@ -1,19 +1,19 @@
 """Module to get and use multiple Big Data DB connections."""
+from contextlib import closing, contextmanager
 from functools import wraps
 import logging
-from contextlib import closing
 import re
 import shutil
 from time import sleep
 from urllib.parse import urlparse
 
+import muttlib.utils as utils
 import pandas as pd
 from pandas.io.json import json_normalize
 import progressbar
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.types import VARCHAR
-
-import muttlib.utils as utils
 
 logger = logging.getLogger(f'dbconn.{__name__}')  # NOQA
 
@@ -149,6 +149,23 @@ class BaseClient:
         connection = self._connect()
         with connection:
             df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
+
+    @contextmanager
+    def session_scope(self, **session_kw):
+        """Provide a transactional scope around a series of operations."""
+
+        Session = sessionmaker(bind=self.get_engine())
+        sess = Session(**session_kw)
+
+        try:
+            yield sess
+            sess.commit()
+        except Exception as err:
+            logger.exception(err)
+            sess.rollback()
+            raise
+        finally:
+            sess.close()
 
 
 class PgClient(BaseClient):
