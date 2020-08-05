@@ -74,7 +74,7 @@ def _parse_sql_statement_decorator(func):
 
 
 @contextmanager
-def session_scope(self, engine: engine.Engine, **session_kw):
+def session_scope(engine: engine.Engine, **session_kw):
     """Provide a transactional scope around a series of operations."""
 
     Session = sessionmaker(bind=engine)
