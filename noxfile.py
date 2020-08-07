@@ -7,7 +7,7 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[test,forecast]")
+    session.install(".[test,forecast,gdrive]")
 
     cmd = ["pytest", "-n", "auto"]
 
