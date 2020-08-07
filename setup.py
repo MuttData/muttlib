@@ -26,7 +26,11 @@ setuptools.setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    setup_requires=['wheel'],
+    setup_requires=['pytest-runner', 'wheel'],
+    tests_require=["pytest", "pytest-cov", "pytest-html", "betamax"]
+    + pyarrow_dep
+    + holidays_dep,
+    test_suite='test',
     install_requires=[
         'jinja2',
         'pandas>=1.0.0',
@@ -56,6 +60,7 @@ setuptools.setup(
             'tabulate',
             'textwrap3',
         ],
+        'gdrive': ['oauth2client', 'requests'],
         'dev': [
             'flake8-bugbear',
             'flake8-docstrings',
@@ -63,6 +68,8 @@ setuptools.setup(
             'sphinx',
             'sphinx_rtd_theme',
             'm2r @ git+https://github.com/crossnox/m2r@dev#egg=m2r',
+            'betamax',
+            'betamax-serializers',
             'pre-commit==2.2.0',
             'isort==4.3.21',
             'black==19.10b0',
@@ -78,6 +85,8 @@ setuptools.setup(
             'pytest-cov',
             'pytest-html',
             'hypothesis',
+            'betamax',
+            'betamax-serializers',
         ]
         + pyarrow_dep
         + holidays_dep,
