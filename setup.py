@@ -67,7 +67,7 @@ setuptools.setup(
             'bump',
             'sphinx',
             'sphinx_rtd_theme',
-            'm2r @ git+https://github.com/crossnox/m2r@dev#egg=m2r',
+            'm2r2',
             'betamax',
             'betamax-serializers',
             'pre-commit==2.2.0',
