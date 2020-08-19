@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import List, Union
 
 import jinja2
+import numpy as np
 import pandas as pd
 import yaml
 from pandas.tseries import offsets
@@ -408,7 +409,7 @@ def get_ordered_factor_levels(df, col, top_n=None, min_counts=None):
 
 def normalize_arr(arr):
     """Normalize a numpy array to sum 1."""
-    arr_sum = pd.np.sum(arr, axis=0)
+    arr_sum = np.sum(arr, axis=0)
     return 1.0 * arr / arr_sum if arr_sum != 0 else arr
 
 
@@ -434,17 +435,17 @@ def normalize_ds_index(df, ds_col):
 
 def standarize_values(values):
     """Standarize array values with MinMAx."""
-    assert pd.np.issubdtype(values, pd.np.number)
+    assert np.issubdtype(values, np.number)
     shifted_values = values - values.min()
     # Degenerate case when values array has all same input values
-    if pd.np.count_nonzero(shifted_values) == 0:
+    if np.count_nonzero(shifted_values) == 0:
         return values
     return shifted_values / (shifted_values.max() - shifted_values.min())
 
 
 def robust_standarize_values(values):
     """Standarize values with InterQuartile Range and median."""
-    assert pd.np.issubdtype(values, pd.np.number)
+    assert np.issubdtype(values, np.number)
     return (values - values.median()) / iqr(values)
 
 
@@ -618,7 +619,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
     """
 
     if isinstance(data, pd.DataFrame):
-        obj_cols = data.select_dtypes(include=[pd.np.object]).columns
+        obj_cols = data.select_dtypes(include=[np.object]).columns
         for col in obj_cols:
             data[col] = (
                 data[col]
@@ -630,7 +631,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
         return data
-    elif isinstance(data, pd.Series) and data.dtype == pd.np.object:
+    elif isinstance(data, pd.Series) and data.dtype == np.object:
         data = (
             data.str.lower()
             .str.lower()
@@ -667,7 +668,7 @@ def df_replace_empty_strs_null(df):
     if str_cols:
         logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
         for col in str_cols:
-            df[col].replace(r'^\s*$', pd.np.nan, regex=True, inplace=True)
+            df[col].replace(r'^\s*$', np.nan, regex=True, inplace=True)
     return df
 
 
@@ -736,7 +737,7 @@ def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
     if col_type == 'cat':  # Work in cases, else dont define include var
         include = ['object', 'category']
     elif col_type == 'num':
-        include = [pd.np.number]
+        include = [np.number]
     elif col_type == 'date':
         include = ['datetime']
     elif col_type in ('bool', 'timedelta'):

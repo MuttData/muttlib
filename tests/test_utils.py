@@ -618,24 +618,20 @@ def test_df_optimize_float_types():
 
 def test_df_replace_empty_strs_null():
     df = pd.DataFrame([' ', " ", "batman!"])
-    df_test = pd.DataFrame([pd.np.nan, pd.np.nan, "batman!"])
+    df_test = pd.DataFrame([np.nan, np.nan, "batman!"])
 
     assert df_test.equals(utils.df_replace_empty_strs_null(df))
 
 
 def test_df_drop_nulls():
     df = pd.DataFrame(
-        {
-            'a': [pd.np.nan, pd.np.nan, "batman!"],
-            'b': [1, 2, 3],
-            'c': ["", "", "lider!"],
-        }
+        {'a': [np.nan, np.nan, "batman!"], 'b': [1, 2, 3], 'c': ["", "", "lider!"],}
     )
 
     df_test = pd.DataFrame({'b': [1, 2, 3]})
     assert df_test.equals(utils.df_drop_nulls(df.copy()))
 
-    df_test = pd.DataFrame({'b': [1, 2, 3], 'c': [pd.np.nan, pd.np.nan, "lider!"]})
+    df_test = pd.DataFrame({'b': [1, 2, 3], 'c': [np.nan, np.nan, "lider!"]})
     assert df_test.equals(utils.df_drop_nulls(df.copy(), protected_cols=['c']))
 
 
