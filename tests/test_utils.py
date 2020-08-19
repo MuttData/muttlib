@@ -5,7 +5,6 @@ import datetime
 import pytest
 from pathlib import Path
 from collections import OrderedDict, namedtuple, deque  # noqa: F401
-import numpy as np
 import pandas as pd
 from pandas.tseries import offsets
 import numpy as np
@@ -619,7 +618,7 @@ def test_df_optimize_float_types():
 
 def test_df_replace_empty_strs_null():
     df = pd.DataFrame([' ', " ", "batman!"])
-    df_test = pd.DataFrame([np.nan, np.nan, "batman!"])
+    df_test = pd.DataFrame([pd.np.nan, pd.np.nan, "batman!"])
 
     assert df_test.equals(utils.df_replace_empty_strs_null(df))
 
@@ -627,7 +626,7 @@ def test_df_replace_empty_strs_null():
 def test_df_drop_nulls():
     df = pd.DataFrame(
         {
-            'a': [np.nan, np.nan, "batman!"],
+            'a': [pd.np.nan, pd.np.nan, "batman!"],
             'b': [1, 2, 3],
             'c': ["", "", "lider!"],
         }
@@ -636,7 +635,7 @@ def test_df_drop_nulls():
     df_test = pd.DataFrame({'b': [1, 2, 3]})
     assert df_test.equals(utils.df_drop_nulls(df.copy()))
 
-    df_test = pd.DataFrame({'b': [1, 2, 3], 'c': [np.nan, np.nan, "lider!"]})
+    df_test = pd.DataFrame({'b': [1, 2, 3], 'c': [pd.np.nan, pd.np.nan, "lider!"]})
     assert df_test.equals(utils.df_drop_nulls(df.copy(), protected_cols=['c']))
 
 
