@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from pandas.tseries import offsets
 
+import datetime
+
 # SQL
 COUNTRY_NAME = "ARGENTINA"
 COUNTRY_ISO3 = "ARG"
@@ -32,15 +34,15 @@ PERCENTILES = np.concatenate([PERCENTILES, (1 - PERCENTILES[::-1])[1:]])
 # TIME
 # # Because of data loss, we know < 19/03 we'll have bad data
 START_DATE = pd.to_datetime('2018-10-01', dayfirst=False)
-END_DATE = pd.datetime.now()
+END_DATE = datetime.now()
 LAST_WEEK_DATE = END_DATE - pd.Timedelta('7d')
 # # First day of a fixed month date of analysis
 FIXED_MONTH_DATE = pd.to_datetime('2018-11-01', dayfirst=False)
 HOURS_PER_DAY = 24
 
-FRIENDS_DAY = pd.to_datetime(f'{pd.datetime.now().year}-07-20', dayfirst=False)
+FRIENDS_DAY = pd.to_datetime(f'{datetime.now().year}-07-20', dayfirst=False)
 
-august_first = pd.to_datetime(f'{pd.datetime.now().year}-08-01', dayfirst=False)
+august_first = pd.to_datetime(f'{datetime.now().year}-08-01', dayfirst=False)
 kids_dow_iteration = 3  # third sunday each August
 KIDS_DAY = pd.date_range(
     start=august_first, end=august_first + offsets.Day(21), freq='W-SUN'
