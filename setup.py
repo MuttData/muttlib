@@ -11,7 +11,7 @@ holidays_dep = ['holidays>=0.10.2']
 
 setuptools.setup(
     name='muttlib',
-    version=muttlib.__version__,
+    version='0.19.0',
     author='Mutt Data',
     home_page='https://gitlab.com/mutt_data/muttlib/',
     keywords='data pandas spark data-analysis database data-munging',
