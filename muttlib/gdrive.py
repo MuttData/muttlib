@@ -12,6 +12,7 @@ TODO:
 
 import enum
 import logging
+import os
 import pathlib
 
 import httplib2
@@ -52,10 +53,13 @@ class DriveClient:
         Session to handle requests to the API
     """
 
-    def __init__(self, auth_file, session=None):
+    def __init__(self, auth_file=None, session=None):
         if session is None:
             session = requests.Session()
         self.session = session
+
+        if auth_file is None:
+            auth_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
 
         if auth_file is not None:
             self.auth = ServiceAccountCredentials.from_json_keyfile_name(
