@@ -155,6 +155,162 @@
         },
         "url": "https://www.googleapis.com/drive/v3/files/1jJ0RW1NSRyGn7OTDW3CXE2NC6tM-D-HgP1wrnG5kjRg"
       }
+    },
+    {
+      "recorded_at": "2020-08-07T18:08:51",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"parents\": [\"root\"], \"name\": \"test_spreadsheet\", \"mimeType\": \"application/vnd.google-apps.spreadsheet\"}"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "Bearer ya29.c.KpAB1wf8mwh8zFrPuWrOjL9GX8aw1yD8n-HSFJGc-DNbDwWr8F_ydglb0_rzq7B0cNkscqwUk-kKmtS0Ly8spRUtpZ-vFU2yDFtnNPqvQrIQMOPHokbkXtqGq8dHI0qhgFOL4FE0ca1BMIwqWvUm-2QzB4vN_z9Ot9JCs5YJISMkdbuFnvCN1dUv8aGN50_LokLt"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "104"
+          ],
+          "Content-Type": [
+            "application/json"
+          ],
+          "User-Agent": [
+            "python-requests/2.24.0"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://www.googleapis.com/drive/v3/files?supportsAllDrives=False"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAAKvmUlDKzsxLUbJSUEopyixLVU7LzElV0gEKZ4IFDXUtTMJMPdJ9dc3M/IPc3ZPNC7zDIowC3EOd8nxzIsotPFxDIh3dw7Ocq5LB2vISc1NBGktSi0viiwuKUhNTijNSU0vAkrmZuakhlQVgBYkFBTmZyYklmfl5+mV5KXrp+fnpOam6QOFiPWR9XLVcAJHbOtSmAAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Alt-Svc": [
+            "h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+          ],
+          "Cache-Control": [
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Security-Policy": [
+            "frame-ancestors 'self'"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 07 Aug 2020 18:08:51 GMT"
+          ],
+          "Expires": [
+            "Mon, 01 Jan 1990 00:00:00 GMT"
+          ],
+          "Pragma": [
+            "no-cache"
+          ],
+          "Server": [
+            "GSE"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "Vary": [
+            "Origin",
+            "X-Origin"
+          ],
+          "X-Content-Type-Options": [
+            "nosniff"
+          ],
+          "X-Frame-Options": [
+            "SAMEORIGIN"
+          ],
+          "X-XSS-Protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://www.googleapis.com/drive/v3/files?supportsAllDrives=False"
+      }
+    },
+    {
+      "recorded_at": "2020-08-07T18:08:51",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "Bearer ya29.c.KpAB1wf8mwh8zFrPuWrOjL9GX8aw1yD8n-HSFJGc-DNbDwWr8F_ydglb0_rzq7B0cNkscqwUk-kKmtS0Ly8spRUtpZ-vFU2yDFtnNPqvQrIQMOPHokbkXtqGq8dHI0qhgFOL4FE0ca1BMIwqWvUm-2QzB4vN_z9Ot9JCs5YJISMkdbuFnvCN1dUv8aGN50_LokLt"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "User-Agent": [
+            "python-requests/2.24.0"
+          ]
+        },
+        "method": "DELETE",
+        "uri": "https://www.googleapis.com/drive/v3/files/1-84V5HgM-66ORGGc7pKVX2PGUBnMlXw8HETYAGWjCzc?supportsAllDrives=False"
+      },
+      "response": {
+        "body": {
+          "encoding": null,
+          "string": ""
+        },
+        "headers": {
+          "Alt-Svc": [
+            "h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""
+          ],
+          "Cache-Control": [
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          "Date": [
+            "Fri, 07 Aug 2020 18:08:51 GMT"
+          ],
+          "Expires": [
+            "Mon, 01 Jan 1990 00:00:00 GMT"
+          ],
+          "Pragma": [
+            "no-cache"
+          ],
+          "Server": [
+            "GSE"
+          ],
+          "Vary": [
+            "Origin",
+            "X-Origin"
+          ]
+        },
+        "status": {
+          "code": 204,
+          "message": "No Content"
+        },
+        "url": "https://www.googleapis.com/drive/v3/files/1-84V5HgM-66ORGGc7pKVX2PGUBnMlXw8HETYAGWjCzc?supportsAllDrives=False"
+      }
     }
   ],
   "recorded_with": "betamax/0.8.1"
