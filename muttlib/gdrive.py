@@ -32,6 +32,7 @@ class GDriveURL(enum.Enum):
     """URLs from the Google Drive API."""
 
     FILES = "https://www.googleapis.com/drive/v3/files"
+    DRIVES = "https://www.googleapis.com/drive/v3/drives"
 
 
 SCOPE = [
@@ -240,11 +241,24 @@ class DriveFolder(DriveNode):
         If True logs relevant info
     """
 
-    def __init__(self, gid, drive_client, path=None, parent=None, verbose=False):
+    def __init__(
+        self,
+        gid,
+        drive_client,
+        path=None,
+        parent=None,
+        shared_drives=False,
+        verbose=False,
+    ):
         self.drive_client = drive_client
         self.verbose = verbose
+        self.shared_drives = shared_drives
 
-        r = self.drive_client.request('get', f"{GDriveURL.FILES.value}/{gid}").json()
+        r = self.drive_client.request(
+            'get',
+            f"{GDriveURL.FILES.value}/{gid}",
+            params={'supportsAllDrives': self.shared_drives},
+        ).json()
 
         super().__init__(gid, r.get('name'), parent)
 
@@ -266,7 +280,12 @@ class DriveFolder(DriveNode):
         if other not in folders:
             raise ValueError("other node not in this node or not a folder")
         return DriveFolder(
-            other, self.drive_client, path=self.path, parent=self, verbose=self.verbose
+            other,
+            self.drive_client,
+            path=self.path,
+            parent=self,
+            verbose=self.verbose,
+            shared_drives=self.shared_drives,
         )
 
     def _init_node(self):
@@ -275,12 +294,22 @@ class DriveFolder(DriveNode):
             'get',
             GDriveURL.FILES.value,
             'files',
-            params={'q': f"trashed=False and ('{self.gid}' in parents)"},
+            params={
+                'q': f"trashed=False and ('{self.gid}' in parents)",
+                'corpora': 'allDrives' if self.shared_drives else 'user',
+                'includeItemsFromAllDrives': self.shared_drives,
+                'supportsAllDrives': self.shared_drives,
+            },
         )
 
         if str(self.path) in ('/', 'root'):
             # adding files shared with me to root if
             # - they have no parent
+            # - shared drive folders
+            # - shared drive root files
+            other_files = []
+            possible_parents = set()
+
             files_shared_with_me = self.drive_client.full_request(
                 'get',
                 GDriveURL.FILES.value,
@@ -288,15 +317,51 @@ class DriveFolder(DriveNode):
                 params={'q': f"trashed=False and sharedWithMe=True"},
             )
 
-            for file_shared_with_me in files_shared_with_me:
+            other_files.extend(files_shared_with_me)
+
+            if self.shared_drives:
+                files_from_shared_drives = self.drive_client.full_request(
+                    'get',
+                    GDriveURL.FILES.value,
+                    'files',
+                    params={
+                        'corpora': 'allDrives',
+                        'includeItemsFromAllDrives': 'true',
+                        'supportsAllDrives': 'true',
+                        'q': 'trashed=False',
+                    },
+                )
+
+                other_drives = set(
+                    [
+                        drive.get('id')
+                        for drive in self.drive_client.full_request(
+                            'get', GDriveURL.DRIVES.value, 'drives'
+                        )
+                    ]
+                )
+
+                possible_parents = possible_parents | other_drives
+
+                other_files.extend(files_from_shared_drives)
+
+            for other_file in other_files:
                 r = self.drive_client.request(
                     'get',
-                    f"{GDriveURL.FILES.value}/{file_shared_with_me.get('id')}",
-                    params={'fields': "parents,id"},
+                    f"{GDriveURL.FILES.value}/{other_file.get('id')}",
+                    params={
+                        'fields': "parents,id",
+                        'supportsAllDrives': self.shared_drives,
+                    },
                 ).json()
+
                 parents = r.get('parents')
-                if parents is None or self.gid in parents:  # can self.gid really be
-                    children.append(file_shared_with_me)  # in parents?
+                if (
+                    parents is None
+                    # or self.gid in parents
+                    or len(set(parents) & possible_parents) > 0
+                ):
+                    children.append(other_file)
 
         self._children.extend(children)
 
@@ -339,6 +404,7 @@ class DriveFolder(DriveNode):
             'post',
             GDriveURL.FILES.value,
             json={'parents': [self.gid], 'name': filename, 'mimeType': mimetype},
+            params={'supportsAllDrives': self.shared_drives},
         )
         self._children.append(r.json())
         return r.json()
@@ -410,12 +476,16 @@ class DriveFolder(DriveNode):
 
     def rm(self, gid):
         """Delete a node within this folder."""
-        self.drive_client.request('delete', f"{GDriveURL.FILES.value}/{gid}")
+        self.drive_client.request(
+            'delete',
+            f"{GDriveURL.FILES.value}/{gid}",
+            params={'supportsAllDrives': self.shared_drives},
+        )
         self._children = [x for x in self._children if x.get('id') != gid]
         return
 
 
-def GDrive(creds_file, gid='root', verbose=False, session=None):
+def GDrive(creds_file, gid='root', verbose=False, shared_drives=False, session=None):
     """Entrypoint util to get a filesystem from root."""
     d = DriveClient(creds_file, session=session)
-    return DriveFolder(gid, d, verbose=verbose)
+    return DriveFolder(gid, d, verbose=verbose, shared_drives=shared_drives)
