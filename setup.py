@@ -7,7 +7,7 @@ with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
 pyarrow_dep = ['pyarrow==0.13.0']
-holidays_dep = ['holidays>=0.9.5,<0.10.1']
+holidays_dep = ['holidays>=0.10.2']
 
 setuptools.setup(
     name='muttlib',
