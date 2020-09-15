@@ -151,6 +151,8 @@ class GSheetsClient:
         index_col=None,
         first_row=1,
         num_header_rows=1,
+        create_spread=False,
+        create_sheet=False,
         **kwargs,
     ):
         """
@@ -175,7 +177,10 @@ class GSheetsClient:
                 f"Valid types for `index_col` are `str` or `int`. Value passed was `{index_col}`."
             )
         spread = self.get_spreadsheet(
-            spreadsheet, worksheet, create_spread=False, create_sheet=False
+            spreadsheet,
+            worksheet,
+            create_spread=create_spread,
+            create_sheet=create_sheet,
         )
         if first_cell_loc:
             first_cell_loc = first_cell_loc.upper()
@@ -213,6 +218,7 @@ class GSheetsClient:
         worksheet=None,
         preclean_sheet=True,
         null_fill_value='',
+        freeze_headers=True,
         **kwargs,
     ):
         """
@@ -238,7 +244,7 @@ class GSheetsClient:
             headers=header,
             start=first_cell_loc,
             replace=preclean_sheet,
-            freeze_headers=True,
+            freeze_headers=freeze_headers,
             fill_value=null_fill_value,
             **kwargs,
         )
