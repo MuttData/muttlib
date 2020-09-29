@@ -1024,3 +1024,21 @@ def test_dev_log_normal_case():
             }
         ),
     )
+
+
+def test_read_jsonl(tmpdir):
+    """Check read_jsonl."""
+    f = tmpdir.join("tmp.jsonl")
+    f.write(
+        """{"Dio":"Oh? You're approaching me?"}
+{"Jotaro":"I can't beat the sh*t out of you without getting closer."}"""
+    )
+    expected = [
+        {'Dio': "Oh? You're approaching me?"},
+        {'Jotaro': "I can't beat the sh*t out of you without getting closer."}]
+
+    data = utils.read_jsonl(f)
+
+    assert expected[0] == data[0]
+    assert expected[1] == data[1]
+    

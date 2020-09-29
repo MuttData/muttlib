@@ -21,6 +21,7 @@ import pandas as pd
 import yaml
 from pandas.tseries import offsets
 from scipy.stats import iqr
+import json
 
 logger = logging.getLogger(f'utils.{__name__}')
 
@@ -1003,3 +1004,18 @@ def compute_differences_dataframes(
     ]
 
     return df_merged.sort_values(key_cols, ascending=True).reset_index(drop=True)
+
+
+def read_jsonl(json_file):
+    """
+    Read a jsonl file
+
+    Args:
+        json_file (string): First dataframe to be taken to compute differences.
+
+    Returns:
+        list: json data parsed as a list
+    """
+    with open(json_file) as f:
+        data = [json.loads(jline) for jline in f.read().splitlines()]
+    return data
