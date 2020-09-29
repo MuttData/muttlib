@@ -1035,10 +1035,10 @@ def test_read_jsonl(tmpdir):
     )
     expected = [
         {'Dio': "Oh? You're approaching me?"},
-        {'Jotaro': "I can't beat the sh*t out of you without getting closer."}]
+        {'Jotaro': "I can't beat the sh*t out of you without getting closer."},
+    ]
 
     data = utils.read_jsonl(f)
 
     assert expected[0] == data[0]
     assert expected[1] == data[1]
-    
