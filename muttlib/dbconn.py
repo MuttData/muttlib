@@ -11,6 +11,7 @@ import pandas as pd
 from pandas.io.json import json_normalize
 import progressbar
 from sqlalchemy import create_engine
+from sqlalchemy.engine.url import URL
 from sqlalchemy.types import VARCHAR
 
 import muttlib.utils as utils
@@ -73,8 +74,19 @@ def _parse_sql_statement_decorator(func):
     return wrapper
 
 
+def format_drivername(dialect, driver):
+    if driver is None:
+        driver = ''
+    else:
+        driver = f'+{driver}'
+    return f'{dialect}{driver}'
+
+
 class BaseClient:
     """Create BaseClient for DBs."""
+
+    default_dialect = None  # To be defined by subclasses.
+    default_driver = None
 
     def __init__(
         self,
@@ -86,25 +98,66 @@ class BaseClient:
         driver=None,
         password=None,
     ):
-        self.dialect = dialect
-        self.host = host
-        self.username = username
-        self.database = database
-        self.port = port
-        self.driver = driver
-        self.password = password
+        if dialect is None:
+            dialect = self.default_dialect
+
+        if driver is None and self.default_driver is not None:
+            driver = self.default_driver
+
+        self.conn_url = URL(
+            drivername=format_drivername(dialect, driver),
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            database=database,
+        )
         self._engine = None
+
+    conn_url_delegated = (
+        "username",
+        "database",
+        "host",
+        "dialect",
+        "port",
+        "driver",
+        "password",
+    )
+
+    def __getattr__(self, attr):
+        if attr in self.conn_url_delegated:
+            if attr == 'dialect':
+                return self.conn_url.get_backend_name()
+            elif attr == 'driver':
+                return self.conn_url.get_driver_name()
+            else:
+                _cls = URL
+                target = self.conn_url
+        else:
+            _cls = object
+            target = self
+
+        return _cls.__getattribute__(target, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.conn_url_delegated:
+            _cls = URL
+            target = self.conn_url
+            if attr in ('dialect', 'driver'):
+                if attr == 'dialect':
+                    value = format_drivername(value, self.driver)
+                elif attr == 'driver':
+                    value = format_drivername(self.dialect, value)
+                attr = 'drivername'
+        else:
+            _cls = object
+            target = self
+
+        return _cls.__setattr__(target, attr, value)
 
     @property
     def _db_uri(self):
-        dialect = (
-            f"{self.dialect}{f'+{self.driver}' if self.driver is not None else ''}"
-        )
-        login = (
-            f"{self.username}{f':{self.password}' if self.password is not None else ''}"
-        )
-        host = f"{self.host}{f':{self.port}' if self.port is not None else ''}"
-        return f'{dialect}://{login}@{host}/{self.database}'
+        return str(self.conn_url)
 
     def get_engine(self, custom_uri=None, connect_args=None, echo=False):
         """Create engine or return existing one."""
@@ -154,33 +207,29 @@ class BaseClient:
 class PgClient(BaseClient):
     """Create Postgres DB client."""
 
-    def __init__(self, dialect='postgresql', port=5432, **kwargs):
-        super().__init__(dialect=dialect, port=port, **kwargs)
+    default_dialect = 'postgresql'
 
 
 class MySqlClient(BaseClient):
     """Create MySql DB client."""
 
-    def __init__(self, dialect='mysql', driver='pymysql', **kwargs):
-        super().__init__(dialect=dialect, driver=driver, **kwargs)
+    default_driver = 'pymysql'
+    default_dialect = 'mysql'
 
 
 class SQLiteClient(BaseClient):
     """Create SQLite DB client."""
 
-    def __init__(self, dialect='sqlite', **kwargs):
-        super().__init__(dialect=dialect, **kwargs)
-
-    def _connect(self):
-        db_uri = f'{self.dialect}:///{self.database}'
-        return self.get_engine(custom_uri=db_uri).connect()
+    default_dialect = 'sqlite'
 
 
 class OracleClient(BaseClient):
     """Create Oracle DB client."""
 
-    def __init__(self, dialect='oracle', schema=None, **kwargs):
-        super().__init__(dialect=dialect, **kwargs)
+    default_dialect = 'oracle'
+
+    def __init__(self, schema=None, **kwargs):
+        super().__init__(**kwargs)
         self.schema = schema
 
     @property
@@ -598,8 +647,10 @@ class HiveDb:
 class SqlServerClient(BaseClient):
     """SQLServer client."""
 
-    def __init__(self, dialect='mssql', **kwargs):
-        super().__init__(dialect=dialect, driver='pymssql', **kwargs)
+    default_dialect = 'mssql'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         if self.database is None:
             raise ValueError("Database argument is not optional!")
 
