@@ -1,4 +1,5 @@
 """Project agnostic utility functions."""
+import contextlib
 import csv
 import hashlib
 import io
@@ -1003,3 +1004,32 @@ def compute_differences_dataframes(
     ]
 
     return df_merged.sort_values(key_cols, ascending=True).reset_index(drop=True)
+
+@contextlib.contextmanager
+def numpy_temp_seed(seed):
+    """
+    Sets numpy temporary random state globally.
+
+    Args:
+        seed (int): Seed for RandomState.
+
+    IMPORTANT: Must be used within a `with` context.
+
+    Examples:
+    
+    >>> with numpy_temp_seed(333):
+    ...     numpy.random.randint(10)
+    3
+
+    >>> with numpy_temp_seed(388681):
+    ...     some_function_that_generates_numpy_random_numbers()
+
+    """
+    if not isinstance(seed, int):
+        raise TypeError(f"`seed` argument must be int typed, not {type(seed)}")
+    state = np.random.get_state()
+    np.random.seed(seed)
+    try:
+        yield
+    finally:
+        np.random.set_state(state)
