@@ -1031,8 +1031,8 @@ def numpy_temp_seed(seed=42):
     if not isinstance(seed, int):
         raise TypeError(f"`seed` argument must be int typed, not {type(seed)}")
     state = np.random.get_state()
-    np.random.seed(seed)
     try:
+        np.random.seed(seed)
         yield
     finally:
         np.random.set_state(state)
