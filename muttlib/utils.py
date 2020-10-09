@@ -1006,7 +1006,7 @@ def compute_differences_dataframes(
     return df_merged.sort_values(key_cols, ascending=True).reset_index(drop=True)
 
 @contextlib.contextmanager
-def numpy_temp_seed(seed):
+def numpy_temp_seed(seed=42):
     """
     Sets numpy temporary random state globally.
 
@@ -1016,7 +1016,7 @@ def numpy_temp_seed(seed):
     IMPORTANT: Must be used within a `with` context.
 
     Examples:
-    
+
     >>> with numpy_temp_seed(333):
     ...     numpy.random.randint(10)
     3
@@ -1024,6 +1024,8 @@ def numpy_temp_seed(seed):
     >>> with numpy_temp_seed(388681):
     ...     some_function_that_generates_numpy_random_numbers()
 
+    raise:
+        TypeError if `seed` argument isn't an instance of `int`.
     """
     if not isinstance(seed, int):
         raise TypeError(f"`seed` argument must be int typed, not {type(seed)}")
