@@ -1000,10 +1000,11 @@ def compute_differences_dataframes(
         ]
     df_merged = df_merged[
         key_cols
-        + [f"row_count{first_suffix}", f"row_count{second_suffix}", "diff", "diff_%",]
+        + [f"row_count{first_suffix}", f"row_count{second_suffix}", "diff", "diff_%"]
     ]
 
     return df_merged.sort_values(key_cols, ascending=True).reset_index(drop=True)
+
 
 @contextlib.contextmanager
 def numpy_temp_seed(seed=42):
