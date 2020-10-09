@@ -1024,3 +1024,17 @@ def test_dev_log_normal_case():
             }
         ),
     )
+
+def test_numpy_temp_seed():
+    a = np.random.rand()
+    with utils.numpy_temp_seed(seed=42):
+        b = np.random.rand()
+    c = np.random.rand()
+    with utils.numpy_temp_seed(seed=42):
+        d = np.random.rand()
+    e = np.random.rand()
+    assert b == d
+    assert (a != c) & (c != e) & (a != e)
+    assert (a != b) & (a != d)
+    assert (c != b) & (c != d)
+    assert (e != b) & (e != d)
