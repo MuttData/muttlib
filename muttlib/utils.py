@@ -1008,25 +1008,28 @@ def compute_differences_dataframes(
 
 @contextlib.contextmanager
 def numpy_temp_seed(seed=42):
-    """
-    Sets numpy temporary random state globally.
+    """Sets numpy temporary random state globally.
 
     Args:
         seed (int): Seed for RandomState.
 
-    IMPORTANT: Must be used within a `with` context.
+    Yields:
+        None
+
+    Raises:
+        TypeError: if `seed` argument isn't an instance of `int`.
 
     Examples:
 
-    >>> with numpy_temp_seed(333):
-    ...     numpy.random.randint(10)
-    3
+        >>> with numpy_temp_seed(333):
+        ...     numpy.random.randint(10)
+        3
 
-    >>> with numpy_temp_seed(388681):
-    ...     some_function_that_generates_numpy_random_numbers()
+        >>> with numpy_temp_seed(388681):
+        ...     some_function_that_generates_numpy_random_numbers()
 
-    raise:
-        TypeError if `seed` argument isn't an instance of `int`.
+    Notes:
+        Must be used within a `with` context.
     """
     if not isinstance(seed, int):
         raise TypeError(f"`seed` argument must be int typed, not {type(seed)}")
