@@ -1027,15 +1027,37 @@ def test_dev_log_normal_case():
 
 
 def test_numpy_temp_seed():
-    a = np.random.rand()
-    with utils.numpy_temp_seed(seed=42):
-        b = np.random.rand()
-    c = np.random.rand()
-    with utils.numpy_temp_seed(seed=42):
-        d = np.random.rand()
-    e = np.random.rand()
-    assert b == d
-    assert (a != c) & (c != e) & (a != e)
-    assert (a != b) & (a != d)
-    assert (c != b) & (c != d)
-    assert (e != b) & (e != d)
+    # Sets a fixed seed
+    fixed_seed = 42
+    # Generates a random value without a fixed seed
+    random_value_1_without_fixed_seed = np.random.rand()
+    # Generates a random value with a fixed seed
+    with utils.numpy_temp_seed(seed=fixed_seed):
+        random_value_1_with_fixed_seed = np.random.rand()
+    # Generates another random value without a fixed seed
+    random_value_2_without_fixed_seed = np.random.rand()
+    # Generates another random value with a fixed seed
+    with utils.numpy_temp_seed(seed=fixed_seed):
+        random_value_2_with_fixed_seed = np.random.rand()
+    # Generates another random value without a fixed seed
+    random_value_3_without_fixed_seed = np.random.rand()
+
+    # Asserts if random values genereated with a fixed seed are equal
+    assert random_value_1_with_fixed_seed == random_value_2_with_fixed_seed
+    # Asserts if random values genereated without a fixed seed are different
+    assert (
+        (random_value_1_without_fixed_seed != random_value_2_without_fixed_seed)
+        & (random_value_2_without_fixed_seed != random_value_3_without_fixed_seed)
+        & (random_value_1_without_fixed_seed != random_value_3_without_fixed_seed)
+    )
+    # Asserts if random values generated without a fixed seed
+    # are different than those generated with a fixed one
+    assert (random_value_1_without_fixed_seed != random_value_1_with_fixed_seed) & (
+        random_value_1_without_fixed_seed != random_value_2_with_fixed_seed
+    )
+    assert (random_value_2_without_fixed_seed != random_value_1_with_fixed_seed) & (
+        random_value_2_without_fixed_seed != random_value_2_with_fixed_seed
+    )
+    assert (random_value_3_without_fixed_seed != random_value_1_with_fixed_seed) & (
+        random_value_3_without_fixed_seed != random_value_2_with_fixed_seed
+    )
