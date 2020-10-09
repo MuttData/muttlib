@@ -625,7 +625,7 @@ def test_df_replace_empty_strs_null():
 
 def test_df_drop_nulls():
     df = pd.DataFrame(
-        {'a': [np.nan, np.nan, "batman!"], 'b': [1, 2, 3], 'c': ["", "", "lider!"],}
+        {'a': [np.nan, np.nan, "batman!"], 'b': [1, 2, 3], 'c': ["", "", "lider!"]}
     )
 
     df_test = pd.DataFrame({'b': [1, 2, 3]})
@@ -1024,6 +1024,7 @@ def test_dev_log_normal_case():
             }
         ),
     )
+
 
 def test_numpy_temp_seed():
     a = np.random.rand()
