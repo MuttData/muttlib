@@ -1,7 +1,7 @@
 """Module to get and use multiple Big Data DB connections."""
+from contextlib import closing
 from functools import wraps
 import logging
-from contextlib import closing
 import re
 import shutil
 from time import sleep
@@ -11,7 +11,7 @@ import pandas as pd
 from pandas.io.json import json_normalize
 import progressbar
 from sqlalchemy import create_engine
-from sqlalchemy.engine.url import URL
+from sqlalchemy.engine.url import URL, make_url
 from sqlalchemy.types import VARCHAR
 
 import muttlib.utils as utils
@@ -49,6 +49,10 @@ try:
     import psycopg2  # noqa: F401 # pylint:disable=unused-import
 except ModuleNotFoundError:
     logger.debug("No Postgresql support.")
+
+
+POSTGRES_DIALECT = "postgresql"
+SQLSERVER_DIALECT = "mssql"
 
 
 def _parse_sql_statement_decorator(func):
@@ -207,7 +211,7 @@ class BaseClient:
 class PgClient(BaseClient):
     """Create Postgres DB client."""
 
-    default_dialect = 'postgresql'
+    default_dialect = POSTGRES_DIALECT
 
 
 class MySqlClient(BaseClient):
@@ -647,7 +651,8 @@ class HiveDb:
 class SqlServerClient(BaseClient):
     """SQLServer client."""
 
-    default_dialect = 'mssql'
+    default_dialect = SQLSERVER_DIALECT
+    default_driver = 'pymssql'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -748,3 +753,52 @@ def get_client(creds):
     """Get a db client from a credentials dict."""
     db_type = creds.pop('db_type')
     return db_type, connectors[db_type](**creds)
+
+
+def parse_connection_string(connstr):
+    """Parse a connection string and return the arguments to call muttlib.dbconn.get_client
+
+    This should work at least work on most of Postgres connection URIs.
+    Ref: https://www.postgresql.org/docs/10/libpq-connect.html
+
+    Note that connection specific args after '?' are ignored.
+
+    Args:
+        connstr (str): URI-like database connection string.
+
+    Return:
+        dict: Parsed components of the connection string.
+    """
+    r = make_url(connstr)
+    dialect = r.get_backend_name()
+    db_type = {
+        POSTGRES_DIALECT: POSTGRES_DB_TYPE,
+        SQLSERVER_DIALECT: SQLSERVER_DB_TYPE,
+    }.get(dialect, dialect)
+    rv = {
+        "db_type": db_type,
+        "dialect": dialect,
+    }
+    if r.database:
+        rv["database"] = r.database
+
+    if "+" in r.drivername:
+        rv["driver"] = r.drivername.split("+")[1]
+
+    if r.username:
+        rv["username"] = r.username
+    if r.password:
+        rv["password"] = r.password
+
+    if r.host:
+        rv["host"] = r.host
+    if r.port:
+        rv["port"] = r.port
+
+    return rv
+
+
+def get_client_from_connstr(connstr):
+    args = parse_connection_string(connstr)
+    rv = get_client(args)
+    return rv
