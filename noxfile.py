@@ -7,7 +7,7 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[test,forecast,gdrive]")
+    session.install(".[test,forecast,gdrive,postgres,mysql,mysql]")
 
     cmd = ["pytest", "-n", "auto"]
 
@@ -23,9 +23,6 @@ def cop(session):
     session.install(".")
     session.install(".[dev]")
     session.install(".[test]")
-    session.install(".[postgres]")
-    session.install(".[mysql]")
-    session.install(".[sqlserver]")
 
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
