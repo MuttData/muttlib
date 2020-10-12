@@ -9,14 +9,10 @@ from muttlib.dbconn import (
     parse_connection_string,
 )
 
-# pip install psycopg2 pymysql
-
 
 def test_PgClient():
     client = PgClient(
         database="database",
-        # dialect="postgresql",
-        # driver="psycopg2",
         host="host",
         password="password",
         port=5555,
