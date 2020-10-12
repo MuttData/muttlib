@@ -34,7 +34,7 @@ def test_PgClient():
     client._engine = None
     engine = client.get_engine()
     assert (
-        str(engine.url) == 'postgresql+psycopg2-binary://username:password@host:5555/test_db'
+        str(engine.url) == 'postgresql+psycopg2://username:password@host:5555/test_db'
     )
 
 
