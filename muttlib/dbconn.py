@@ -80,6 +80,15 @@ def _parse_sql_statement_decorator(func):
 
 
 def format_drivername(dialect, driver):
+    """Helper function to format the schema part of connection strings.
+
+    Args:
+        dialect (str): Database dialect.
+        driver (str): Database driver to be used.
+
+    Returns:
+        str: Formatted schema generated.
+    """
     if driver is None:
         driver = ''
     else:
