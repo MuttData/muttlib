@@ -119,7 +119,7 @@ class BaseClient:
         )
         self._engine = None
 
-    conn_url_delegated = (
+    _conn_url_delegated = (
         "username",
         "database",
         "host",
@@ -130,7 +130,7 @@ class BaseClient:
     )
 
     def __getattr__(self, attr):
-        if attr in self.conn_url_delegated:
+        if attr in self._conn_url_delegated:
             if attr == 'dialect':
                 return self.conn_url.get_backend_name()
             elif attr == 'driver':
@@ -145,7 +145,7 @@ class BaseClient:
         return _cls.__getattribute__(target, attr)
 
     def __setattr__(self, attr, value):
-        if attr in self.conn_url_delegated:
+        if attr in self._conn_url_delegated:
             _cls = URL
             target = self.conn_url
             if attr in ('dialect', 'driver'):
