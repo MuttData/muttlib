@@ -79,19 +79,19 @@ def _parse_sql_statement_decorator(func):
     return wrapper
 
 
-def format_drivername(dialect, driver):
+def format_drivername(dialect: str, driver: Optional[str] = None):
     """Helper function to format the schema part of connection strings.
 
     Args:
         dialect (str): Database dialect.
-        driver (str): Database driver to be used.
+        driver (str, optional): Database driver to be used.
 
     Returns:
         str: Formatted schema generated.
     """
     if driver is None:
         driver = ''
-    else:
+    if driver != '':
         driver = f'+{driver}'
     return f'{dialect}{driver}'
 
