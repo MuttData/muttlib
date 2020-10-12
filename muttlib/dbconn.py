@@ -5,6 +5,7 @@ import logging
 import re
 import shutil
 from time import sleep
+from typing import Optional
 from urllib.parse import urlparse
 
 import pandas as pd
@@ -89,8 +90,8 @@ def format_drivername(dialect, driver):
 class BaseClient:
     """Create BaseClient for DBs."""
 
-    default_dialect = None  # To be defined by subclasses.
-    default_driver = None
+    default_dialect: Optional[str] = None  # To be defined by subclasses.
+    default_driver: Optional[str] = None
 
     def __init__(
         self,
