@@ -2,6 +2,8 @@
 
 [![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)
 
+## Description
+
 Library with helper code to start a project by [Mutt Data](https://muttdata.ai/).
 
 Current modules:
@@ -16,7 +18,18 @@ Current modules:
 - `gsheetsconn`: Module to make data interactions to/from Google Sheets <> Pandas.
 - `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks.
 
-## Install
+## Table of Contents
+
+- Installation
+- Usage
+- Contributing
+- Development Setup
+- Testing
+- Code of Conduct
+- Credits
+- License
+
+## Installation
 
 Base lib:
 
@@ -58,27 +71,40 @@ Install custom branch:
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
-## Testing
-Run all tests:
-```
-python setup.py test
-```
-Note: Some extra deps might be needed. Those can be added with this `pip install -e .[ipynb-utils]`.
+### Dirty Dry-run (done dirt cheap)
 
-Run all tests locally as CI:
-```
-gitlab-runner exec docker test
-```
-Note: This requires to install [gitlab-runner](https://docs.gitlab.com/runner/install/) (but not register) and docker.
+```bash
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 
-Run coverage:
-```
-py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
+python -c 'from muttlib import dbconn, utils'
+
+pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+python -c 'from muttlib import ipynb_const, ipynb_utils'
 ```
 
-That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
+## Usage
 
-## Docs
+###  Google Sheets Credentials
+
+To use the client in `gsheetsconn.py` one must first get the appropriate credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
+**Important note**: to obtain the necessary credentials, one must first have a valid GCP account which implies that billing for that account is already enabled. Having a standalone @gmail.com email will generally not suffice. This reference may probably help: [on billing and accounts support for GCP](https://cloud.google.com/support/billing/).
+
+
+A good and simple step by step guide on how to get the Json file credentials can be seen in this [medium post](https://medium.com/@denisluiz/python-with-google-sheets-service-account-step-by-step-8f74c26ed28e). These credentials will be used by our client to read/write/edit files in Google Sheets.
+
+The general idea is that in GCP we need to create or use an existing project, then enable the Sheets and Drive APIs for the selected project and finally create new service-account credentials for your script. Download them in Json format and put them somewhere accessible to your script.
+There are other types of credentials but in this way we can have a server-side script that does not require explicit user consent to proceed with auth.
+
+## Contributing
+
+### How to submit issues, bugs, security issues
+
+<merge !64 MR>
+
+### How to send PRs
+
+### Documentation style
+
 muttlib uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's docs from docstrings. Pushing all the docs is too cumbersome. You can generate them locally like so:
 
 ```bash
@@ -92,18 +118,9 @@ And open `docs/build/html/index.html` on your browser of choice.
 Alternatively you can see the docs for the `master` branch [here.](https://mutt_data.gitlab.io/muttlib/index.html)
 
 
-## Dirty Dry-run (done dirt cheap)
+## Development Setup
 
-```bash
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
-
-python -c 'from muttlib import dbconn, utils'
-
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
-python -c 'from muttlib import ipynb_const, ipynb_utils'
-```
-
-## Pre-Commit for Version Control Integration
+### Pre-Commit for Version Control Integration
 
 When developing you'll have to use the python library
 [pre-commit](https://pre-commit.com/) to run a series of linters and formatters, defined
@@ -169,15 +186,33 @@ more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
 
 **Important note on coverage:** A regex that captures the otuput from `pytest-cov` has been set from Settings -> CI/CD -> General Pipelines -> Test coverage parsing
 
-# Google Sheets Credentials
-
-To use the client in `gsheetsconn.py` one must first get the appropriate credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
-**Important note**: to obtain the necessary credentials, one must first have a valid GCP account which implies that billing for that account is already enabled. Having a standalone @gmail.com email will generally not suffice. This reference may probably help: [on billing and accounts support for GCP](https://cloud.google.com/support/billing/).
-
-
-A good and simple step by step guide on how to get the Json file credentials can be seen in this [medium post](https://medium.com/@denisluiz/python-with-google-sheets-service-account-step-by-step-8f74c26ed28e). These credentials will be used by our client to read/write/edit files in Google Sheets.
-
-The general idea is that in GCP we need to create or use an existing project, then enable the Sheets and Drive APIs for the selected project and finally create new service-account credentials for your script. Download them in Json format and put them somewhere accessible to your script.
-There are other types of credentials but in this way we can have a server-side script that does not require explicit user consent to proceed with auth.
-
 **Important note**: the service-account credentials will effectively provide us with a google-valid email, whicih will act as the "user" editing/modifying/etc. the data in Google Sheets. This implies that this service email needs to have sufficient permissions to actually edit these files. In general, giving permissions to the needed sheets will suffice.
+
+## Testing
+Run all tests:
+```
+python setup.py test
+```
+Note: Some extra deps might be needed. Those can be added with this `pip install -e .[ipynb-utils]`.
+
+Run all tests locally as CI:
+```
+gitlab-runner exec docker test
+```
+Note: This requires to install [gitlab-runner](https://docs.gitlab.com/runner/install/) (but not register) and docker.
+
+Run coverage:
+```
+py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
+```
+
+That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
+
+## Code of Conduct
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+## Credits
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+
+## License
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
