@@ -1,22 +1,21 @@
-
 ### Summary
 
-<!-- Please describe the bug encountered. -->
+<!-- Please describe the bug encountered -->
 
 ### Steps to reproduce
 
-<!-- How can we reproduce it? Please provide a very short MWE. -->
+<!-- Provide a short but concise step-by-step description of how it can be reproduced -->
 
 ### Expected results
 
-<!-- What should happen? -->
+<!-- Describe what should be the proper/expected result -->
 
 ### Actual results
 
-<!-- What actually happens? -->
+<!-- Describe what is the actual/unexpected result -->
 
 ### Notes
 
-<!-- Aditional notes if needed -->
+<!-- Provide additional notes (if needed) that you consider relevant to this issue -->
 
 /label ~bug
