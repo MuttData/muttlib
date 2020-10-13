@@ -1,26 +1,25 @@
-
 ### Description
 
-<!-- What is the problem and solution you're proposing? -->
+<!-- Please describe what is the requirement you're proposing -->
 
 ### Proposal
 
-<!-- How are we going to solve it? -->
+<!-- Describe how it can be solved -->
 
 ###  Benefit
 
-<!-- What is the expected value to deliver? -->
+<!-- Describe what is the expected value to deliver -->
 
 ### Beneficiaries
 
-<!-- Who will use this? -->
+<!-- Provide a list of users / beneficiaries of this feature -->
 
 ### Acceptance criteria
 
-<!-- How do we measure that the solution is working correctly? -->
+<!-- Describe how can be measured that the solution is working correctly -->
 
 ### Notes
 
-<!-- Aditional notes if needed -->
+<!-- Provide additional notes (if needed) that you consider relevant to this issue -->
 
 /label ~feature-request
