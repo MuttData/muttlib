@@ -22,3 +22,5 @@
 ### Notes
 
 <!-- Aditional notes if needed -->
+
+/label ~feature-request
