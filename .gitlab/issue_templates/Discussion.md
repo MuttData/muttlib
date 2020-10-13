@@ -1,0 +1,4 @@
+
+### Discussion template
+
+/label ~discussion
