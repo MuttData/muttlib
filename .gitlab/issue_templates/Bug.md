@@ -18,3 +18,5 @@
 ### Notes
 
 <!-- Aditional notes if needed -->
+
+/label ~bug
