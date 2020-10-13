@@ -128,6 +128,10 @@ class BaseClient:
         )
         self._engine = None
 
+    # This variable is used to list class attributes to be forwarded to
+    # `self.conn_url` for backward compatibility.
+    # This should be removed in the future as well as the extra setter/getter
+    # logic.
     _conn_url_delegated = (
         "username",
         "database",
