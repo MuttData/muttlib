@@ -5,7 +5,7 @@
 
 ### Steps to reproduce
 
-<!-- How can we reproduce it? -->
+<!-- How can we reproduce it? Please provide a very short MWE. -->
 
 ### Expected results
 
