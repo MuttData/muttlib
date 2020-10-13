@@ -1,7 +1,7 @@
 
 ### Summary
 
-<!-- What is the bug encountered? -->
+<!-- Please describe the bug encountered. -->
 
 ### Steps to reproduce
 
