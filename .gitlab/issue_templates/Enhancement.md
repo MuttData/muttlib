@@ -5,7 +5,7 @@
 
 ### Motivation
 
-<!-- Why this change is important? What are the goals? -->
+<!-- Why is this change is? What are the goals? -->
 
 ### Proposal
 

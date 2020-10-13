@@ -17,7 +17,7 @@
 
 ### Acceptance criteria
 
-<!-- When the solution is working correctly? -->
+<!-- How do we measure that the solution is working correctly? -->
 
 ### Notes
 
