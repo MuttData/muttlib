@@ -129,7 +129,6 @@ py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov
 
 That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
 
-
 ## Contributing
 We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](CONTRIBUTING.md).
 
