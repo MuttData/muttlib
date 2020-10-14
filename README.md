@@ -20,13 +20,20 @@ Current modules:
 
 ## Table of Contents
 
-- [Installation](#Installation)
-- [Usage](#Usage)
-  - [Google Sheets Credentials](#Google-Sheets-Credentials)
-- [Testing](#Testing)
-- [Contributing](#Contributing)
-- [Credits](#Contributing)
-- [License](#License)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [dbconn](#dbconn)
+  - [file_processing](#file_processing)
+  - [forecast](#forecast)
+  - [utils](#utils)
+  - [ipynb_const](#ipynb_const)
+  - [gsheetsconn](#gsheetsconn)
+  - [gcd](#gcd)
+- [Google Sheets Credentials](#google-sheets-credentials)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Credits](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -67,7 +74,6 @@ pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRAN
 ```
 
 ### Dirty Dry-run (done dirt cheap)
-
 ```bash
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 
@@ -78,14 +84,25 @@ python -c 'from muttlib import ipynb_const, ipynb_utils'
 ```
 
 ## Usage
-
+### dbconn
+<!-- missing -->
+### file_processing
+<!-- missing -->
+### forecast
+<!-- missing -->
+### utils
+<!-- missing -->
+### ipynb_const
+<!-- missing -->
+### gsheetsconn
+<!-- missing -->
+### gcd
 <!-- missing -->
 
-###  Google Sheets Credentials
+##  Google Sheets Credentials
 
 To use the client in `gsheetsconn.py` one must first get the appropriate credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
 **Important note**: to obtain the necessary credentials, one must first have a valid GCP account which implies that billing for that account is already enabled. Having a standalone @gmail.com email will generally not suffice. This reference may probably help: [on billing and accounts support for GCP](https://cloud.google.com/support/billing/).
-
 
 A good and simple step by step guide on how to get the Json file credentials can be seen in this [medium post](https://medium.com/@denisluiz/python-with-google-sheets-service-account-step-by-step-8f74c26ed28e). These credentials will be used by our client to read/write/edit files in Google Sheets.
 
