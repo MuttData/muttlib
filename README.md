@@ -84,20 +84,7 @@ python -c 'from muttlib import ipynb_const, ipynb_utils'
 ```
 
 ## Usage
-### dbconn
-<!-- missing -->
-### file_processing
-<!-- missing -->
-### forecast
-<!-- missing -->
-### utils
-<!-- missing -->
-### ipynb_const
-<!-- missing -->
-### gsheetsconn
-<!-- missing -->
-### gcd
-<!-- missing -->
+See the [documentation](https://mutt_data.gitlab.io/muttlib/) to get started with muttlib.
 
 ##  Google Sheets Credentials
 
