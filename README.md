@@ -169,6 +169,14 @@ more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
 
 **Important note on coverage:** A regex that captures the otuput from `pytest-cov` has been set from Settings -> CI/CD -> General Pipelines -> Test coverage parsing
 
+### Contribution
+We appreciate for considering to help out maintaining this project. If you'd like to contribute you could:
+
+- Submit a [Bug](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Bug),
+- Request a new [Feature](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Feature),
+- Propose an [Enhancment](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Enhancment),
+- Open a [Discusion](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Discusion).
+
 # Google Sheets Credentials
 
 To use the client in `gsheetsconn.py` one must first get the appropriate credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
