@@ -22,13 +22,6 @@ Current modules:
 
 - [Installation](#installation)
 - [Usage](#usage)
-  - [dbconn](#dbconn)
-  - [file_processing](#file_processing)
-  - [forecast](#forecast)
-  - [utils](#utils)
-  - [ipynb_const](#ipynb_const)
-  - [gsheetsconn](#gsheetsconn)
-  - [gcd](#gcd)
 - [Google Sheets Credentials](#google-sheets-credentials)
 - [Testing](#testing)
 - [Contributing](#contributing)
