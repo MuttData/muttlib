@@ -24,8 +24,6 @@ Current modules:
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Google Sheets Credentials](#google-sheets-credentials)
-- [Testing](#testing)
 - [Contributing](#contributing)
 - [Credits](#contributing)
 - [License](#license)
