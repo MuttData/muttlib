@@ -180,6 +180,6 @@ more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
 **Important note on coverage:** A regex that captures the output from `pytest-cov` has been set from Settings -> CI/CD -> General Pipelines -> Test coverage parsing
 
 ## Rules of Thumb
-- Important changes should be mentioned in the README.md
+- Important changes should be mentioned in the [README.md](README.md)
 - Documentation must be updated.
-- Every change should be present in the CHANGELOG.md
+- Every change should be present in the [CHANGELOG.md](CHANGELOG.md)
