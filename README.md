@@ -4,7 +4,7 @@
 
 ## Description
 
-Library with helper code to start a data-related project. 
+Library with helper code to start a data-related project.
 By [Mutt Data](https://muttdata.ai/).
 
 Current modules:
@@ -17,6 +17,7 @@ Current modules:
 - `utils`: A single version of miscellaneous functions needed every now and then.
 - `ipynb_const` and `ipynb_utils`: Utilities when doing exploratory work (helpful for jupyter notebooks).
 - `gsheetsconn`: Module to make data interactions to/from Google Sheets <> Pandas.
+- `gdrive`: Module that provides a UNIX-ish interface to GDrive.
 - `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks.
 
 ## Table of Contents
@@ -31,28 +32,28 @@ Current modules:
 
 ## Installation
 
-Base lib:
+To install base lib:
 ```bash
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
 ```
 
 Parquet and Feather support:
-```
+```bash
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[pyarrow]
 ```
 
 IPython utils:
-```
+```bash
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
 ```
 
 Forecast:
-```
+```bash
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[forecast]
 ```
 
 Misc DB support for dbconn:
-```
+```bash
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
 pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
@@ -63,26 +64,16 @@ pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
 ```
 
 Install custom branch:
-```
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
-```
-
-### Dirty Dry-run (done dirt cheap)
 ```bash
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
-
-python -c 'from muttlib import dbconn, utils'
-
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
-python -c 'from muttlib import ipynb_const, ipynb_utils'
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 ## Usage
 See the [documentation](https://mutt_data.gitlab.io/muttlib/) to get started with muttlib.
 
 ##  Google Sheets Credentials
-
 To use the client in `gsheetsconn.py` one must first get the appropriate credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
+
 **Important note**: to obtain the necessary credentials, one must first have a valid GCP account which implies that billing for that account is already enabled. Having a standalone @gmail.com email will generally not suffice. This reference may probably help: [on billing and accounts support for GCP](https://cloud.google.com/support/billing/).
 
 A good and simple step by step guide on how to get the Json file credentials can be seen in this [medium post](https://medium.com/@denisluiz/python-with-google-sheets-service-account-step-by-step-8f74c26ed28e). These credentials will be used by our client to read/write/edit files in Google Sheets.
@@ -90,32 +81,47 @@ A good and simple step by step guide on how to get the Json file credentials can
 The general idea is that in GCP we need to create or use an existing project, then enable the Sheets and Drive APIs for the selected project and finally create new service-account credentials for your script. Download them in Json format and put them somewhere accessible to your script.
 There are other types of credentials but in this way we can have a server-side script that does not require explicit user consent to proceed with auth.
 
-## Testing
-Run all tests:
-```
-python setup.py test
-```
-Note: Some extra deps might be needed. Those can be added with this `pip install -e .[ipynb-utils]`.
+**Important note**: the service-account credentials will effectively provide us with a google-valid email, which will act as the "user" editing/modifying/etc. the data in Google Sheets.
+This implies that this service email needs to have sufficient permissions to actually edit these files.
+In general, giving permissions to the needed sheets will suffice.
 
-Run all tests locally as CI:
-```
-gitlab-runner exec docker test
-```
-Note: This requires to install [gitlab-runner](https://docs.gitlab.com/runner/install/) (but not register) and docker.
 
-Run coverage:
-```
-pytest --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
-```
-
-That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
 
 ## Contributing
 We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](CONTRIBUTING.md).
 
 ## Credits
 
-<!-- missing -->
+<!-- check-up -->
+
+- Aldo Escobar
+- Alejandro
+- aoelvp94
+- a-rusi
+- Cristián Antuña
+- CrossNox
+- Eric Rishmuller
+- fabian wolfmann
+- Fabian Wolfmann
+- Gabriel Miretti
+- Javi M
+- jdemonasterio
+- josé
+- Jose Castagnino
+- Juan Martin Pampliega
+- juapampliega
+- Luis Alberto Hernandez
+- Matías Battocchia
+- mdm
+- mutt-luis
+- nox
+- Pablo Andres Lorenzatto
+- Pablo Lorenzatto
+- Pedro Ferrari
+- petobens
+- risheric
+- rishis07
+- Santiago
 
 ## License
-muttlib is licensed under the [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/).
+`muttlib` is licensed under the [Apache License 2.0](#https://gitlab.com/mutt_data/muttlib/-/blob/master/LICENCE).
