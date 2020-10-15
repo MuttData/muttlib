@@ -4,7 +4,8 @@
 
 ## Description
 
-Library with helper code to start a project by [Mutt Data](https://muttdata.ai/).
+Library with helper code to start a data-related project. 
+By [Mutt Data](https://muttdata.ai/).
 
 Current modules:
 
@@ -104,7 +105,7 @@ Note: This requires to install [gitlab-runner](https://docs.gitlab.com/runner/in
 
 Run coverage:
 ```
-py.test --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
+pytest --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. test/
 ```
 
 That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.

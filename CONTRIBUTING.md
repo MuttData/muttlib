@@ -188,11 +188,13 @@ push.
 
 Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or newer: `git push -o ci.skip`
 more info in https://docs.gitlab.com/ce/ci/yaml/README.html#skipping-builds.
-`IMPORTANT`. If you skip the CI job it will not disable the option to do merge, be careful doing this.
+`IMPORTANT`. If you skip the CI job it will not disable the option to do the merge, be careful when doing this.
 
 **Important note on coverage:** A regex that captures the otuput from `pytest-cov` has been set from Settings -> CI/CD -> General Pipelines -> Test coverage parsing
 
-**Important note**: the service-account credentials will effectively provide us with a google-valid email, whicih will act as the "user" editing/modifying/etc. the data in Google Sheets. This implies that this service email needs to have sufficient permissions to actually edit these files. In general, giving permissions to the needed sheets will suffice.
+**Important note**: the service-account credentials will effectively provide us with a google-valid email, which will act as the "user" editing/modifying/etc. the data in Google Sheets. 
+This implies that this service email needs to have sufficient permissions to actually edit these files. 
+In general, giving permissions to the needed sheets will suffice.
 
 ### README
 Relevant changes (e.g. new modules) should be included in the README.
