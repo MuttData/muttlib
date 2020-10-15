@@ -124,4 +124,4 @@ We appreciate for considering to help out maintaining this project. If you'd lik
 - Santiago
 
 ## License
-`muttlib` is licensed under the [Apache License 2.0](#https://gitlab.com/mutt_data/muttlib/-/blob/master/LICENCE).
+`muttlib` is licensed under the [Apache License 2.0](LICENCE).
