@@ -90,7 +90,7 @@ We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.htm
 - Method/functions to explain what it does and what it's parameters are
 
 ## Testing
-We use the [pytest framework](https://docs.pytest.org/en/latest/) to test `muttlib`.
+`muttlib` uses the [pytest framework](https://docs.pytest.org/en/latest/) to test `muttlib`.
 
 To run the default test suite run this:
 ```bash
@@ -126,7 +126,7 @@ And open `docs/build/html/index.html` on your browser of choice.
 Alternatively you can see the docs for the `master` branch [here.](https://mutt_data.gitlab.io/muttlib/index.html)
 
 ## Versioning
-We use [SemVer](https://semver.org). To keep things easy, we've included [bump](https://pypi.org/project/bump/) as a dev dependency. Running `bump` will bump the patch version. To bump minor/major versions:
+`muttlib` uses [SemVer](https://semver.org). To keep things easy, we've included [bump](https://pypi.org/project/bump/) as a dev dependency. Running `bump` will bump the patch version. To bump minor/major versions:
 ```bash
 bump --minor
 bump --major
