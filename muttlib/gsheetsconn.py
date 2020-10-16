@@ -33,6 +33,34 @@ A full round trip of how this module operates scan be seen as follows:
 > gsheets_client.insert_from_frame(df, spreadsheet_id, index=True, worksheet=worksheet)
 >​
 > return_df = gsheets_client.to_frame(spreadsheet_id, worksheet=worksheet)
+
+Google Sheets Credentials
+
+To use the client in gsheetsconn.py one must first get the appropriate
+credentials in Json format. These are provided by GCP (Google's computing platform - cloud).
+
+Important note: to obtain the necessary credentials, one must first have a valid GCP account
+which implies that billing for that account is already enabled. Having a standalone @gmail.com email
+will generally not suffice. This reference may probably help: on billing and accounts support
+for GCP.
+
+A good and simple step by step guide on how to get the Json file credentials can be seen
+in this medium post. These credentials will be used by our client to read/write/edit files
+in Google Sheets.
+
+The general idea is that in GCP we need to create or use an existing project, then enable
+the Sheets and Drive APIs for the selected project and finally create new service-account
+credentials for your script. Download them in Json format and put them somewhere accessible
+to your script.
+
+There are other types of credentials but in this way we can have a server-side script that does
+not require explicit user consent to proceed with auth.
+
+Important note: the service-account credentials will effectively provide us with a google-valid
+email, which will act as the "user" editing/modifying/etc. the data in Google Sheets.
+
+This implies that this service email needs to have sufficient permissions to actually
+edit these files. In general, giving permissions to the needed sheets will suffice.
 """
 # TODO July 29, 2019: extend docstring with examples
 import logging
