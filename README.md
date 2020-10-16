@@ -85,14 +85,11 @@ We appreciate for considering to help out maintaining this project. If you'd lik
 - Javier Mermet
 - Jose Castagnino
 - Juan Pampliega
-- Matías Battocchia
-- Mateo de Monasterio
 - Luis Alberto Hernandez
+- Mateo de Monasterio
+- Matías Battocchia
 - Pablo Lorenzatto
 - Pedro Ferrari
-- petobens
-- risheric
-- rishis07
 - Santiago Hernandez
 
 ## License
