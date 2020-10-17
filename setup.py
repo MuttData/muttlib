@@ -48,6 +48,7 @@ setuptools.setup(
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
+        'teradata': ['teradatasql'],
         'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
         'ipynb-utils': [
             'IPython',
