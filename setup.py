@@ -65,7 +65,7 @@ setuptools.setup(
         'dev': [
             'flake8-bugbear',
             'flake8-docstrings',
-            'bump',
+            'bumpit',
             'sphinx',
             'sphinx_rtd_theme',
             'm2r2',
