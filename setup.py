@@ -48,6 +48,7 @@ setuptools.setup(
         'mysql': ['pymysql'],
         'sqlserver': ['pymssql'],
         'mongo': ['pymongo'],
+        'bigquery': ['google-cloud-bigquery'],
         'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
         'ipynb-utils': [
             'IPython',
