@@ -38,16 +38,30 @@ class RenameByResult:
     ):
         """Setup instance to work as either contextmanager or decorator.
 
-        Either fn or decorate_arg mut be provided
+        Either fn or decorate_arg must be provided.
 
-        Args:
-            fn (str, Path): Directory from which to read files.
-            fn_arg (str): When used as decorator this name of the argument from which the path will
-                          be taken.
-            ready_prefix (str): Preffix to check if the file is ready.
-            done_prefix (str): Preffix to set if call result was successful.
-            fail_prefix (str): Preffix to set if call failed.
+        Parameters
+        ----------
+        fn : str or Path
+            Path to the file to processes.
+        fn_arg : str
+            When used as decorator this name of the argument from which the path will
+            be taken.
+        ok_unless_exception : str
+            Considers any result successful unless an exception happens.
+        ready_prefix : str
+            Preffix to check if the file is ready.
+        done_prefix : str
+            Preffix to set if call result was successful.
+        fail_prefix : str
+            Preffix to set if call failed.
+
+        Returns
+        -------
+        list of Any
+            Returns with the results of applying the function to each file.
         """
+
         if not (fn or fn_arg):
             raise ValueError("Either fn or decorate_arg mut be provided.")
         self.fn = Path(fn)
@@ -61,6 +75,13 @@ class RenameByResult:
 
     @property
     def clean_fn(self):
+        """Return the name of the file without prefix
+
+        Returns
+        -------
+        str
+            Resulting file name.
+        """
         rv = self.fn.name
         if self.fn.name.startswith(self.ready_prefix):
             rv = rv[len(self.ready_prefix) + 1 :]
@@ -71,10 +92,24 @@ class RenameByResult:
 
     @property
     def done_fn(self):
+        """Return the name of the file if the result was successful.
+
+        Returns
+        -------
+        str
+            Resulting file name.
+        """
         return self._prefixed_fn(self.done_prefix)
 
     @property
     def fail_fn(self):
+        """Return the name of the file if the result was failure.
+
+        Returns
+        -------
+        str
+            Resulting file name.
+        """
         return self._prefixed_fn(self.fail_prefix)
 
     def __enter__(self):
@@ -98,17 +133,21 @@ class RenameByResult:
         self.fn.rename(result_fn)
 
     def set_result(self, result):
-        """Set attribute to indicate if task was successfull.
+        """Set attribute to indicate if task was successful.
 
         Note that in some cases and empty result (such as [] or {}) can
         be valid but it will be converted into False and the task for
         this file will be considered as failed. In such cases return
         smth like {None: []} that can be easily discarded down the line.
+
+        Parameters
+        ----------
+        result : Any
+            Value to be evaluated as `bool` to consider the task successful.
         """
         self.result = bool(result)
 
     def __call__(self, func):
-        # import pdb; pdb.set_trace()
         sig = inspect.signature(func)
         if self.fn_arg is None:
             raise ValueError(
@@ -131,7 +170,7 @@ class RenameByResult:
 
 
 class DummyPoolExecutor:
-    """Dummy class to emulate multiprocessing."""
+    """Dummy class to emulate a Pool Executor."""
 
     def __init__(self, *args, **kwargs):
         """Keep args and do nothing."""
@@ -153,7 +192,23 @@ class DummyPoolExecutor:
 
 
 def get_new_files(in_dir, only_ready=False, ready_prefix=READY_PREFIX):
-    """Get files ready for processing."""
+    """Get files in a directory with a given prefix ready to be for processing.
+
+    Parameters
+    ----------
+    in_dir : Path or str
+        Input directory.
+    only_ready : bool
+        The second parameter.
+    ready_prefix : str
+        Prefix to consider the file ready.
+
+    Returns
+    -------
+    list of Path
+        Paths matching the ready prefix.
+    """
+
     filter_prefix = ready_prefix if only_ready else ''
     fns = glob.glob(os.path.join(in_dir, filter_prefix + '*'))
     return fns
@@ -164,6 +219,16 @@ def process_new_files(proc_func, in_dir, **extra_data):
 
     Process files that match ready prefix the given function and rename them
     based on the result.
+
+    Parameters
+    ----------
+    proc_func : callable
+        Function to be called for each ready file in in_dir.
+        The filename and a RenameByResult instance will be passed as arguments.
+    in_dir : str or Path
+        Input directory.
+    extra_data : dict
+        Extra kwargs to pass to the fucntion.
     """
     for fn in get_new_files(in_dir):
         with RenameByResult(fn) as rbr:
@@ -174,18 +239,29 @@ def process_new_files(proc_func, in_dir, **extra_data):
 def process_new_files_parallel(func, paths, workers=None, args=None, kwargs=None):
     """Process files that match ready prefix in parallel.
 
-    Args:
-        fn (callable): Function to apply.
-        in_dir (:obj:`str`, optional): The second parameter. Defaults to None.}
-            Second line of description should be indented.
-        workers (int): Max number of workers to spawn. None default to cpu count.
-                       Passing -1 forces single thread execution (good for debugging).
-        args (list, None): Extra args to  length argument list .
-        kwargs (dict, None): Arbitrary keyword arguments.
-
     Process files that match ready prefix the given function and rename them
     based on the result.
     By default the number of workers is equal to the number of cores.
+
+    Parameters
+    ----------
+    fn : callable
+        Function to apply.
+    in_dir : :obj:`str`, optional
+        The second parameter. Defaults to None.
+        Second line of description should be indented.
+    workers : int
+        Max number of workers to spawn. None default to cpu count.
+        Passing -1 forces single thread execution (good for debugging).
+    args : list or None
+        Extra args to length argument list.
+    kwargs : dict or None
+        Arbitrary kwargs to be passed to the function.
+
+    Returns
+    -------
+    list of Any
+        Returns with the results of applying the function to each file.
 
     TODO:
     - Add selector for pool type (process or thread). Threads would be the
