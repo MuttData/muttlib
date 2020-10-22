@@ -12,12 +12,10 @@ from muttlib.file_processing import (  # merge_result_dfs,; split_res,
     FAIL_PREFIX,
     READY_PREFIX,
     DummyPoolExecutor,
-    IsolatedProcessFailedBadly,
     RenameByResult,
-    isolate_bad_failures,
+    process_new_files,
+    process_new_files_parallel,
 )
-
-# from tests.testing_helpers import items_equal
 
 
 def get_ctxmgr_exception_tester(exc=None):
@@ -133,19 +131,35 @@ def test_rbr_as_decorator_inside_processpool(
         fut.result()
 
 
+def test_rbr_validation_init():
+    with pytest.raises(ValueError):
+        RenameByResult(fn="")
+    with pytest.raises(ValueError):
+        RenameByResult(fn_arg=None)
+
+
+def test_rbr_validation_as_decorator():
+
+    with pytest.raises(ValueError):
+
+        @RenameByResult(fn_arg="this_isnt_fn_arg")
+        def f(fn_arg):
+            pass
+
+        f()
+
+    def f(fn_arg):
+        pass
+
+    rbr = RenameByResult(fn_arg="this_isnt_fn_arg")
+    rbr.fn_arg = None
+    with pytest.raises(ValueError):
+        rbr(f)
+
+
 def f_get_pid():
     """Just return current pid."""
     return os.getpid()
-
-
-def f_pid_to_file(filename, exception=None):
-    """Writes the current process PID to file."""
-    pid = os.getpid()
-    with open(filename, "w") as f:
-        f.write(str(pid))
-    if exception:
-        raise exception
-    return filename, pid
 
 
 def run_poolexecutor_test(pool, is_multi_process=False, n_tasks=5):
@@ -177,44 +191,41 @@ def test_DummyPoolExecutor():
     run_poolexecutor_test(pool, is_multi_process=False)
 
 
-def f_queue_test_helper(q):
-    f = q.get()
-    try:
-        q.put(f())
-    except Exception as ex:
-        q.put(ex)
-        raise ex
+@pytest.mark.parametrize(
+    "func, base_fn, expected_fn, expected_exc, ok_unless_exception",
+    [(f_ok, f"{READY_PREFIX}_test", f"{DONE_PREFIX}_test", None, False),],
+)
+def test_process_new_files(
+    func, base_fn, expected_fn, expected_exc, ok_unless_exception
+):
+    def proc_func(fn, rbr):
+        pass
+
+    with run_rbr_helper_contextmanager(
+        base_fn, expected_fn, expected_exc=expected_exc
+    ) as fn:
+        in_dir = Path(fn).parent
+        process_new_files(proc_func, in_dir)
 
 
-def f_signal(sig):
-    os.kill(os.getpid(), sig)
-
-
-def f_kill9():
-    f_signal(signal.SIGKILL)
-
-
-def f_segfault():
-    f_signal(signal.SIGSEGV)
+def proc_func(fn):
+    Path(fn).rename(str(fn).replace('ready_', 'done_'))
 
 
 @pytest.mark.parametrize(
-    "func, expected_ret, expected_exc",
+    "func, base_fn, expected_fn, expected_exc, ok_unless_exception, workers",
     [
-        (f_kill9, None, IsolatedProcessFailedBadly),
-        (f_segfault, None, IsolatedProcessFailedBadly),
-        (f_ok, 1, None),
-        (f_valueerror, None, ValueError),
+        (f_ok, f"{READY_PREFIX}_test", f"{DONE_PREFIX}_test", None, False, None),
+        (f_ok, f"{READY_PREFIX}_test", f"{DONE_PREFIX}_test", None, False, -1),
     ],
 )
-def test_isolate_bad_failures(func, expected_ret, expected_exc):
-    @isolate_bad_failures
-    def f(a):
-        func()
-        return a
+def test_process_new_files_parallel(
+    func, base_fn, expected_fn, expected_exc, ok_unless_exception, workers
+):
 
-    ret = None
-    with get_ctxmgr_exception_tester(expected_exc):
-        ret = f(1)
-
-    assert expected_ret == ret
+    with run_rbr_helper_contextmanager(
+        base_fn, expected_fn, expected_exc=expected_exc
+    ) as fn:
+        # import pdb; pdb.set_trace()
+        # in_dir = Path(fn).parent
+        process_new_files_parallel(proc_func, [fn], workers=workers)

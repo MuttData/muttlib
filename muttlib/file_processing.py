@@ -1,4 +1,4 @@
-from concurrent.futures import Future, ProcessPoolExecutor
+from concurrent.futures import Future, ProcessPoolExecutor, wait as wait_futures
 import functools
 import glob
 import inspect
@@ -108,6 +108,7 @@ class RenameByResult:
         self.result = bool(result)
 
     def __call__(self, func):
+        # import pdb; pdb.set_trace()
         sig = inspect.signature(func)
         if self.fn_arg is None:
             raise ValueError(
@@ -151,49 +152,68 @@ class DummyPoolExecutor:
         return future
 
 
-class IsolatedProcessFailedBadly(Exception):
-    """Exception raised when the isolated process fails badly."""
+def get_new_files(in_dir, only_ready=False, ready_prefix=READY_PREFIX):
+    """Get files ready for processing."""
+    filter_prefix = ready_prefix if only_ready else ''
+    fns = glob.glob(os.path.join(in_dir, filter_prefix + '*'))
+    return fns
 
 
-def isolate_bad_failures(func, enabled=True):
-    """Decorator to isolate code in a separate process.
+def process_new_files(proc_func, in_dir, **extra_data):
+    """Process files that match ready prefix.
 
-    This decorator provides a safe way to run code that may fail badly without killing the parent.
-    (Fail badly meaning be killed via SIGKILL or suffer segmentation faults).
+    Process files that match ready prefix the given function and rename them
+    based on the result.
+    """
+    for fn in get_new_files(in_dir):
+        with RenameByResult(fn) as rbr:
+            res = proc_func(fn, rbr, **extra_data)
+            rbr.set_result(res)
 
-    If the function runs inside a process based execution pool consider using theads since this
-    decorator when (enabled) already solves the GIL issue.
+
+def process_new_files_parallel(func, paths, workers=None, args=None, kwargs=None):
+    """Process files that match ready prefix in parallel.
 
     Args:
-        func (function): Function to decorate.
-        enabled (bool; True): Enable or disable the isolation.
+        fn (callable): Function to apply.
+        in_dir (:obj:`str`, optional): The second parameter. Defaults to None.}
+            Second line of description should be indented.
+        workers (int): Max number of workers to spawn. None default to cpu count.
+                       Passing -1 forces single thread execution (good for debugging).
+        args (list, None): Extra args to  length argument list .
+        kwargs (dict, None): Arbitrary keyword arguments.
+
+    Process files that match ready prefix the given function and rename them
+    based on the result.
+    By default the number of workers is equal to the number of cores.
+
+    TODO:
+    - Add selector for pool type (process or thread). Threads would be the
+      preffered option if `fn` frees the GIL either by using Numba or
+      Cython.
     """
-    if not enabled:
-        return func
 
-    @functools.wraps(func)
-    def wrapper_decorator(*args, **kwargs):
+    if args is None:
+        args = []
 
-        q = Queue()
+    if kwargs is None:
+        kwargs = {}
 
-        def h(q, func, *args, **kwargs):
-            try:
-                qv = func(*args, **kwargs)
-            except Exception as e:  # pylint:disable=W0703
-                qv = e
-            q.put(qv)
+    if workers is None:
+        workers = os.cpu_count()
 
-        p = Process(target=h, args=(q, func, *args), kwargs=kwargs)
-        p.start()
-        p.join()
-        if q.empty():
-            raise IsolatedProcessFailedBadly(
-                "Process ended badly check for kills and segfaults."
-            )
-        else:
-            res = q.get()
-            if isinstance(res, Exception):
-                raise res
-        return res
+    if workers > 0:
+        pool = ProcessPoolExecutor(max_workers=workers)
+        logger.info(f"Using process {workers} workers for file processing.")
+    else:
+        pool = DummyPoolExecutor()
+        logger.info(f"Using a single worker.")
 
-    return wrapper_decorator
+    futures = []
+    with pool as executor:
+        for p in paths:
+            futures.append(executor.submit(func, p, *args, **kwargs))
+
+    wait_futures(futures)
+    res = [f.result() for f in futures]
+    return res
