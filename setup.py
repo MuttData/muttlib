@@ -88,6 +88,7 @@ setuptools.setup(
             'hypothesis',
             'betamax',
             'betamax-serializers',
+            'freezegun',
         ]
         + pyarrow_dep
         + holidays_dep,
