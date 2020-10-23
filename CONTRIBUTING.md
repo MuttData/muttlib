@@ -116,7 +116,7 @@ nox --session tests
 `muttlib` uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's [docs](https://mutt_data.gitlab.io/muttlib/) that are automatically built from [docstrings](#docstrings) and pushed by the [CI jobs](#cicd-jobs). Check the [style guide](#style-guide) section for notes on docstrings. Pushing all the docs is too cumbersome. You can generate them locally like so:
 
 ```bash
-pip install .[dev]
+pip install .[all]
 cd docs
 make html
 ```
