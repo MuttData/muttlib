@@ -126,14 +126,17 @@ class GSheetsClient:
         create_sheet=True,
         **kwargs,
     ):
-        """
-        Get Spreadsheet object.
+        """Get Spreadsheet object.
 
-        Args:
-            id_or_name (str): Spreadsheet id or name as in Drive.
-            worksheet (str, int): Optional, name or index of Worksheet.
+        Parameters
+        ---------
+        id_or_name : str
+            Spreadsheet id or name as in Drive.
+        worksheet : str or int or Optional
+            Name or index of Worksheet.
 
-        Notes:
+        Notes
+        -----
             A spreadsheet is the whole document, whilst a worksheet is a single
             sheet/tab in google Sheets.
             Spread name needs not already exist, it'll be created by your
@@ -186,17 +189,21 @@ class GSheetsClient:
         """
         Get data from spreadsheet and convert to DF.
 
-        Args:
-            spreadsheet (str): Spreadsheet id or name as in Drive.
-            worksheet (str, int): Optional, name or index of Worksheet.
-            first_cell_loc (str), Optional, Gsheet-like cell location of top-left-most
-                cell in the data. This defines and overrides the `index_col` and
-                `first_row` args.
-            index_col (int, str): Optional, number of col to be set as index.
-            first_row (int): Optional, number of row at which data, including header,
-                starts.
-            num_header_rows (int): Optional, number of rows to be read as header.
-
+        Parameters
+        ----------
+        spreadsheet : str
+            Spreadsheet id or name as in Drive.
+        worksheet : str or int or none
+            Name or index of Worksheet.
+        first_cell_loc : str or None
+            Gsheet-like cell location of top-left-most cell in the data.
+            This defines and overrides the `index_col` and `first_row` args.
+        index_col : int or str or None
+            Number of col to be set as index.
+        first_row : int or None
+            Number of row at which data, including header, starts.
+        num_header_rows : int or None
+            Number of rows to be read as header.
         """
         if index_col is not None and not (
             isinstance(index_col, str) or isinstance(index_col, int)
@@ -252,17 +259,24 @@ class GSheetsClient:
         """
         Convert DF to spreadsheet data.
 
-        Args:
-            df (pd.DataFrame): the data to upload.
-            spreadsheet (str): Spreadsheet id or name as in Drive.
-            index (bool): Upload DF index.
-            header (bool): Upload DF header.
-            first_cell_loc (int): Optional, exact row/column location to start
-                dumping the data.
-            worksheet (str, int): Optional, name or index of Worksheet.
-                number of col to be set as index.
-            preclean_sheet (int): Optional, to clean previous data in worksheet or not.
-            null_fill_value (str): Optional, the value representing nulls in data.
+        Parameters
+        ----------
+        df : pd.DataFrame
+            The data to upload.
+        spreadsheet : str
+            Spreadsheet id or name as in Drive.
+        index : bool
+            Upload DF index.
+        header : bool)
+            Upload DF header.
+        first_cell_loc : int or Nonee
+            Exact row/column location to start dumping the data.
+        worksheet : str or int or None
+            Name or index of Worksheet.
+        preclean_sheet : int or None
+            To clean previous data in worksheet or not.
+        null_fill_value : str or None
+            The value representing nulls in data.
         """
         spread = self.get_spreadsheet(spreadsheet, worksheet)
         spread.df_to_sheet(

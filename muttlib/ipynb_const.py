@@ -32,7 +32,7 @@ PERCENTILES = np.asarray([0.01, 0.03, 0.05, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5])
 PERCENTILES = np.concatenate([PERCENTILES, (1 - PERCENTILES[::-1])[1:]])
 
 # TIME
-# # Because of data loss, we know < 19/03 we'll have bad data
+# START_DATE is reference date.
 START_DATE = pd.to_datetime('2018-10-01', dayfirst=False)
 END_DATE = datetime.now()
 LAST_WEEK_DATE = END_DATE - pd.Timedelta('7d')

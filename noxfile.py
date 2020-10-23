@@ -7,7 +7,7 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[test,forecast,gdrive,postgres,mysql,mysql]")
+    session.install(".[test,forecast,gdrive,postgres,mysql,mysql,bigquery]")
 
     cmd = ["pytest", "-n", "auto"]
 

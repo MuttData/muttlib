@@ -19,6 +19,7 @@ disable =
     logging-fstring-interpolation,
     lost-exception,
     using-constant-test,
+    logging-fstring-interpolation,
 
 [FORMAT]
 
