@@ -11,7 +11,6 @@ import time
 READY_PREFIX = "ready"
 DONE_PREFIX = "done"
 FAIL_PREFIX = "fail"
-
 STAGING_PREFIX = "stg"
 
 logger = logging.getLogger(__name__)
@@ -47,7 +46,7 @@ class RenameByResult:
         fn_arg : str
             When used as decorator this name of the argument from which the path will
             be taken.
-        ok_unless_exception : str
+        ok_unless_exception : bool
             Considers any result successful unless an exception happens.
         ready_prefix : str
             Preffix to check if the file is ready.
@@ -245,11 +244,10 @@ def process_new_files_parallel(func, paths, workers=None, args=None, kwargs=None
 
     Parameters
     ----------
-    fn : callable
+    func : callable
         Function to apply.
-    in_dir : :obj:`str`, optional
-        The second parameter. Defaults to None.
-        Second line of description should be indented.
+    paths : list of str
+        Paths of files that would be processed by func.
     workers : int
         Max number of workers to spawn. None default to cpu count.
         Passing -1 forces single thread execution (good for debugging).
