@@ -68,7 +68,7 @@ TODO:
     is set by using a specific prophet method. Thus, we have that our current
     SKProphet class handles this parameter by setting it manually and knowing
     about this implicitly. If, for some future reason, prophet's API changes to
-    include a variety of other/new parameters that are added _not-on-init_,
+    include a variety of other/new parameters that are added _not-on-init _,
     then it'ld be probably a good idea to keep an internal dictionary of the
     parameter's dtype and prophet's method used to set it, so as to iterate and
     set these in a "programatic" way.
@@ -103,16 +103,21 @@ class SkProphet(Prophet):
         ----------
         sk_date_column: str
             Name of the column to use as date in Prophet.
-        sk_yhat_only= Boolean
+
+        sk_yhat_only: Boolean
             True to return only the yhat from Prophet predictions.
             False to return everything.
+
         sk_extra_regressors: [] or [str] or [dict()]
             List with extra regressors to use. The list can have:
+
             * strings: column names (default prophet arguments for extra
               regressors will be used).
             * dicts: {name: *column_name*, prior_scale: _, standardize: _,
                       mode: _}
-              For more information see Prophet.add_regressors.
+
+            For more information see Prophet.add_regressors.
+
         prophet_kwargs: dict
             Keyword arguments to forward to Prophet.
         """
@@ -363,7 +368,7 @@ class StepsSelectorEstimator(BaseEstimator):
         }
 
     def set_params(self, **params):
-        """Sets the estimator's params to **params."""
+        """Sets the estimator's params to \*\*params."""
         self.estimator_class = Classer.from_obj(params['estimator_class'])
         self.amount_of_steps = params['amount_of_steps']
         self.sort_col = params['sort_col']

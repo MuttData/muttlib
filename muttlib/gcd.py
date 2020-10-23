@@ -92,26 +92,29 @@ class TimeRangeConfiguration(AttributeHelperMixin):
         end_hour=0,
         round_dates=False,
     ):
-        """
-        Initialize.
+        """Initialize.
 
-        Args:
-            end_date (datetime): End of the data to train.
-            forecast_train_window (int): Number of days previous to the `end_date`,
-                used for training.
-            forecast_future_window (int): Positive number of future days for
-                the forecast interval. Note this is anchored from the `end_date` arg.
-            time_granularity (string): String values defining a time frequency
-                such as 'H', 'D', 'M', etc.
+        Parameters
+        ----------
+        end_date : datetime
+            End of the data to train.
+        forecast_train_window : int
+            Number of days previous to the `end_date`, used for training.
+        forecast_future_window : int
+            Positive number of future days for the forecast interval.
+            Note this is anchored from the `end_date` arg.
+        time_granularity : string:
+            String values defining a time frequency such as 'H', 'D', 'M', etc.
 
-        Notes:
-            Resulting calculated dates will be rounded to the nearest **lowest** time,
-            according to the granularity.
+        Notes
+        -----
+        Resulting calculated dates will be rounded to the nearest **lowest** time,
+        according to the granularity.
 
-        Ref:
-            https://pandas.pydata.org/pandas-docs/stable/user_guide/
-            timeseries.html#timeseries-offset-aliases
-
+        Refs
+        ----
+        * https://pandas.pydata.org/pandas-docs/stable/user_guide/
+        * timeseries.html#timeseries-offset-aliases
         """
         sd, ed, fd = create_forecaster_dates(
             end_date, forecast_train_window, forecast_future_window

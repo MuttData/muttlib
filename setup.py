@@ -50,6 +50,7 @@ extra_dependencies = {
         'nox',
     ],
     'test': [
+        'freezegun',
         'nox',
         'pytest',
         'pytest-xdist',
@@ -58,7 +59,6 @@ extra_dependencies = {
         'hypothesis',
         'betamax',
         'betamax-serializers',
-        'freezegun',
     ]
     + pyarrow_dep
     + holidays_dep,
