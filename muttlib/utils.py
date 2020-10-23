@@ -94,19 +94,24 @@ def local_df_cache(
     The decorated function must not have any params that MATCH the ones of this
     decorator.
 
-    Args:
-        use_cache: Whether to consult the cache or not.
-        refresh_cache: Whether to update the cache or not (does not depend on
-                       use_cache).
-        cache_fn: Name of the cache file.
-        cache_dir: Directory where the cached files will be stored.
-        cache_format: Cache file format.
-        cache_hit_msg: Show this when cache hit.
-        cache_miss_msg: Show this when cache miss.
-        cache_put_msg: Show this when cache put.
-
-    Cache format is defined by the ones that df_to_multi and
-    df_to_multi support.
+    Parameters
+    ----------
+    use_cache : bool
+        Whether to consult the cache or not.
+    refresh_cache : bool
+        Whether to update the cache or not (does not depend on use_cache).
+    cache_fn : str
+        Name of the cache file.
+    cache_dir : str
+        Directory where the cached files will be stored.
+    cache_format : str
+        Cache file format as supported by `df_to_multi`.
+    cache_hit_msg : str
+        Show this when cache hit.
+    cache_miss_msg : str
+        Show this when cache miss.
+    cache_put_msg : str
+        Show this when cache put.
 
     IMPORTANT: By default the filename is used as cache key,
     as such it does not consider the actual contents of the DataFrame
@@ -363,8 +368,12 @@ def get_obj_hash(d, length=10):
 def query_yes_no(question, default='no'):
     """Ask a yes/no question via input() and return their answer.
 
-    "question" is a string that is presented to the user.
-    "default" is the presumed answer if the user just hits <Enter>.
+    Parameters
+    ----------
+    question : str
+        Question presented to the user.
+    default : str
+        Default answer if the user just hits <Enter>.
         It must be "yes" (the default), "no" or None (meaning
         an answer is required of the user).
 
@@ -879,29 +888,40 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
 
 
 def dataframe_diff(df_x, df_y, key, right_suffix="_x", left_suffix="_y"):
-    """
-    Compute diff between 2 dataframes taking their columns in common as key.
-    Args:
-        - df_x (DataFrame object): first df
-        - df_y (DataFrame object): second df
-        - key (list of string): list of column names taken as keys
-        - right_suffix (string): suffix for the right side dataframe
-        - left_suffix (string): suffix for the left side dataframe
+    """Compute diff between 2 dataframes taking their columns in common as key.
 
-    Returns a tuple that contains the difference and additional data.
+    Parameters
+    ---------
+    df_x : DataFrame
+        First df.
+    df_y : DataFrame
+        Second df.
+    key : list of str
+        List of column names taken as keys.
+    right_suffix : str
+        Suffix for the right side dataframe.
+    left_suffix : str
+        Suffix for the elft side dataframe.
 
-    First df contains the following columns:
-        - key: list of columns taken as group columns
-        - value_x: different value of x side
-        - value_y: different value of y side
-        - column_name: contains the name of column where the change is produced
+    Returns
+    -------
+    tuple of DataFrame
+        Returns a tuple that contains the difference and additional data.
 
-    Second df contains the following columns:
-        - key: list of columns taken as group columns
-        - other columns in common between df_x and df_y that contain additional changes
-        - sets: contains the name of df where the change is produced (df_x or df_y)
+        First df contains the following columns:
+        * key: list of columns taken as group columns
+        * value_x: different value of x side
+        * value_y: different value of y side
+        * column_name: contains the name of column where the change is produced
 
-    Reference: https://github.com/yogiadi/dataframe_diff/blob/master/dataframe_diff/dataframe_diff.py
+        Second df contains the following columns:
+        * key: list of columns taken as group columns
+        * other columns in common between df_x and df_y that contain additional changes
+        * sets: contains the name of df where the change is produced (df_x or df_y)
+
+    Refs
+    ----
+    * https://github.com/yogiadi/dataframe_diff/blob/master/dataframe_diff/dataframe_diff.py
     """
     set_x = [f"df{right_suffix}" for i in range(len(df_x))]
     df_x['sets'] = set_x

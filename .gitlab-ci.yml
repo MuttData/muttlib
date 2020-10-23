@@ -38,7 +38,7 @@ pages:
   script:
   - pip install .[all]
   - cd docs
-  - make html
+  - make html -e SPHINXOPTS=-W
   - cd ..
   - mv docs/build/html/ public/
   artifacts:
