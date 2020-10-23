@@ -920,7 +920,6 @@ def dataframe_diff(df_x, df_y, key, right_suffix="_x", left_suffix="_y"):
         * sets: contains the name of df where the change is produced (df_x or df_y)
 
     Refs
-    ----
     * https://github.com/yogiadi/dataframe_diff/blob/master/dataframe_diff/dataframe_diff.py
     """
     set_x = [f"df{right_suffix}" for i in range(len(df_x))]
