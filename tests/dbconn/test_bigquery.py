@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from muttlib.dbconn import BigQueryClient
+from muttlib.dbconn import BIGQUERY_DB_TYPE, BigQueryClient
 
 
 @pytest.fixture
