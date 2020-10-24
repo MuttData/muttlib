@@ -1,8 +1,6 @@
 from sqlalchemy.engine.url import make_url
 
 from muttlib.dbconn.base import BaseClient
-
-# import pdb; pdb.set_trace()
 from muttlib.dbconn.bigquery import BIGQUERY_DB_TYPE, BigQueryClient
 from muttlib.dbconn.hive import HIVE_DB_TYPE, HiveClient, HiveDb
 from muttlib.dbconn.ibis import IBIS_DB_TYPE, IbisClient
