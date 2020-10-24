@@ -17,3 +17,4 @@ from muttlib.dbconn.sqlserver import (
     SQLSERVER_DIALECT,
     SqlServerClient,
 )
+from muttlib.dbconn.teradata import TERADATA_DB_TYPE, TeradataClient

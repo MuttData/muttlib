@@ -18,6 +18,7 @@ extra_dependencies = {
     'mysql': ['pymysql'],
     'sqlserver': ['pymssql'],
     'mongo': ['pymongo'],
+    'teradata': ['teradatasql'],
     'bigquery': ['google-cloud-bigquery'],
     'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
     'ipynb-utils': [
