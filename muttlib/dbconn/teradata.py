@@ -24,9 +24,9 @@ class TeradataClient(BaseClient):
         password: str,
         database: str,
         table: str,
-        port=1025,
-        authentication="LDAP",
-    ):  # pylint: disable-msg=too-many-arguments
+        port: int = 1025,
+        authentication: str = "LDAP",
+    ):
         """Wrapper around Teradata Connection.
         host : str
             Host name of Teradata.
@@ -40,7 +40,10 @@ class TeradataClient(BaseClient):
             Table name where data will be inserted.
         port : int
             Teradata's port
+        authentication : str
+            Teradata's authentication type
         """
+
         self.host = host
         self.port = port
         self.username = username
@@ -49,6 +52,12 @@ class TeradataClient(BaseClient):
         self.connection = None
         self.database = database
         self.table = table
+
+    def __setattr__(self, *args):
+        pass
+
+    def __getattr__(self, *args):
+        pass
 
     def _connect(self):
         if self.connection is None:
@@ -108,9 +117,6 @@ class TeradataClient(BaseClient):
         full_table = f'{self.database}.{self.table}'
         logger.info("Going to insert data into %s...", full_table)
 
-        if create_first:
-            self._create_table(self.database, self.table, create_sql)
-
         connection = self._connect()
         with closing(connection.cursor()) as cursor:
             cols_placeholder = ('?, ' * len(df.columns))[:-2]  # remove trailing comma
@@ -119,29 +125,3 @@ class TeradataClient(BaseClient):
             sql_insert = f'INSERT INTO {full_table} ({cols_placeholder})'
             cursor.execute(sql_insert, records)
         logger.info("Inserted %s records into %s", len(df), full_table)
-
-    def _create_table(self, db, table, sql):
-        """Create table if it doesn't exist.
-
-        Parameters
-        ----------
-        db: str
-            Database name where data will be inserted.
-        table: str
-            Table name where data will be inserted.
-        sql: str or path
-            SQL query string or path to file with create statements.
-        """
-        table_exists = self._table_exists(db, table)
-        if not table_exists:
-            self.execute(sql, params={'db': db, 'table': table})
-            logger.info("Created %s.%s", db, table)
-
-    def _table_exists(self, db, table):
-        """Check whether table exists in db."""
-        logger.info("Checking if %s.%s exists...", db, table)
-        sql = f"""
-        SELECT * FROM dbc.tables WHERE databasename = '{db}' AND tablename = '{table}'
-        """  # nosec
-        df = self.to_frame(sql)
-        return False if df.empty else True
