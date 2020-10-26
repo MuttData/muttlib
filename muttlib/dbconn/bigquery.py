@@ -23,8 +23,8 @@ class BigQueryClient(BaseClient):
         db: str,
         table: str,
         project: str,
-        auth: Optional[str],
-        auth_file: Optional[Union[str, Path]],
+        auth: Optional[str] = None,
+        auth_file: Optional[Union[str, Path]] = None,
     ):
         """Wrapper around BigQuery Connection.
 
@@ -48,6 +48,10 @@ class BigQueryClient(BaseClient):
         self.client = None
         self.db = db
         self.table = table
+
+    @property
+    def table_id(self):
+        return f"{self.project}.{self.db}.{self.table}"
 
     def _read_cred(
         self, auth: Optional[str], auth_file: Optional[Union[str, Path]],
@@ -91,7 +95,7 @@ class BigQueryClient(BaseClient):
         if self.client is not None:
             self.client.close()
 
-    def execute(self, sql, params=None):  # pylint: disable=W0613
+    def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
         """Execute sql statement.
 
         sql: str or path
@@ -110,7 +114,7 @@ class BigQueryClient(BaseClient):
         logger.info(f"Executing query:\n{sql}")
         return self.client.query(sql)
 
-    def to_frame(self, sql, params=None):
+    def to_frame(self, *args, **kwargs):
         """Return sql execution as Pandas dataframe.
 
         sql: str or path
@@ -120,7 +124,7 @@ class BigQueryClient(BaseClient):
         client: google.cloud.bigquery.client
             client to the database, if it's already created.
         """
-        return self.execute(sql, params).to_dataframe()
+        return self.execute(*args, **kwargs).to_dataframe()
 
     def insert_from_frame(
         self, df, create_first=True, create_sql=None,
@@ -138,16 +142,15 @@ class BigQueryClient(BaseClient):
         create_sql: str or path
             SQL query string or path to file with create statements.
         """
-        table_id = f"{self.project}.{self.db}.{self.table}"
-        logger.info(f"Going to insert data into {table_id}")
+        logger.info(f"Going to insert data into {self.table_id}")
 
         if create_first:
-            self._create_table(table_id, create_sql)
+            self._create_table(self.table_id, create_sql)
 
-        job = self._connect().load_table_from_dataframe(df, table_id)
+        job = self._connect().load_table_from_dataframe(df, self.table_id)
         job.result()  # Wait for the job to complete.
 
-        logger.info(f"Inserted {len(df)} records into {table_id}")
+        logger.info(f"Inserted {len(df)} records into {self.table_id}")
 
     def _create_table(self, table_id, sql):
         """Create table if it doesn't exist.
