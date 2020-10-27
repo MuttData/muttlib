@@ -29,7 +29,6 @@ extra_dependencies = {
         'pandas',
         'seaborn',
         'tabulate',
-        'textwrap3',
     ],
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
