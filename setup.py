@@ -27,8 +27,7 @@ extra_dependencies = {
         'matplotlib',
         'numpy',
         'pandas',
-        'seaborn',
-        'tabulate',
+        'seaborn'
     ],
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
@@ -55,7 +54,6 @@ extra_dependencies = {
         'pytest-xdist',
         'pytest-cov',
         'pytest-html',
-        'hypothesis',
         'betamax',
         'betamax-serializers',
     ]
