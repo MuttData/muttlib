@@ -28,7 +28,6 @@ extra_dependencies = {
         'numpy',
         'pandas',
         'seaborn',
-        'textwrap3',
     ],
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
