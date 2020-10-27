@@ -10,7 +10,6 @@ from string import Formatter
 
 import pandas as pd
 import numpy as np
-from tabulate import tabulate
 from typing import List
 from jinja2 import Undefined
 from jinjasql import JinjaSql
@@ -48,11 +47,6 @@ def convert_to_snake_case(name: str):
     """Convert string to snake_case."""
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-
-
-def tabulated_df(df: pd.DataFrame):
-    """Pretty print, ready-to-clipboard dataframes in ipynbs."""
-    print(tabulate(df, headers='keys', tablefmt='psql'))
 
 
 def list_to_sql_tuple(l: List) -> str:
