@@ -1,4 +1,4 @@
-"""Helper functions for ipyb visualizations and explorations."""
+"""Helper functions for ipynb visualizations and explorations."""
 import re
 import _string
 import subprocess
@@ -8,7 +8,7 @@ from functools import partial
 from pathlib import Path
 from string import Formatter
 
-import pandas as pd
+import pandas
 import numpy as np
 from typing import List
 from jinja2 import Undefined
@@ -43,10 +43,33 @@ NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
 
 
-def convert_to_snake_case(name: str):
-    """Convert string to snake_case."""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+def convert_to_snake_case(raw_string: str):
+    """Convert string to snake_case.
+
+    Parameters
+    ----------
+    raw_string: str
+        Raw string to convert.
+
+    Returns
+    -------
+        String converted to snake_case: str
+
+    Examples
+    --------
+        >>> convert_to_snake_case('Batman-and-Robin')
+        ... 'batman_and_robin'
+
+        >>> convert_to_snake_case('RobinAndBatman')
+        ... 'robin_and_batman'
+    """
+    raw_string = re.sub(r' +|-|_', r' ', raw_string)
+    raw_string = raw_string.strip()
+    if len(raw_string.split(' ')) > 1:
+        raw_string = ''.join([w.capitalize() for w in raw_string.split(' ')])
+    raw_string = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', raw_string)
+    raw_string = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', raw_string).lower()
+    return raw_string
 
 
 def list_to_sql_tuple(l: List) -> str:
@@ -56,30 +79,94 @@ def list_to_sql_tuple(l: List) -> str:
     return f'({placeholders:s})'
 
 
-def describe_table(table_name: str, db_connector) -> pd.DataFrame:
-    """Describe table sql template."""
+def describe_table(table_name: str, db_connector) -> pandas.DataFrame:
+    """Describe table sql template.
+
+    Parameters
+    ----------
+    table_name: str
+
+    db_connector:
+
+
+    Returns
+    -------
+
+    """
     desc = db_connector.execute(f'describe {table_name}')
     return desc
 
 
 def write_to_clipboard(output) -> None:
-    """Write str to clipboard using UTF-8 encoding."""
+    """Write str to clipboard using UTF-8 encoding.
+
+    Parameters
+    ----------
+    output :
+
+
+    Returns
+    -------
+
+    """
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE
     )
     process.communicate(output.encode('utf-8'))
 
 
-def list_vals_contains_str(in_list, val: str):
-    """Filter string list containing certain string match in lowercase."""
-    return [s for s in in_list if val.lower() in s.lower()]
+def list_vals_contains_str(value_list: list, filter_value: str) -> list:
+    """Filter string list containing certain string match in lowercase.
+
+    Parameters
+    ----------
+    value_list: list
+        List with string values
+
+    filter_value: str
+        String filter_value to filter
+
+    Returns
+    -------
+        List filtered by _filter_value_ : list
+
+    Examples
+    --------
+        >>> filter_value = 'batman'
+        >>> value_list = ['robin', 'batman', 'riddler', 'two_face', 'Batman']
+        >>> assert list_vals_contains_str(value_list, filter_value)
+        ... ['batman', 'Batman']
+
+    """
+    return [s for s in value_list if filter_value.lower() in s.lower()]
 
 
-def ab_split(id_obj, salt, control_group_size: float):
-    """Return True (for test) or False (for control).
+def ab_split(id_obj: str, salt: str, control_group_size: float):
+    """Split object into test or control group based on the ID and salt.
 
-    Logic is based on the ID string and salt.. The control_group_size number
-    is between 0 and 1. This sets how big the control group is in perc.
+    Parameters
+    ----------
+    id_obj : str
+        Object id.
+    salt : str
+        Salt value.
+    control_group_size : float
+        Sets how big the control group is desired in percentage.
+        Must be between 0 and 1.
+
+    Returns
+    -------
+        True (for test) or False (for control) : bool
+
+    Examples
+    --------
+        >>> users = pandas.DataFrame({'id': numpy.arange(100**2)})
+        >>> users['test_group'] = users.id.apply(
+        ...     lambda id: ab_split(id, 'E1F53135E559C253', 0.25))
+        >>> users.test_group.value_counts(normalize=True)
+        True     0.7465
+        False    0.2535
+        Name: test_group, dtype: float64
     """
     test_id = str(id_obj) + '-' + str(salt)
     test_id_digest = md5(test_id.encode('ascii')).hexdigest()  # nosec
@@ -90,7 +177,7 @@ def ab_split(id_obj, salt, control_group_size: float):
 
 
 def col_sample_display(
-    df: pd.DataFrame,
+    df: pandas.DataFrame,
     col: str,
     quantile: float = None,
     top_val: float = None,
@@ -101,6 +188,23 @@ def col_sample_display(
     Also shows 10 unique specific values from the column and has
     modifiers for either showing a histogram for numeric data, or
     showing top_value counts for non-numeric columns.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    col: str :
+
+    quantile: float :
+         (Default value = None)
+    top_val: float :
+         (Default value = None)
+    num_sample: float :
+         (Default value = 300)
+
+    Returns
+    -------
+
     """
     len_col = df[col].shape[0]
     unique_vals = df[col].unique()
@@ -124,7 +228,7 @@ def col_sample_display(
             is_numeric_type = True
         else:  # cols that are string which might get converted
             try:
-                pd.to_numeric(df[col].sample(num_sample))
+                pandas.to_numeric(df[col].sample(num_sample))
                 is_numeric_type = True
             except ValueError:
                 is_numeric_type = False
@@ -138,7 +242,7 @@ def col_sample_display(
 
     if is_numeric_type:
         num_col = df[[col]].copy()  # keep in dataframe form to use the .query method
-        num_col[col] = pd.to_numeric(num_col[col].values, errors='coerce')
+        num_col[col] = pandas.to_numeric(num_col[col].values, errors='coerce')
         query_str = f'{col} == {col}'
         if quantile is not None:
             top_perc = num_col[col].quantile(q=quantile)
@@ -154,7 +258,7 @@ def col_sample_display(
 
 
 def top_categorical_vs_kdeplot(
-    df: pd.DataFrame,
+    df: pandas.DataFrame,
     categorical_col: str,
     numerical_col: str,
     quantile: float = None,
@@ -162,12 +266,32 @@ def top_categorical_vs_kdeplot(
     num_category_levels: int = 2,
     **kde_kwargs,
 ):
-    """
-    Plot multiple kdeplots for each category level.
+    """Plot multiple kdeplots for each category level.
 
     We would like to plot different kdeplots for a numerical column,
     yet generating a different plot for all rows corresponding to
     a specific category level (the possible values of the category set).
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    categorical_col: str :
+
+    numerical_col: str :
+
+    quantile: float :
+         (Default value = None)
+    upper_bound_val: float :
+         (Default value = None)
+    num_category_levels: int :
+         (Default value = 2)
+    **kde_kwargs :
+
+
+    Returns
+    -------
+
     """
     # Get enough colors for our test
     palette = sns.color_palette('husl', num_category_levels)
@@ -214,19 +338,37 @@ def top_categorical_vs_kdeplot(
 
 
 def top_categorical_vs_heatmap(
-    df: pd.DataFrame,
+    df: pandas.DataFrame,
     dependent_col: str,
     ind_col: str,
     quantile: float = None,
     top_val: float = None,
     with_log: bool = False,
 ):
-    """
-    Plot heatmap from two variables which are categorical.
+    """Plot heatmap from two variables which are categorical.
 
     Where one variable is categorical and in the index, and the other
     is categorical but is the dependent variable, as columns.
     We generate a plot for all values/levels of the index.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    dependent_col: str :
+
+    ind_col: str :
+
+    quantile: float :
+         (Default value = None)
+    top_val: float :
+         (Default value = None)
+    with_log: bool :
+         (Default value = False)
+
+    Returns
+    -------
+
     """
     # Default query to filter data
     query_str = f'{dependent_col}== {dependent_col}'
@@ -264,12 +406,25 @@ def top_categorical_vs_heatmap(
     plt.show()
 
 
-def get_one_to_one_relationship(df: pd.DataFrame, factor_id: str, factor_name: str):
+def get_one_to_one_relationship(df: pandas.DataFrame, factor_id: str, factor_name: str):
     """Do for a given factor, which we understand as a categorical column.
 
     Of different category levels. We would like to know if there is a
     1-1 relation between the ids of the values of that factor with the
     column corresponding to the names of those ids.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    factor_id: str :
+
+    factor_name: str :
+
+
+    Returns
+    -------
+
     """
     rv = None
     g = df[[factor_id, factor_name]].groupby(factor_id)
@@ -279,12 +434,28 @@ def get_one_to_one_relationship(df: pd.DataFrame, factor_id: str, factor_name: s
 
 
 def sum_count_aggregation(
-    df: pd.DataFrame,
-    group_cols: List,
-    numerical_cols: List,
-    aggregation_operations: List = ['sum', 'count'],
+    df: pandas.DataFrame,
+    group_cols: list,
+    numerical_cols: list,
+    aggregation_operations: list = ['sum', 'count'],
 ):
-    """Aggregate data by a gruop of columns into sum and count."""
+    """Aggregate data by a gruop of columns into sum and count.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    group_cols: list :
+
+    numerical_cols: list :
+
+    aggregation_operations: list :
+        (Default value = ['sum', 'count']) :
+
+    Returns
+    -------
+
+    """
     # Create aggregating dictionary
     agg_dict = {col: aggregation_operations for col in numerical_cols}
 
@@ -307,7 +478,7 @@ def sum_count_aggregation(
 
 
 def sum_count_time_series(
-    df: pd.DataFrame,
+    df: pandas.DataFrame,
     date_col: str,
     numerical_series: List,
     resample_frequency: str = 'D',
@@ -317,6 +488,29 @@ def sum_count_time_series(
     """Get a time series grouping in a a certain time-window.
 
     Only for a view of the original df.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    date_col: str :
+
+    numerical_series: List :
+
+    resample_frequency: str :
+         (Default value = 'D')
+    aggregation_operations: List :
+         (Default value = ['sum')
+    'count'] :
+
+    filter_query: str :
+         (Default value = None)
+    # to select a subset of the whole database only :
+
+
+    Returns
+    -------
+
     """
     if not filter_query:
         filter_query = f'{date_col} == {date_col}'
@@ -341,7 +535,25 @@ def sum_count_time_series(
 def plot_agg_bar_charts(
     agg_df, agg_ops, group_cols, series_col: str, perc_filter: float = 0.03
 ):
-    """Plot bar charts on an aggregated dataframe."""
+    """Plot bar charts on an aggregated dataframe.
+
+    Parameters
+    ----------
+    agg_df :
+
+    agg_ops :
+
+    group_cols :
+
+    series_col: str :
+
+    perc_filter: float :
+         (Default value = 0.03)
+
+    Returns
+    -------
+
+    """
     perc_cols = ['_'.join([series_col, aggr, 'perc']) for aggr in agg_ops]
 
     fig = plt.figure()
@@ -374,11 +586,35 @@ def plot_category2category_pie_charts(
     autopct='%.1f',
     sample_frac=0.1,
 ):
-    """
-    Plot a single pie-chart per 1st catcol. Display % sizes by 2nd catcol.
+    """Plot a single pie-chart per 1st catcol. Display % sizes by 2nd catcol.
 
     The maximum category levels will filter out both categorical cols' "tail"
     levels.
+
+    Parameters
+    ----------
+    df :
+
+    cat_col :
+
+    cat2_col :
+
+    max_category_levels :
+         (Default value = 4)
+    n_rows :
+         (Default value = 1)
+    figsize :
+         (Default value = (16)
+    6) :
+
+    autopct :
+         (Default value = '%.1f')
+    sample_frac :
+         (Default value = 0.1)
+
+    Returns
+    -------
+
     """
     unique_levels, n_cols = utils.get_ordered_factor_levels(df, cat_col)
     unique2_levels, _ = utils.get_ordered_factor_levels(df, cat2_col)
@@ -446,52 +682,55 @@ def plot_timeseries(
     color=None,
     **kwargs,
 ):
-    """
-    Create a special tseries plot from a df's index and y-col.
+    """Create a special tseries plot from a df's index and y-col.
 
     Various daily and hourly formats for xticks can be used.
     Optionally one can pass a specific column to act as index.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df : pandas.DataFrame
         At least one values column (y) and one date-kind index
         or column with ordinality.
     y_col : str
         The name of the colum with the values.
     fig_size : int tuple, optional
-        The x,y size cm size for the figure.
+        The x,y size cm size for the figure. (Default value = (10)
     non_index_col : str, optional
         By default the plot will use the df index as the ordinal column,
         yet if passed, this arg will be the key of the col to be used as
         index (x-axis).
     title_str : str, optional
-        Used as title for the figure.
+        Used as title for the figure. (Default value = '')
     hourly_formatted : bool, optional
         If major/minor xticks should be formatted for hourly-kind of data.
-        It may clutter the axis when using data with long time-ranges.
+        It may clutter the axis when using data with long time-ranges. (Default value = False)
     fig_ax : tuple, optional
         A matplotlib (fig, ax) tuple that can be used as base for this
-        plot.
+        plot. (Default value = None)
     y_thousands_fmt : numeric, optional
         Format y-axis with thousand-ticks, activated when y-col median is over
-        this numerical threshold.
+        this numerical threshold. (Default value = 1000)
     secondary_y_scale : bool
-        To add another right-scale where to draw the series.
+        To add another right-scale where to draw the series. (Default value = False)
     fmt : [matplotlib] str, optional
-        The series's format string.
+        The series's format string. (Default value = '-o')
     label : [matplotlib] str, optional
-        The series's legend name.
+        The series's legend name. (Default value = None)
     color : [matplotlib] str, optional
-        The series color.
-
-    kwargs: dict, optional
+        The series color. (Default value = None)
+    kwargs : dict, optional
         Additional matplotlib-kind of arguments passed to the matplotlib
         plotting functions.
+    8) :
+
+    **kwargs :
+
 
     Returns
     -------
-    A matplotlib (figure, axis) tuple.
+
+
     """
     fig, ax = fig_ax or plt.subplots()
     indext = df[non_index_col] if non_index_col else df.index
@@ -553,11 +792,38 @@ def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
 
     This outputs a new cat col with reduced levels.
     It will not modify any null values in original category.
+
+    Parameters
+    ----------
+    df :
+
+    categorical_col :
+
+    n_levels :
+         (Default value = 8)
+    default_level :
+         (Default value = 'Other')
+
+    Returns
+    -------
+
     """
     top_levels, _ = utils.get_ordered_factor_levels(df, categorical_col, n_levels - 1)
 
     def sub_categorize(x, top_levels):
-        """Reduce category series levels."""
+        """Reduce category series levels.
+
+        Parameters
+        ----------
+        x :
+
+        top_levels :
+
+
+        Returns
+        -------
+
+        """
         if x in top_levels:
             return x
         else:
@@ -565,7 +831,7 @@ def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
 
     # Modify only non-null values
     rv = df[categorical_col].apply(
-        lambda x: sub_categorize(x, top_levels) if (pd.notnull(x)) else x
+        lambda x: sub_categorize(x, top_levels) if (pandas.notnull(x)) else x
     )
 
     return rv
@@ -575,15 +841,38 @@ def clean_numeric_col(df, numeric_col, **kwds):
     """Clean/cast a numeric.column from object/string type.
 
     This outputs a new series with numeric or null values.
+
+    Parameters
+    ----------
+    df :
+
+    numeric_col :
+
+    **kwds :
+
+
+    Returns
+    -------
+
     """
     # Remove emtpy whitespace
     df[numeric_col] = df[numeric_col].str.replace(' ', '').replace('', np.nan)
     # Convert to float. Defauls pushing errors as nulls
-    return partial(pd.to_numeric, errors='raise')(df[numeric_col], **kwds)
+    return partial(pandas.to_numeric, errors='raise')(df[numeric_col], **kwds)
 
 
-def optimize_numeric_types(df):
-    """Cast numeric columns to more memory friendly types."""
+def optimize_numeric_types(df: pandas.DataFrame):
+    """Cast numeric columns to more memory friendly types.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+
+        df : pandas.DataFrame
+    """
     # Check which types best.
     new_ftypes = {c: 'float32' for c in df.dtypes[df.dtypes == 'float64'].index}
     df = df.astype(new_ftypes, copy=False)
@@ -591,7 +880,16 @@ def optimize_numeric_types(df):
 
 
 def get_string_named_placeholders(s):
-    """Output list of placeholders in a formatted string."""
+    """Output list of placeholders in a formatted string.
+
+    Parameters
+    ----------
+    s : str
+
+    Returns
+    -------
+        list : list
+    """
     rv = [
         _string.formatter_field_name_split(fn)[0]
         for _, fn, _, _ in Formatter().parse(s)
@@ -601,7 +899,19 @@ def get_string_named_placeholders(s):
 
 
 def load_sql_query(sql, query_context_params=None):
-    """Read sql file or string and format with a dictionary of params."""
+    """Read sql file or string and format with a dictionary of params.
+
+    Parameters
+    ----------
+    sql :
+
+    query_context_params :
+         (Default value = None)
+
+    Returns
+    -------
+
+    """
     pat = Path(sql).expanduser()
     if pat.exists():
         with open(pat, 'r') as f:
@@ -628,7 +938,25 @@ def load_sql_query(sql, query_context_params=None):
 def get_sql_stats_aggr(
     input_expression, as_name=None, with_std=False, with_ndv=False, with_count=False
 ):
-    """Get Cloudera-valid battery of statistical aggregations clause."""
+    """Get Cloudera-valid battery of statistical aggregations clause.
+
+    Parameters
+    ----------
+    input_expression :
+
+    as_name :
+         (Default value = None)
+    with_std :
+         (Default value = False)
+    with_ndv :
+         (Default value = False)
+    with_count :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
     rv = f"""
     SUM({input_expression}) as sum_{as_name},
     AVG({input_expression}) as mean_{as_name},
@@ -642,14 +970,29 @@ def get_sql_stats_aggr(
         rv += f'\n NDV({input_expression}) as unique_{as_name},'
     if with_count:
         rv += f'\n COUNT(1) as count_{as_name},'
-
     return rv
 
 
 def get_null_count_aggr(
-    columns_list, as_name='null_count_', no_ending_comma=False, empty_string_null=False
+    columns_list, as_name='null_count', no_ending_comma=False, empty_string_null=False
 ):
-    """Get Cloudera-valid expression counting nulls for columns."""
+    """Get Cloudera-valid expression counting nulls for columns.
+
+    Parameters
+    ----------
+    columns_list :
+
+    as_name :
+         (Default value = 'null_count')
+    no_ending_comma :
+         (Default value = False)
+    empty_string_null :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
     rv = ""
     pre_clause = NULL_COUNT_CLAUSE
     if empty_string_null:
@@ -666,7 +1009,21 @@ def get_null_count_aggr(
 
 
 def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
-    """Filter list by inclusion and exclusion regexes."""
+    """Filter list by inclusion and exclusion regexes.
+
+    Parameters
+    ----------
+    cols :
+
+    include_regexes :
+         (Default value = None)
+    exclude_regexes :
+         (Default value = None)
+
+    Returns
+    -------
+
+    """
     if include_regexes is None:
         ret = cols
     else:
@@ -677,9 +1034,22 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     return sorted(list(ret))
 
 
-def get_matching_columns(cols, regex_list):
-    """Match a list of columns with a nuber of regexes."""
-    ret = []
+def get_matching_columns(cols: list, regex_list: list) -> list:
+    """Match a list of columns with a nuber of regexes.
+
+    Parameters
+    ----------
+    cols : list
+
+    regex_list : list
+
+
+    Returns
+    -------
+
+
+    """
+    ret: List = []
     for regex in regex_list:
         regex = re.compile(regex)
         ret += filter(regex.search, cols)
@@ -689,7 +1059,19 @@ def get_matching_columns(cols, regex_list):
 def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     """Get SQL Server-valid synthax for hashed-sampling an id clause.on
 
-    Takes as imput a given sample_pct in (0, 1)."""
+    Takes as imput a given sample_pct in (0, 1).
+
+    Parameters
+    ----------
+    id_clause :
+
+    sample_pct :
+
+
+    Returns
+    -------
+
+    """
     assert 0 < sample_pct < 1, f'{sample_pct} should be a float  in (0,1)'
     int_pct = int(sample_pct * 100)
     rv = f"""
@@ -698,6 +1080,17 @@ def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     return rv
 
 
-def wrap_list_values_quotes(lis):
-    """Wraps all values in a list with single quotes."""
-    return [f"'{val}'" for val in lis]
+def wrap_list_values_quotes(value_list: list):
+    """Wraps all values in a list with single quotes
+
+    Parameters
+    ----------
+    value_list: list
+        Unquoted value list.
+
+    Returns
+    -------
+        Single-quotes wrapped value list : list
+
+    """
+    return [f"'{value}'" for value in value_list]
