@@ -55,10 +55,10 @@ Start by cloning the repo
 git clone git@gitlab.com:mutt_data/muttlib.git
 ```
 
-Then install all `dev` dependencies:
+Then install all minimal dependencies for development use:
 ```bash
 cd muttlib
-pip install .[dev]
+pip install -e .[dev]
 ```
 
 ### Pre-Commit for Version Control Integration
@@ -96,7 +96,11 @@ To run the default test suite run this:
 ```bash
 pytest
 ```
-Note: Some extra deps might be needed. Those can be added with this `pip install -e .[ipynb-utils]`.
+
+Note that some tests may depend on external dependencies not installed with `[dev]` if you want to run the full set of tests use `[all]` instead, running this:
+```bash
+pip install -e .[all]
+```
 
 Run coverage:
 ```bash
