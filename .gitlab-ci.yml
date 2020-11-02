@@ -36,6 +36,7 @@ bandit:
 pages:
   stage: deploy
   script:
+  - pip install .
   - pip install .[all]
   - cd docs
   - make html -e SPHINXOPTS=-W
