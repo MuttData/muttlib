@@ -34,7 +34,7 @@ extra_dependencies = {
         'flake8-bugbear',
         'flake8-docstrings',
         'bump2version',
-        'sphinx',
+        'sphinx==3.2.1',
         'sphinx_rtd_theme',
         'm2r2',
         'betamax',
@@ -100,6 +100,7 @@ setuptools.setup(
         'scikit-learn',
         'scipy',
         'sqlalchemy',
+        'numpy',
     ],
     extras_require=extra_dependencies,
 )
