@@ -150,8 +150,6 @@ def local_df_cache(
 
             if callable(cache_fn):
                 cache_fn = cache_fn(cache_opts, *args, **kwargs)
-            else:
-                cache_fn = cache_fn
 
             base_fn = f"{cache_fn}.{cache_format}"
             cache_fn = os.path.join(cache_dir, base_fn)

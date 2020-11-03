@@ -30,18 +30,15 @@ repos:
       language: system
       types: [python]
       exclude: docs/*
-    #-   repo: https://github.com/pre-commit/mirrors-pylint
-    #    rev: v2.4.4
-    #    hooks:
-    #    - id: pylint
-    #      name: pylint
-    #      entry: pylint
-    # - id: pylint
-    #   name: pylint
-    #   entry: pylint
-    #   language: system
-    #   types: [python]
-    #   exclude: docs/*
+-   repo: https://github.com/pre-commit/mirrors-pylint
+    rev: v2.4.4
+    hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      exclude: (docs/*|muttlib/(?!utils).*/*|tests/*)
 -   repo: local
     hooks:
     - id: pytest
