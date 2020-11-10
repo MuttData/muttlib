@@ -15,7 +15,7 @@ def tests(session):
 @nox.session(reuse_venv=True)
 def cop(session):
     """Run all pre-commit hooks."""
-    session.install(".[dev,test]")
+    session.install(".[all]")
     session.run("pre-commit", "install", "-c", ".pre-commit-config-nox.yaml")
     session.run(
         "pre-commit",

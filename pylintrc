@@ -12,8 +12,6 @@ disable =
     fixme,
     logging-format-interpolation,
     logging-fstring-interpolation,
-    lost-exception,
-    using-constant-test,
     # Errors:
     no-member
 
