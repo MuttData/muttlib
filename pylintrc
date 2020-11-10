@@ -12,8 +12,6 @@ disable =
     fixme,
     logging-format-interpolation,
     logging-fstring-interpolation,
-    # Errors:
-    no-member
 
 [FORMAT]
 
