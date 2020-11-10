@@ -28,7 +28,16 @@ Current modules:
 - [Credits](#contributing)
 - [License](#license)
 
-## Installation
+### From Gitlab package registry
+```bash
+pip install muttlib --extra-index-url https://gitlab.com/api/v4/projects/10542840/packages/pypi/simple
+```
+
+Check below for available extras.
+
+### From repo
+
+Base lib:
 
 To install base lib:
 ```bash
