@@ -72,5 +72,5 @@ deploy:
     - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
     - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
     - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - python -m twine upload --repository-url ${PYPI_REPO} dist/*
+    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
 
