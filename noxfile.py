@@ -15,9 +15,16 @@ def tests(session):
 @nox.session(reuse_venv=True)
 def cop(session):
     """Run all pre-commit hooks."""
-    session.install(".[dev,test]")
-    session.run("pre-commit", "install")
-    session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
+    session.install(".[all]")
+    session.run("pre-commit", "install", "-c", ".pre-commit-config-nox.yaml")
+    session.run(
+        "pre-commit",
+        "run",
+        "--show-diff-on-failure",
+        "--all-files",
+        "-c",
+        ".pre-commit-config-nox.yaml",
+    )
 
 
 @nox.session(reuse_venv=True)
