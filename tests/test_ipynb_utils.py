@@ -12,7 +12,7 @@ from muttlib.utils import numpy_temp_seed
 from unittest import mock
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def sample_df():
     base_date = numpy.datetime64('2020-01-01')
     n_rows = 100 ** 2
@@ -22,14 +22,15 @@ def sample_df():
                 'id': numpy.arange(n_rows),
                 'batman': numpy.random.randint(1, 5, n_rows),
                 'robin': numpy.random.randint(1, 1000, n_rows),
-                'riddler': numpy.random.randint(1, 2, n_rows),
             }
         )
+        df['str_robin'] = df.robin.astype(str)
+        df['riddler'] = df.batman.replace([1, 2, 3, 4], ['a', 'b', 'c', 'd'])
         df['two_face'] = df.batman.apply(lambda x: base_date + numpy.random.choice(x))
     return df
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def sample_timeseries_df():
     return pandas.DataFrame(
         {
@@ -68,7 +69,10 @@ def test_list_to_sql_tuple():
 
 
 def test_describe_table():
-    assert True
+    db_connector_mock = mock.Mock()
+    db_connector_mock.configure_mock(**{'execute.return_value': 'OK'})
+    utils.describe_table('super_heroes', db_connector_mock)
+    db_connector_mock.execute.assert_called_once_with('describe super_heroes')
 
 
 def test_write_to_clipboard():
@@ -104,19 +108,29 @@ def test_ab_split(sample_df):
 
 
 def test_col_sample_display(sample_df):
-    assert True
-
-
-def test_top_categorical_vs_kdeplot():
-    assert True
-
-
-def test_top_categorical_vs_heatmap():
-    assert True
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(sample_df, 'batman', top_val=0.35)
+        assert 'Col is batman' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+        assert '4 [3 4 1 2]' in mock_stdout.getvalue()
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(sample_df, 'batman', quantile=0.25)
+        assert 'Col is batman' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+        assert '4 [3 4 1 2]' in mock_stdout.getvalue()
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(
+            df=sample_df, col='two_face', top_val=0.35, num_sample=15000
+        )
+        assert 'Col is two_face' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
 
 
 def test_get_one_to_one_relationship(sample_df):
-    assert True
+    df = utils.get_one_to_one_relationship(
+        sample_df, factor_id='batman', factor_name='riddler'
+    )
+    assert df.riddler.unique()[0] == 1
 
 
 def test_sum_count_aggregation(sample_df):
@@ -133,18 +147,6 @@ def test_sum_count_aggregation(sample_df):
 def test_sum_count_time_series(sample_df, sample_timeseries_df):
     df = utils.sum_count_time_series(sample_df, 'two_face', ['batman', 'robin'])
     assert df.equals(sample_timeseries_df)
-
-
-def test_plot_agg_bar_charts():
-    assert True
-
-
-def test_plot_category2category_pie_charts():
-    assert True
-
-
-def test_plot_timeseries():
-    assert True
 
 
 def test_category_reductor(sample_df):
@@ -209,20 +211,14 @@ def test_get_sql_stats_aggr():
 
 
 def test_get_null_count_aggr():
-    value_list = ['robin', 'batman', 'riddler', 'two_face', 'Batman']
+    value_list = ['robin', 'batman']
     assert utils.get_null_count_aggr(
         value_list, no_ending_comma=True, empty_string_null=True
     ) == (
         "SUM( CASE WHEN robin = ''\n    "
         "THEN 1 ELSE 0 END ) AS null_countrobin,\n"
         "SUM( CASE WHEN batman = ''\n    "
-        "THEN 1 ELSE 0 END ) AS null_countbatman,\n"
-        "SUM( CASE WHEN riddler = ''\n    "
-        "THEN 1 ELSE 0 END ) AS null_countriddler,\n"
-        "SUM( CASE WHEN two_face = ''\n    "
-        "THEN 1 ELSE 0 END ) AS null_counttwo_face,\n"
-        "SUM( CASE WHEN Batman = ''\n    "
-        "THEN 1 ELSE 0 END ) AS null_countBatman"
+        "THEN 1 ELSE 0 END ) AS null_countbatman"
     )
 
 
@@ -269,7 +265,9 @@ def test_get_matching_columns():
 
 def test_get_sqlserver_hashed_sample_clause():
     assert utils.get_sqlserver_hashed_sample_clause(123456, 0.5) == (
-        "\n    AND ABS(CAST(HASHBYTES('SHA1',\n        123456) AS BIGINT)) % 100 <= 50"
+        "\n    "
+        "AND ABS(CAST(HASHBYTES('SHA1',\n        "
+        "123456) AS BIGINT)) % 100 <= 50"
     )
 
 

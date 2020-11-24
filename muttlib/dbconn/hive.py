@@ -19,34 +19,81 @@ HIVE_DB_TYPE = 'hive'
 
 
 class HiveClient:
-    """Create Hive DB Client."""
+    """Wrapper around PyHive's hive module.
+
+    Parameters
+    ----------
+    host: str
+        Host url.
+    port: int, Optional
+        Port to connect to the HiveServer. Defaults to 10000.
+    auth: str, Optional
+        Authentication protocol or layer. Defaults to "NOSASL".
+    database: str, Optional
+        Name of database to connect to.
+    username: str, Optional
+        Hive username.
+    password: str, Optional
+        Use with `auth="LDAP"` or `auth="CUSTOM"` only.
+
+    Notes
+    ----------
+    Refer to PyHive's docstrings for better context on parameters' descriptions:
+    https://github.com/dropbox/PyHive/blob/2c2446bf905ea321aac9dcdd3fa033909ff0b0b5/pyhive/hive.py#L105
+
+    """
 
     def __init__(
-        self, host, port=10_000, auth='NOSASL', database='default', username=None
+        self,
+        host,
+        port=10_000,
+        auth='NOSASL',
+        database='default',
+        username=None,
+        password=None,
     ):
         self.host = host
         self.port = port
         self.auth = auth
         self.database = database
         self.username = username
+        self.password = password
 
     def _connect(self):
+        """Instance a connection to the database.
+
+        Returns
+        ----------
+        pyhive.hive.Connection
+        """
         return hive.connect(
             host=self.host,
             port=self.port,
             auth=self.auth,
             database=self.database,
             username=self.username,
+            password=self.password,
         )
 
     def _cursor(self):
+        """Instance a cursor from HiveServer connection.
+
+        Returns
+        ----------
+        pyhive.hive.Cursor
+        """
         conn = self._connect()
         return conn.cursor()
 
     def execute(
         self, sql, params=None, show_progress=True, dry_run=False, async_=False
     ):
-        """Execute sql statement."""
+        """Execute sql statement.
+
+        Returns
+        ----------
+        pyhive.hive.Cursor or None
+        """
         sql = utils.path_or_string(sql)
         if params is not None:
             try:
@@ -99,7 +146,13 @@ class HiveClient:
         return progress
 
     def to_frame(self, *args, **kwargs):
-        """Execute sql statement and return results as a Pandas dataframe."""
+        """
+        Execute sql statement and return results as a Pandas dataframe.
+
+        Returns
+        ----------
+        pd.DataFrame
+        """
         with closing(self.execute(*args, **kwargs)) as cursor:
             if not cursor:
                 return

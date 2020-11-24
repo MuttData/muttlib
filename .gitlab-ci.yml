@@ -3,7 +3,13 @@ image: python:3.7
 before_script:
   - apt-get update
 
+stages:
+  - validate
+  - test_stage
+  - deploy_stage
+
 test:
+  stage: test_stage
   script:
   - pip install .
   - python -c 'from muttlib import dbconn, utils'
@@ -22,19 +28,21 @@ test:
 
 
 lint:
+  stage: test_stage
   script:
     - pip install nox
     - nox --sessions cop
 
 
 bandit:
+  stage: test_stage
   script:
     - pip install nox
     - nox --sessions bandit
 
 
 pages:
-  stage: deploy
+  stage: deploy_stage
   script:
   - pip install .
   - pip install .[all]
@@ -47,3 +55,40 @@ pages:
     - public
   only:
   - master
+
+
+# Deploy from master to package registry
+# If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
+# package registry, thus using the required variables to do so
+# The package will be uploaded to PYPI_URL, which can be overrided
+# not to upload to gitlab's PYPI
+deploy:
+  stage: deploy_stage
+  only:
+    refs:
+      - master
+  script:
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
+    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
+    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
+    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
+
+
+check_version:
+  stage: validate
+  script:
+    - pip install packaging
+    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- muttlib/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
+    - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+    - exit_status=$?
+    - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
+    - exit $exit_status
+  only:
+    refs:
+      - merge_requests
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
