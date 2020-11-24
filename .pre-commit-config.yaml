@@ -1,44 +1,4 @@
 repos:
--   repo: https://github.com/psf/black
-    rev: 19.10b0
-    hooks:
-    - id: black
-      name: black
-      entry: black
-      language: system
-      types: [python]
-      args: [--skip-string-normalization]
-      exclude: docs/*
--   repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.5.0
-    hooks:
-    - id: trailing-whitespace
-    - id: requirements-txt-fixer
-      #- id: flake8
-      #  name: flake8
-      #  entry: flake8
-      #  language: system
-      #  types: [python]
-      #  args: [--max-line-length=88]
-      #  exclude: docs/*
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.770
-    hooks:
-    - id: mypy
-      name: mypy
-      entry: mypy
-      language: system
-      types: [python]
-      exclude: docs/*
--   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.4.4
-    hooks:
-    - id: pylint
-      name: pylint
-      entry: pylint
-      language: system
-      types: [python]
-      exclude: (docs/*|muttlib/(?!utils).*/*|tests/*)
 -   repo: local
     hooks:
     - id: pytest
@@ -53,7 +13,7 @@ repos:
       language: system
       entry: nox --session cop
       types: [python]
-      stages: [push]
+      stages: [commit,push]
       pass_filenames: false
     - id: bandit
       name: bandit
