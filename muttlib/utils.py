@@ -14,7 +14,7 @@ from copy import deepcopy
 from datetime import datetime, date
 from functools import wraps
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Dict
 
 import jinja2
 import numpy as np
@@ -55,7 +55,7 @@ def is_readable_path(str_or_path):
     try:
         f = open(str_or_path)
         f.close()
-    except Exception:
+    except (OSError, ValueError):
         return False
 
     return True
@@ -532,7 +532,7 @@ def template(path_or_str, **kwargs):
     return environment.from_string(path_or_string(path_or_str))
 
 
-def render_jinja_template(path_or_str, jparams={}):
+def render_jinja_template(path_or_str, jparams: Dict = None):
     """
     Render a query via jinja, from a str or a sql-like file.
 
@@ -554,6 +554,8 @@ def render_jinja_template(path_or_str, jparams={}):
     # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
     #  share a method that checks is_valid_path()
     # Standarize to pathlib object, supports str objects
+    if jparams is None:
+        jparams = dict()
 
     pat = Path(path_or_str).expanduser().resolve().as_posix()
     if is_readable_path(pat):
@@ -655,7 +657,11 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 
 def df_optimize_float_types(
-    df, type_mappings={"float64": "float16", "float32": "float16"}
+    df,
+    type_mappings={
+        "float64": "float16",
+        "float32": "float16",
+    },  # pylint: disable=dangerous-default-value
 ):
     """Cast dataframe columns to more memory friendly types.
 
@@ -680,10 +686,12 @@ def df_replace_empty_strs_null(df):
     return df
 
 
-def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
+def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
     """Drop null columns in df, for null share over a certain threshold."""
     # Note: Pandas treats string columns as `object` data types.
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    if protected_cols is None:
+        protected_cols = list()
     logger.debug(
         f'Dropping columns with null ratio greater than {max_null_prop:.2%}...'
     )
@@ -705,9 +713,11 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     return df
 
 
-def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
+def df_drop_std(df, min_std_dev=1.5e-2, protected_cols: List[str] = None):
     """Drop low variance cols."""
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    if protected_cols is None:
+        protected_cols = list()
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
@@ -721,11 +731,21 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
 
 
 def df_drop_corr(
-    df, target_col, max_corr=0.3, protected_cols=[], frac=0.2, random_state=None
+    df,
+    target_col,
+    max_corr=0.3,
+    protected_cols: List[str] = None,
+    frac=0.2,
+    random_state=None,
 ):
     """Drop high correlated to-target cols."""
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
-    assert target_col in df.columns
+
+    if target_col not in df.columns:
+        raise ValueError(f"target col ({target_col}) is not in dataframe columns")
+
+    if protected_cols is None:
+        protected_cols = list()
 
     corr_df = df.sample(frac=frac, random_state=random_state).corr()
     high_corr_cols = abs(corr_df[target_col]) > max_corr
@@ -739,9 +759,12 @@ def df_drop_corr(
     return df
 
 
-def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
+def df_get_typed_cols(df, col_type='cat', protected_cols: List[str] = None):
     """Get typed columns, excluding protected cols if passed."""
     assert col_type in ('cat', 'num', 'date', 'bool', 'timedelta')
+    if protected_cols is None:
+        protected_cols = list()
+
     if col_type == 'cat':  # Work in cases, else dont define include var
         include = ['object', 'category']
     elif col_type == 'num':
@@ -757,9 +780,17 @@ def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
 
 
 def df_encode_categorical_dummies(
-    df, cat_cols=[], skip_cols=[], top=25, other_val='OTHER'
+    df,
+    cat_cols: List[str] = None,
+    skip_cols: List[str] = None,
+    top=25,
+    other_val='OTHER',
 ):
     """Encode categorical columns into dummies."""
+    if skip_cols is None:
+        skip_cols = list()
+    if cat_cols is None:
+        cat_cols = list()
     pre_dummy_cols = df.columns.tolist()
     cat_cols = df_get_typed_cols(df, col_type='cat') if cat_cols == [] else cat_cols
     cat_cols = [c for c in cat_cols if c not in skip_cols]
