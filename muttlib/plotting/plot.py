@@ -1,6 +1,7 @@
 """Auxiliary functions for plotting"""
 from typing import Dict, Optional, Tuple
 from datetime import timedelta
+from copy import deepcopy
 
 import pandas as pd
 import numpy as np
