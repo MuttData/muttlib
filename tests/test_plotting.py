@@ -1,4 +1,9 @@
 from copy import deepcopy
+
+import numpy as np
+import pandas as pd
+import pytest
+
 from muttlib.plotting import plot
 from muttlib.plotting.constants import (
     DAILY_TIME_GRANULARITY,
@@ -7,10 +12,6 @@ from muttlib.plotting.constants import (
     Y_COL,
     YHAT_COL,
 )
-
-import numpy as np
-import pandas as pd
-import pytest
 
 
 @pytest.fixture
@@ -65,51 +66,67 @@ def sample_data_df():
     )
 
 
-def test_create_forecast_figure(sample_data_df):
+def perturb_ts(df, col, scale=1):
+    """Add noise to ts
+    """
+    mean = df[col].mean() * scale
+    df[col] += np.random.default_rng(42).uniform(
+        low=-mean / 2, high=mean / 2, size=len(df)
+    )
+    return df
 
+
+def test_create_forecast_figure(sample_data_df):
     time_series = sample_data_df.iloc[:30]
     predictions = sample_data_df.iloc[30:]
     predictions = predictions.rename(columns={Y_COL: YHAT_COL})
-
     full_series = pd.concat([predictions, time_series])
     full_series[DS_COL] = pd.to_datetime(full_series[DS_COL])
-    start_date = min(pd.to_datetime(time_series[DS_COL]))
     end_date = pd.to_datetime(predictions[DS_COL]).min()
     forecast_window = (pd.to_datetime(predictions[DS_COL]).max() - end_date).days
-
-    plot_config = deepcopy(PLOT_CONFIG)
-
     fig = plot.create_forecast_figure(
         full_series,
         'test',
         end_date,
         forecast_window,
         time_granularity=DAILY_TIME_GRANULARITY,
-        plot_config=plot_config,
+        plot_config=deepcopy(PLOT_CONFIG),
     )
 
 
-"""def run_standard_ForecastPlotterTask(tmp_path, time_series, prediction):
-    plot_config = deepcopy(PLOT_CONFIG)
-    plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
-    fpt = ForecastPlotterTask(
-        path=tmp_path,
-        metric_name='test',
-        time_granularity=MONTHLY_TIME_GRANULARITY,
-        plot_config=plot_config,
+def test_create_forecast_figure_overlapping(sample_data_df):
+    time_series = sample_data_df
+    predictions = sample_data_df.iloc[30:]
+    predictions = predictions.rename(columns={Y_COL: YHAT_COL})
+    predictions = perturb_ts(predictions, YHAT_COL, scale=0.1)
+    full_series = pd.concat([predictions, time_series])
+    full_series[DS_COL] = pd.to_datetime(full_series[DS_COL])
+    end_date = pd.to_datetime(predictions[DS_COL]).min()
+    forecast_window = (pd.to_datetime(predictions[DS_COL]).max() - end_date).days
+    fig = plot.create_forecast_figure(
+        full_series,
+        'test',
+        end_date,
+        forecast_window,
+        time_granularity=DAILY_TIME_GRANULARITY,
+        plot_config=deepcopy(PLOT_CONFIG),
     )
-    fpt.run(time_series, prediction)
-    return fpt
 
 
-@pytest.mark.mpl_image_compare
-def test_ForecastPlotterTask_simple(
-    tmp_path, sample_data_df, set_time_locale
-):  # pylint: disable=redefined-outer-name,unused-argument
-    time_series = sample_data_df.iloc[:30]
-    prediction = sample_data_df.iloc[30:]
-    prediction = prediction.rename(columns={Y_COL: YHAT_COL})
-    fpt = run_standard_ForecastPlotterTask(tmp_path, time_series, prediction)
-    assert_out_paths_equal(['0_forecast_2013020100_2015080100_.png'], tmp_path)
-    return fpt.fig
-"""
+def test_ForecastPlotterTask_overlapping(sample_data_df):
+    time_series = sample_data_df
+    predictions = sample_data_df.iloc[30:]
+    predictions = predictions.rename(columns={Y_COL: YHAT_COL})
+    predictions = perturb_ts(predictions, YHAT_COL, scale=0.1)
+    full_series = pd.concat([predictions, time_series])
+    full_series[DS_COL] = pd.to_datetime(full_series[DS_COL])
+    end_date = pd.to_datetime(predictions[DS_COL]).min()
+    forecast_window = (pd.to_datetime(predictions[DS_COL]).max() - end_date).days
+    fig = plot.create_forecast_figure(
+        full_series,
+        'test',
+        end_date,
+        forecast_window,
+        time_granularity=DAILY_TIME_GRANULARITY,
+        plot_config=deepcopy(PLOT_CONFIG),
+    )
