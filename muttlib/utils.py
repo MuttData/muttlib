@@ -657,13 +657,14 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 
 def df_optimize_float_types(
-    df,
-    type_mappings={
-        "float64": "float16",
-        "float32": "float16",
-    },  # pylint: disable=dangerous-default-value
+    df, type_mappings: Dict[str, str] = None,
 ):
     """Cast dataframe columns to more memory friendly types.
+
+    Parameters
+    ----------
+        df: DataFrame to be modified.
+        type_mappings: Mapping of types. Defaults to {"float64":"float16", "float32":"float16"}
 
     WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
     Eg:
@@ -671,6 +672,12 @@ def df_optimize_float_types(
     >>> np.float64(n), np.float32(n)
     (3.402823669209385e+38, inf)
     """
+    if type_mappings is None:
+        type_mappings = {
+            "float64": "float16",
+            "float32": "float16",
+        }
+
     new_dtypes = {c: type_mappings.get(t.name, t) for c, t in df.dtypes.iteritems()}
     df = df.astype(new_dtypes, copy=False)
     return df
