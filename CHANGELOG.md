@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.27.7] - 2020-12-01
 
-Closes #101 - Add tests to `ipynb_utils.py`:
+Closes #101 - pylint `file_processing.py`:
 
 ## [0.27.0] - 2020-11-19
 
