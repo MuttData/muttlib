@@ -3,7 +3,6 @@ import functools
 import glob
 import inspect
 import logging
-from multiprocessing import Process, Queue, cpu_count
 import os
 from pathlib import Path
 import time
@@ -281,7 +280,7 @@ def process_new_files_parallel(func, paths, workers=None, args=None, kwargs=None
         logger.info(f"Using process {workers} workers for file processing.")
     else:
         pool = DummyPoolExecutor()
-        logger.info(f"Using a single worker.")
+        logger.info("Using a single worker.")
 
     futures = []
     with pool as executor:
