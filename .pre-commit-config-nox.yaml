@@ -31,5 +31,5 @@ repos:
       entry: pylint
       language: system
       types: [python]
-      exclude: (docs/*|muttlib/(?!(file_processing|utils|ipynb_const|gcd|gsheetsconn|gdrive)).*/*|tests/*)
+      exclude: (docs/*|muttlib/(?!(file_processing|utils|ipynb_const|ipynb_utils|gcd|gsheetsconn|gdrive)).*/*|tests/*)
 
