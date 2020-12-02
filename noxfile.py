@@ -6,7 +6,7 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".[all]")
-    cmd = ["pytest", "-n", "auto"]
+    cmd = ["pytest", "-n", "auto", "--mpl"]
     if session.posargs:
         cmd.extend(session.posargs)
     session.run(*cmd)

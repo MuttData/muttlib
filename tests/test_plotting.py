@@ -7,6 +7,7 @@ import pytest
 from muttlib.plotting import plot
 from muttlib.plotting.constants import (
     DAILY_TIME_GRANULARITY,
+    HOURLY_TIME_GRANULARITY,
     PLOT_CONFIG,
     DS_COL,
     Y_COL,
@@ -66,6 +67,64 @@ def sample_data_df():
     )
 
 
+@pytest.fixture
+def sample_data_yhat_df():
+    # Taken from https://raw.githubusercontent.com/facebook/prophet/master/examples/example_retail_sales.csv
+    return pd.DataFrame.from_records(
+        np.array(
+            [
+                ('2013-02-01T00:00:00.000000000', 0.138, 0.018, 0.38, 1),
+                ('2013-03-01T00:00:00.000000000', 0.138, 0.018, 0.38, 1),
+                ('2013-04-01T00:00:00.000000000', 0.181, 0.011, 0.81, 1),
+                ('2013-05-01T00:00:00.000000000', 0.185, 0.015, 0.85, 1),
+                ('2013-06-01T00:00:00.000000000', 0.101, 0.011, 0.01, 1),
+                ('2013-07-01T00:00:00.000000000', 0.157, 0.017, 0.57, 1),
+                ('2013-08-01T00:00:00.000000000', 0.150, 0.010, 0.50, 1),
+                ('2013-09-01T00:00:00.000000000', 0.199, 0.019, 0.99, 1),
+                ('2013-10-01T00:00:00.000000000', 0.140, 0.010, 0.40, 1),
+                ('2013-11-01T00:00:00.000000000', 0.111, 0.011, 0.11, 1),
+                ('2013-12-01T00:00:00.000000000', 0.105, 0.015, 0.05, 1),
+                ('2014-01-01T00:00:00.000000000', 0.199, 0.019, 0.99, 1),
+                ('2014-02-01T00:00:00.000000000', 0.115, 0.015, 0.15, 1),
+                ('2014-03-01T00:00:00.000000000', 0.106, 0.016, 0.06, 1),
+                ('2014-04-01T00:00:00.000000000', 0.115, 0.015, 0.15, 1),
+                ('2014-05-01T00:00:00.000000000', 0.122, 0.012, 0.22, 1),
+                ('2014-06-01T00:00:00.000000000', 0.152, 0.012, 0.52, 1),
+                ('2014-07-01T00:00:00.000000000', 0.105, 0.015, 0.05, 1),
+                ('2014-08-01T00:00:00.000000000', 0.113, 0.013, 0.13, 1),
+                ('2014-09-01T00:00:00.000000000', 0.171, 0.011, 0.71, 1),
+                ('2014-10-01T00:00:00.000000000', 0.102, 0.012, 0.02, 1),
+                ('2014-11-01T00:00:00.000000000', 0.110, 0.010, 0.10, 1),
+                ('2014-12-01T00:00:00.000000000', 0.132, 0.012, 0.32, 1),
+                ('2015-01-01T00:00:00.000000000', 0.152, 0.012, 0.52, 1),
+                ('2015-02-01T00:00:00.000000000', 0.135, 0.015, 0.35, 1),
+                ('2015-03-01T00:00:00.000000000', 0.110, 0.010, 0.10, 1),
+                ('2015-04-01T00:00:00.000000000', 0.117, 0.017, 0.17, 1),
+                ('2015-05-01T00:00:00.000000000', 0.115, 0.015, 0.15, 1),
+                ('2015-06-01T00:00:00.000000000', 0.129, 0.019, 0.29, 1),
+                ('2015-07-01T00:00:00.000000000', 0.110, 0.010, 0.10, 1),
+                ('2015-08-01T00:00:00.000000000', 0.140, 0.010, 0.40, 1),
+                ('2015-09-01T00:00:00.000000000', 0.117, 0.017, 0.17, 1),
+                ('2015-10-01T00:00:00.000000000', 0.159, 0.019, 0.59, 1),
+                ('2015-11-01T00:00:00.000000000', 0.107, 0.017, 0.07, 1),
+                ('2015-12-01T00:00:00.000000000', 0.153, 0.013, 0.53, 1),
+                ('2016-01-01T00:00:00.000000000', 0.128, 0.018, 0.28, 1),
+                ('2016-02-01T00:00:00.000000000', 0.154, 0.014, 0.54, 1),
+                ('2016-03-01T00:00:00.000000000', 0.193, 0.013, 0.93, 1),
+                ('2016-04-01T00:00:00.000000000', 0.135, 0.015, 0.35, 1),
+                ('2016-05-01T00:00:00.000000000', 0.121, 0.011, 0.21, 1),
+            ],
+            dtype=[
+                ('ds', '<M8[ns]'),
+                ('y', '<i8'),
+                ('yhat_lower', '<i8'),
+                ('yhat_upper', '<i8'),
+                ('sign', '<i8'),
+            ],
+        ),
+    )
+
+
 def perturb_ts(df, col, scale=1):
     """Add noise to ts
     """
@@ -76,6 +135,7 @@ def perturb_ts(df, col, scale=1):
     return df
 
 
+@pytest.mark.mpl_image_compare
 def test_create_forecast_figure(sample_data_df):
     time_series = sample_data_df.iloc[:30]
     predictions = sample_data_df.iloc[30:]
@@ -92,11 +152,13 @@ def test_create_forecast_figure(sample_data_df):
         time_granularity=DAILY_TIME_GRANULARITY,
         plot_config=deepcopy(PLOT_CONFIG),
     )
+    return fig
 
 
-def test_create_forecast_figure_overlapping(sample_data_df):
-    time_series = sample_data_df
-    predictions = sample_data_df.iloc[30:]
+@pytest.mark.mpl_image_compare
+def test_create_forecast_figure_overlapping(sample_data_yhat_df):
+    time_series = sample_data_yhat_df
+    predictions = sample_data_yhat_df.iloc[30:]
     predictions = predictions.rename(columns={Y_COL: YHAT_COL})
     predictions = perturb_ts(predictions, YHAT_COL, scale=0.1)
     full_series = pd.concat([predictions, time_series])
@@ -108,25 +170,7 @@ def test_create_forecast_figure_overlapping(sample_data_df):
         'test',
         end_date,
         forecast_window,
-        time_granularity=DAILY_TIME_GRANULARITY,
-        plot_config=deepcopy(PLOT_CONFIG),
+        anomaly_window=0.5,
+        time_granularity=HOURLY_TIME_GRANULARITY,
     )
-
-
-def test_ForecastPlotterTask_overlapping(sample_data_df):
-    time_series = sample_data_df
-    predictions = sample_data_df.iloc[30:]
-    predictions = predictions.rename(columns={Y_COL: YHAT_COL})
-    predictions = perturb_ts(predictions, YHAT_COL, scale=0.1)
-    full_series = pd.concat([predictions, time_series])
-    full_series[DS_COL] = pd.to_datetime(full_series[DS_COL])
-    end_date = pd.to_datetime(predictions[DS_COL]).min()
-    forecast_window = (pd.to_datetime(predictions[DS_COL]).max() - end_date).days
-    fig = plot.create_forecast_figure(
-        full_series,
-        'test',
-        end_date,
-        forecast_window,
-        time_granularity=DAILY_TIME_GRANULARITY,
-        plot_config=deepcopy(PLOT_CONFIG),
-    )
+    return fig

@@ -54,6 +54,7 @@ extra_dependencies = {
         'pytest-xdist',
         'pytest-cov',
         'pytest-html',
+        'pytest-mpl',
         'betamax',
         'betamax-serializers',
     ]

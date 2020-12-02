@@ -52,11 +52,9 @@ def create_forecast_figure(
     plot_config: Optional[Dict] = None,
 ) -> Figure:
     """Plot trend, forecast and anomalies with history, anomaly and forecast phases."""
-
     plot_config_: Dict
     if plot_config is None:
-        plot_config_ = PLOT_CONFIG
-
+        plot_config = PLOT_CONFIG
     plot_config_ = deepcopy(plot_config)["anomaly_plot"]  # type: ignore
 
     # plot_config_ = plot_config["anomaly_plot"]
