@@ -657,7 +657,8 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 
 def df_optimize_float_types(
-    df, type_mappings: Dict[str, str] = None,
+    df,
+    type_mappings: Dict[str, str] = None,
 ):
     """Cast dataframe columns to more memory friendly types.
 
@@ -911,7 +912,7 @@ def get_matching_columns(cols, regex_list):
 def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
     """Filter list by inclusion and exclusion regexes."""
     if not cols:
-        raise ValueError(f"`cols` argument must be a non-empty list")
+        raise ValueError("`cols` argument must be a non-empty list")
     if include_regexes is None:
         ret = cols
     else:
