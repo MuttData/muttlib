@@ -57,7 +57,6 @@ def create_forecast_figure(
         plot_config = PLOT_CONFIG
     plot_config_ = deepcopy(plot_config)["anomaly_plot"]  # type: ignore
 
-    # plot_config_ = plot_config["anomaly_plot"]
     plot_time_conf: dict = plot_config_[time_granularity]
     color_conf: dict = plot_config_[COLORS]
     label_conf: dict = plot_config_[LABELS]
