@@ -97,6 +97,6 @@ PLOT_CONFIG = {
             FORECAST: "Forecast",
             OUTLIER: "Outlier: {date}",
         },
-        "title": "{plot_type} for {metric_name} {start_date:%d-%b} to {end_date:%d-%b}",
+        "title": "{plot_type} for {metric_name} from {start_date:%d-%b} to {end_date:%d-%b}.",
     }
 }
