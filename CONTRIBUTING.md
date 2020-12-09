@@ -188,7 +188,7 @@ def some_old_function(x, y):
 ```
 
 ### Release
-Deprecations must be implemented in minor releases and EOL will be on the next major release.
+Deprecation warning must be added in minor releases and EOL will be on the next major releases.
 
 ## PRs
 Also called MRs (Merge Requests) in gitlab.
