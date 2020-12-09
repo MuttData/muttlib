@@ -19,6 +19,8 @@ This guide is not final. It will evolve over time, as we learn and add new voice
 - [Documentation](#documentation)
 - [Versioning](#versioning)
 - [Deprecation](#deprecation)
+  - [Decorator](#decorator)
+  - [Release](#release)
 - [PRs](#prs)
   - [WIP](#wip)
   - [RFC](#rfc)
@@ -135,7 +137,58 @@ Alternatively you can see the docs for the `master` branch [here.](https://mutt_
 Please remember to bump the version when submitting your PR!
 
 ## Deprecation
-Before fully deprecating a feature or making a breaking change, give users a warning and enough time for them to migrate their code. State when the EOL will be. Then, in the pertaining release, it can be included.
+
+Before fully deprecating a feature or making a breaking change, give users a `DeprecationWarning` and enough time for them to migrate their code.
+
+### Decorator
+
+`muttlib` uses [deprecated](https://github.com/tantale/deprecated) decorators to implement `DeprecationWarning`.
+
+Add a `DeprecationWarning` considering indicate:
+  - How to achieve similar behavior if an alternative is available or a reason for the deprecation if no clear alternative is available.
+  - The versions number when the functionality was deprecated and when the EOL will be.
+
+To do this, decorate your deprecated function with **@deprecated** decorator:
+
+```python
+from deprecated import deprecated
+
+
+@deprecated
+def some_old_function(x, y):
+    return x + y
+```
+
+You can also decorate a class or a method:
+
+```python
+from deprecated import deprecated
+
+
+class SomeClass(object):
+    @deprecated
+    def some_old_method(self, x, y):
+        return x + y
+
+
+@deprecated
+class SomeOldClass(object):
+    pass
+```
+
+You can give a "reason" message to help the developer to choose another function/class:
+
+```python
+from deprecated import deprecated
+
+
+@deprecated(reason="use another function")
+def some_old_function(x, y):
+    return x + y
+```
+
+### Release
+Deprecation warning must be added in minor releases and EOL will be on the next major releases.
 
 ## PRs
 Also called MRs (Merge Requests) in gitlab.

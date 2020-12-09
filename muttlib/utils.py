@@ -657,8 +657,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 
 def df_optimize_float_types(
-    df,
-    type_mappings: Dict[str, str] = None,
+    df, type_mappings: Dict[str, str] = None,
 ):
     """Cast dataframe columns to more memory friendly types.
 
