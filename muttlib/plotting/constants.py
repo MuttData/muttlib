@@ -1,6 +1,4 @@
 """Plotting module constants"""
-from datetime import datetime, timedelta
-
 
 # Global
 DS_COL = "ds"
