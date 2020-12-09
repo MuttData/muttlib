@@ -2,15 +2,11 @@
 from typing import Dict, Optional, Tuple
 from datetime import timedelta
 from copy import deepcopy
-
 import pandas as pd
 import numpy as np
-
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter
-
-from muttlib.plotting.utils import _create_common_series, _base_10_tick_scaler
 from muttlib.plotting.constants import (
     ANOMALY_WIN,
     ANOMALY_WIN_FILL,
@@ -42,6 +38,36 @@ from muttlib.plotting.constants import (
 )
 
 
+def _create_common_series(
+    df: pd.DataFrame, ds_col: str, start_date=None, end_date=None
+) -> Tuple[pd.DataFrame, np.ndarray]:  # pylint:disable=unused-argument
+    """Get series data for start/end date range.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        [description]
+    ds_col : str
+        [description]
+    start_date : [type], optional
+        [description], by default None
+    end_date : [type], optional
+        [description], by default None
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, np.ndarray]
+        Filtered values and dates.
+    """
+    window = df
+    if start_date:
+        window = window.query(f"@start_date <= {ds_col}")
+    if end_date:
+        window = window.query(f"{ds_col} <= @end_date")
+    window_dates = window[ds_col].dt.to_pydatetime()
+    return window, window_dates
+
+
 def create_forecast_figure(
     df: pd.DataFrame,
     metric_name: str,
@@ -51,13 +77,33 @@ def create_forecast_figure(
     time_granularity: str = DAILY_TIME_GRANULARITY,
     plot_config: Optional[Dict] = None,
 ) -> Figure:
-    """Plot trend, forecast and anomalies with history, anomaly and forecast phases."""
-    plot_config_: Dict
+    """Plot trend, forecast and anomalies with history, anomaly and forecast phases.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        [description]
+    metric_name : str
+        [description]
+    end_date : [type]
+        [description]
+    forecast_window : [type]
+        [description]
+    anomaly_window : int, optional
+        [description], by default 0
+    time_granularity : str, optional
+        [description], by default DAILY_TIME_GRANULARITY
+    plot_config : Optional[Dict], optional
+        [description], by default None
+
+    Returns
+    -------
+    Figure
+        [description]
+    """
     if plot_config is None:
         plot_config = PLOT_CONFIG
-    plot_config_ = deepcopy(plot_config)["anomaly_plot"]  # type: ignore
-
-    # plot_config_ = plot_config["anomaly_plot"]
+    plot_config_: dict = deepcopy(plot_config)["anomaly_plot"]
     plot_time_conf: dict = plot_config_[time_granularity]
     color_conf: dict = plot_config_[COLORS]
     label_conf: dict = plot_config_[LABELS]
@@ -151,9 +197,11 @@ def create_forecast_figure(
     ax.set_xlabel(label_conf["xlabel"])
     ax.set_xlim([history_dates.min(), forecast_dates.max()])
 
-    # FIXME: This seems to break the label ticks.
-    # fig, ax = _set_time_locator_interval(fig, ax, time_granularity, plot_time_conf)
-    base_10_scale = _base_10_tick_scaler(df[Y_COL].median())
+    base_10_scale = 0
+    median_val = df[Y_COL].median()
+    if median_val > 0:
+        base_10_scale = int(np.log10(median_val))
+
     ax.yaxis.set_major_formatter(
         FuncFormatter(lambda y, pos: f"{(y * (10 ** -base_10_scale)):g}")
     )
