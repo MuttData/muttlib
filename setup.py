@@ -46,6 +46,7 @@ extra_dependencies = {
         'flake8==3.7.8',
         'pylint==2.4.4',
         'nox',
+        'deprecated',
     ],
     'test': [
         'freezegun',
