@@ -656,7 +656,7 @@ def test_df_drop_corr():
     )
     df_test = pd.DataFrame(index=[0, 1, 2, 3])
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         utils.df_drop_corr(df.copy(), '34')
 
     df_test.equals(utils.df_drop_corr(df.copy(), 'a', frac=1, random_state=42))

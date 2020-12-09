@@ -94,8 +94,8 @@ class SkProphet(Prophet):
         self,
         sk_date_column=DS,
         sk_yhat_only=True,
-        sk_extra_regressors=[],
-        prophet_kwargs={},
+        sk_extra_regressors=None,
+        prophet_kwargs=None,
     ):
         """Scikit learn compatible interface for FBProphet.
 
@@ -121,6 +121,11 @@ class SkProphet(Prophet):
         prophet_kwargs: dict
             Keyword arguments to forward to Prophet.
         """
+        if sk_extra_regressors is None:
+            sk_extra_regressors = []
+        if prophet_kwargs is None:
+            prophet_kwargs = {}
+
         super().__init__(**prophet_kwargs)
         self.sk_date_column = sk_date_column
         self.sk_yhat_only = sk_yhat_only
@@ -128,7 +133,9 @@ class SkProphet(Prophet):
         self.prophet_kwargs = prophet_kwargs
         self._set_my_extra_regressors()
 
-    def fit(self, X, y=None, copy=True, **fit_params):
+    def fit(
+        self, X, y=None, copy=True, **fit_params
+    ):  # pylint: disable=arguments-differ
         """Scikit learn's like fit on the Prophet model.
 
         Parameters
@@ -170,7 +177,7 @@ class SkProphet(Prophet):
                 X['y'] = self._as_np_vector(y)
         return super().fit(X, **fit_params)
 
-    def predict(self, X, copy=True):
+    def predict(self, X, copy=True):  # pylint: disable=arguments-differ
         """Scikit learn's predict (returns predicted values).
 
         Parameters
@@ -300,7 +307,7 @@ class SkProphet(Prophet):
 
 class StepsSelectorEstimator(BaseEstimator):
     def __init__(
-        self, estimator_class, amount_of_steps, estimator_kwargs={}, sort_col='date'
+        self, estimator_class, amount_of_steps, estimator_kwargs=None, sort_col='date'
     ):
         """An estimator that only uses a certain amount of rows on fit.
 
@@ -326,6 +333,9 @@ class StepsSelectorEstimator(BaseEstimator):
 
         > StepsSelectorEstimator(RandomForestRegressor(), 100)
         """
+        if estimator_kwargs is None:
+            estimator_kwargs = {}
+
         self.amount_of_steps = amount_of_steps
         self.sort_col = sort_col
         self.estimator_kwargs = estimator_kwargs
@@ -368,7 +378,7 @@ class StepsSelectorEstimator(BaseEstimator):
         }
 
     def set_params(self, **params):
-        """Sets the estimator's params to \*\*params."""
+        """Sets the estimator's params to \*\*params."""  # pylint: disable=anomalous-backslash-in-string
         self.estimator_class = Classer.from_obj(params['estimator_class'])
         self.amount_of_steps = params['amount_of_steps']
         self.sort_col = params['sort_col']
@@ -376,7 +386,7 @@ class StepsSelectorEstimator(BaseEstimator):
         self._estimator = self.estimator_class.new(**self.estimator_kwargs)
         return self
 
-    def __repr__(self):
+    def __repr__(self):  # pylint: disable=signature-differs
         """Text representation of the object to look it nicely in the
         interpreter.
         """

@@ -14,7 +14,7 @@ from typing import List
 from jinja2 import Undefined
 from jinjasql import JinjaSql
 from IPython.display import display
-from textwrap import wrap
+
 import matplotlib
 
 import muttlib.utils as utils
@@ -30,14 +30,6 @@ if current_backend != 'TkAgg':
     )
 import matplotlib.pyplot as plt  # NOQA
 
-# For nice df prints that can be copy pasted to chat services
-import seaborn as sns  # NOQA
-
-# Cleanear matplotlib dates as day in letters
-import matplotlib.dates as mdates  # NOQA
-
-# Cleanear matplotlib formatting
-from matplotlib import ticker  # NOQA
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -286,9 +278,9 @@ def get_one_to_one_relationship(df: pandas.DataFrame, factor_id: str, factor_nam
 
 def sum_count_aggregation(
     df: pandas.DataFrame,
-    group_cols: list,
-    numerical_cols: list,
-    aggregation_operations: list = ['sum', 'count'],
+    group_cols: List,
+    numerical_cols: List,
+    aggregation_operations=('sum', 'count'),
 ):
     """Aggregate data by a gruop of columns into sum and count.
 
@@ -300,8 +292,8 @@ def sum_count_aggregation(
 
     numerical_cols: list :
 
-    aggregation_operations: list :
-        (Default value = ['sum', 'count']) :
+    aggregation_operations: tuple or list :
+        (Default value = ('sum', 'count')) :
 
     Returns
     -------
@@ -333,7 +325,7 @@ def sum_count_time_series(
     date_col: str,
     numerical_series: List,
     resample_frequency: str = 'D',
-    aggregation_operations: List = ['sum', 'count'],
+    aggregation_operations=('sum', 'count'),
     filter_query: str = None,  # to select a subset of the whole database only
 ):
     """Get a time series grouping in a a certain time-window.
@@ -346,13 +338,12 @@ def sum_count_time_series(
 
     date_col: str :
 
-    numerical_series: List :
+    numerical_series: list :
 
     resample_frequency: str :
          (Default value = 'D')
-    aggregation_operations: List :
-         (Default value = ['sum')
-    'count'] :
+    aggregation_operations: tuple or list :
+         (Default value = ('sum', 'count') :
 
     filter_query: str :
          (Default value = None)
