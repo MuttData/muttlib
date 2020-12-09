@@ -1,3 +1,32 @@
+"""muttlib.plotting test suite.
+
+`muttlib` uses `pytest-mpl` to plots testing.
+
+To use, you simply need to mark the function where you want to compare images using
+@pytest.mark.mpl_image_compare, and make sure that the function returns
+a Matplotlib figure (or any figure object that has a savefig method):
+
+```python
+import pytest
+import matplotlib.pyplot as plt
+
+@pytest.mark.mpl_image_compare
+def test_succeeds():
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot([1,2,3])
+    return fig
+```
+
+To generate the baseline images, run the tests with the --mpl-generate-path option
+with the name of the directory where the generated images should be placed:
+
+```python
+pytest --mpl-generate-path=baseline
+```
+
+More info about `pytest-mpl` library: https://github.com/matplotlib/pytest-mpl#using
+"""
 from copy import deepcopy
 
 import numpy as np
@@ -69,7 +98,7 @@ def sample_data_df():
 
 @pytest.fixture
 def sample_data_yhat_df():
-    # Taken from https://raw.githubusercontent.com/facebook/prophet/master/examples/example_retail_sales.csv
+    # Taken from `sample_data_df`
     return pd.DataFrame.from_records(
         np.array(
             [
