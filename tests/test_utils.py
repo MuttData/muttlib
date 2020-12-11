@@ -1,16 +1,17 @@
 # pylint:disable=W0611, E1101
 
-from muttlib import utils
+from collections import OrderedDict, deque, namedtuple  # noqa: F401
 import datetime
-import pytest
 from pathlib import Path
-from collections import OrderedDict, namedtuple, deque  # noqa: F401
-import pandas as pd
-from pandas.tseries import offsets
-import numpy as np
 from textwrap import dedent
-from pandas._testing import assert_frame_equal
 
+import numpy as np
+import pandas as pd
+from pandas._testing import assert_frame_equal
+from pandas.tseries import offsets
+import pytest
+
+from muttlib import utils
 
 ## MOCKS FOR DIFF DATAFRAME AND DEVIATION_LOG
 
@@ -522,12 +523,28 @@ def test_in_clause_requirement():
     assert not utils.in_clause_requirement(34)
 
 
-def test_format_in_clause():
-    str_test = "(walk,away,my,boy)"
-    with pytest.raises(utils.BadInClauseException):
-        utils.format_in_clause("hello")
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        (["walk", "away", "my", "boy"], "('walk','away','my','boy')"),
+        (["walk", "away", "my", "boy", 4], "('walk','away','my','boy',4)"),
+        ([1, 3, 4.23], "(1,3,4.23)"),
+        ([], "()"),
+    ],
+)
+def test_format_in_clause(test_input, expected):
+    """Test valid calls to format_in_clause (mixed and empty)"""
+    assert expected == utils.format_in_clause(test_input)
 
-    assert str_test == utils.format_in_clause(["walk", "away", "my", "boy"])
+
+@pytest.mark.parametrize(
+    "test_input",  # noqa
+    [[sum, "hello"], [1, object()], [1, ["walk", "away", "my", "boy"]]],
+)
+def test_format_in_clause_invalid_type(test_input):
+    """Test iterable formatting with invalid value types."""
+    with pytest.raises(utils.BadInClauseException):
+        utils.format_in_clause(test_input)
 
 
 def test_get_cloudera_sql_stats_aggr():
