@@ -40,13 +40,13 @@ def _create_common_series(
     Parameters
     ----------
     df : pd.DataFrame
-        [description]
+        Series Dataframe
     ds_col : str
-        [description]
+        Series column
     start_date : [type], optional
-        [description], by default None
+        Series starts date, by default None
     end_date : [type], optional
-        [description], by default None
+        Series ends date, by default None
 
     Returns
     -------
@@ -76,24 +76,24 @@ def create_forecast_figure(
     Parameters
     ----------
     df : pd.DataFrame
-        [description]
+        Series Dataframe
     metric_name : str
-        [description]
-    end_date : [type]
-        [description]
-    forecast_window : [type]
-        [description]
+        Metric Name
+    end_date :
+        End_Date
+    forecast_window :
+        Forecast Window
     anomaly_window : int, optional
-        [description], by default 0
+        Anomaly Window, by default 0
     time_granularity : str, optional
-        [description], by default DAILY_TIME_GRANULARITY
+        Time Granularity, by default DAILY_TIME_GRANULARITY
     plot_config : Optional[Dict], optional
-        [description], by default None
+        Plot Config, by default None
 
     Returns
     -------
     Figure
-        [description]
+        Forecast Figure
     """
     if plot_config is None:
         plot_config = PLOT_CONFIG
