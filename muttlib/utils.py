@@ -1,27 +1,32 @@
 """Project agnostic utility functions."""
+from collections import OrderedDict, deque, namedtuple
 import contextlib
+from copy import deepcopy
 import csv
+from datetime import date, datetime
+from functools import wraps
 import hashlib
 import io
 import logging
 import logging.config
+from numbers import Number
 import os
+from pathlib import Path
 import re
 import sys
-
 from collections import OrderedDict, deque, namedtuple
 from copy import deepcopy
 from datetime import datetime, date
 from functools import wraps
 from pathlib import Path
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Tuple
 
 import jinja2
 import numpy as np
 import pandas as pd
-import yaml
 from pandas.tseries import offsets
 from scipy.stats import iqr
+import yaml
 
 logger = logging.getLogger(f'utils.{__name__}')
 
@@ -501,19 +506,61 @@ def in_clause_requirement(obj):
     return isinstance(obj, (list, tuple))
 
 
-def format_in_clause(iterable):
+def _format_value_in_clause(value: Union[Number, str]) -> str:
+    """Format value according to type.
+
+    Args:
+        value (Union[Number, str]): any number or string
+
+    Raises:
+        BadInClauseException: for values other than Number or str
+
+    Returns:
+        str: formatted string
+    """
+    if isinstance(value, str):
+        return f"'{value}'"
+    elif isinstance(value, Number):
+        return f"{value}"
+    else:
+        raise BadInClauseException(
+            f"Value type: {type(value)} is not allowed for in clause formatting"
+        )
+
+
+def format_in_clause(
+    iterable: Union[Tuple[Union[Number, str]], List[Union[Number, str]]]
+) -> str:
     """
     Create a Jinja2 filter to format list-like values passed.
 
-    Idea originally from
-    https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
+    Args:
+        iterable (list, tuple): list / tuple of strings and numbers. Can be empty.
+
+    Raises:
+        BadInClauseException: for non iterable inputs.
+
+    Returns:
+        str: The formatted string of the list of elements.
+
+    Notes:
+        Idea originally from
+        https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
+        Passing an empty tuple/list won't raise an exception, in order to
+        simplify the function. Also, regarding failing queries, there's no
+        explicit goal for sql formatting (although that's a common use case).
+
+    Examples:
+        >>> format_in_clause([1.12, 1, 'a'])
+
+        (1.12,1,'a')
     """
     if not in_clause_requirement(iterable):
         raise BadInClauseException(
             f"Value passed is not a list or tuple: '{iterable}'. "
             f"Where the query uses the '| inclause'."
         )
-    values = [f"{v}" for v in iterable]
+    values = [_format_value_in_clause(v) for v in iterable]
     clause = ",".join(values)
     clause = "(" + clause + ")"
     return clause
