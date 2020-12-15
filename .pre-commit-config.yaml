@@ -1,6 +1,36 @@
 repos:
 -   repo: local
     hooks:
+    - id: black
+      name: black
+      entry: black
+      language: system
+      types: [python]
+      args: [--skip-string-normalization]
+      exclude: docs/*
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v2.5.0
+    hooks:
+    - id: trailing-whitespace
+    - id: requirements-txt-fixer
+-   repo: local
+    hooks:
+    - id: mypy
+      name: mypy
+      entry: mypy
+      language: system
+      types: [python]
+      exclude: docs/*
+-   repo: local
+    hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      exclude: (docs/|muttlib/dbconn/|tests/)
+-   repo: local
+    hooks:
     - id: pytest
       name: pytest
       language: system
@@ -13,7 +43,7 @@ repos:
       language: system
       entry: nox --session cop
       types: [python]
-      stages: [commit,push]
+      stages: [push]
       pass_filenames: false
     - id: bandit
       name: bandit
@@ -22,3 +52,4 @@ repos:
       types: [python]
       stages: [push]
       pass_filenames: false
+
