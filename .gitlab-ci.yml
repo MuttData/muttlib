@@ -45,7 +45,7 @@ pages:
   stage: deploy_stage
   script:
   - pip install .
-  - pip install .[all]
+  - pip install .[all] --use-deprecated=legacy-resolver
   - cd docs
   - make html -e SPHINXOPTS=-W
   - cd ..
