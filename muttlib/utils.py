@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 import re
 import sys
-from typing import Dict, List, Tuple, Union
+from typing import List, Union, Dict, Tuple
 
 import jinja2
 import numpy as np
