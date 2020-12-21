@@ -7,6 +7,7 @@ import pandas as pd
 import progressbar
 
 import muttlib.utils as utils
+from muttlib.dbconn.base import BaseClient
 
 logger = logging.getLogger(__name__)
 try:
@@ -18,7 +19,7 @@ except ModuleNotFoundError:
 HIVE_DB_TYPE = 'hive'
 
 
-class HiveClient:
+class HiveClient(BaseClient):
     """Wrapper around PyHive's hive module.
 
     Parameters
@@ -52,12 +53,14 @@ class HiveClient:
         username=None,
         password=None,
     ):
-        self.host = host
-        self.port = port
+        super().__init__(
+            host=host,
+            port=port,
+            database=database,
+            username=username,
+            password=password,
+        )
         self.auth = auth
-        self.database = database
-        self.username = username
-        self.password = password
 
     def _connect(self):
         """Instance a connection to the database.
@@ -75,18 +78,14 @@ class HiveClient:
             password=self.password,
         )
 
-    def _cursor(self):
-        """Instance a cursor from HiveServer connection.
-
-        Returns
-        ----------
-        pyhive.hive.Cursor
-        """
-        conn = self._connect()
-        return conn.cursor()
-
     def execute(
-        self, sql, params=None, show_progress=True, dry_run=False, async_=False
+        self,
+        sql,
+        params=None,
+        connection=None,
+        show_progress=True,
+        dry_run=False,
+        async_=False,
     ):
         """Execute sql statement.
 
@@ -108,11 +107,21 @@ class HiveClient:
             logger.debug(f"Query dry-run:{sql}")
             return
 
-        cursor = self._cursor()
+        should_close = False
+
+        if connection is None:
+            connection = self._connect()
+            should_close = True
+
+        cursor = connection.cursor()
         cursor.execute(sql, async_=async_)
 
         if show_progress:
             self._show_query_progress(cursor)
+
+        if should_close:
+            connection.close()
+
         return cursor
 
     def _show_query_progress(self, cursor, max_val=100, poll_interval=1):
@@ -144,28 +153,6 @@ class HiveClient:
             progress, total = m.groups()
             progress = int(progress) / int(total)
         return progress
-
-    def to_frame(self, *args, **kwargs):
-        """
-        Execute sql statement and return results as a Pandas dataframe.
-
-        Returns
-        ----------
-        pd.DataFrame
-        """
-        with closing(self.execute(*args, **kwargs)) as cursor:
-            if not cursor:
-                return
-            data = cursor.fetchall()  # pylint: disable=no-member
-            # TODO: Add variant that dumps per row rather than the whole thing
-            if data:
-                df = pd.DataFrame(data)
-                df.columns = [
-                    c[0] for c in cursor.description  # pylint: disable=no-member
-                ]
-            else:
-                df = pd.DataFrame()
-            return df
 
 
 # Backward compatiblity alias.
