@@ -28,7 +28,7 @@ test:
   only:
     refs:
       - merge_requests
-      - master-ci-test
+      - master
 
 lint:
   stage: test_stage
@@ -38,7 +38,7 @@ lint:
   only:
     refs:
       - merge_requests
-      - master-ci-test
+      - master
 
 bandit:
   stage: test_stage
@@ -48,7 +48,7 @@ bandit:
   only:
     refs:
       - merge_requests
-      - master-ci-test
+      - master
 
 pages:
   stage: deploy_stage
@@ -99,4 +99,4 @@ check_version:
     refs:
       - merge_requests
     variables:
-      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master-ci-test"
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
