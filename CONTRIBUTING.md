@@ -5,30 +5,27 @@ Thanks for your interest in contributing to `muttlib` 🎉. These are the guidel
 This guide is not final. It will evolve over time, as we learn and add new voices to the project. Check it from time to time and feel free to make suggestions 😃
 
 ## Table of Contents
-- [Contributing to muttlib](#contributing-to-muttlib)
-  - [Foreword](#foreword)
-  - [Table of Contents](#table-of-contents)
-  - [Code of Conduct](#code-of-conduct)
-  - [Issues](#issues)
-    - [Labels](#labels)
-    - [Security issues](#security-issues)
-  - [Development Setup](#development-setup)
-    - [Installation](#installation)
-    - [Pre-Commit for Version Control Integration](#pre-commit-for-version-control-integration)
-  - [Style guide](#style-guide)
-  - [Docstrings](#docstrings)
-  - [Testing](#testing)
-    - [Regression testing](#regression-testing)
-  - [Documentation](#documentation)
-  - [Versioning](#versioning)
-  - [Deprecation](#deprecation)
-    - [Decorator](#decorator)
-    - [Release](#release)
-  - [PRs](#prs)
-    - [WIP](#wip)
-    - [RFC](#rfc)
-    - [CI/CD jobs](#cicd-jobs)
-  - [Rules of Thumb](#rules-of-thumb)
+- [Code of Conduct](#code-of-conduct)
+- [Issues](#issues)
+  - [Labels](#labels)
+  - [Security issues](#security-issues)
+- [Development Setup](#development-setup)
+  - [Installation](#installation)
+  - [Pre-Commit for Version Control Integration](#pre-commit-for-version-control-integration)
+- [Style guide](#style-guide)
+- [Docstrings](#docstrings)
+- [Testing](#testing)
+  - [Regression testing](#regression-testing)
+- [Documentation](#documentation)
+- [Versioning](#versioning)
+- [Deprecation](#deprecation)
+  - [Decorator](#decorator)
+  - [Release](#release)
+- [PRs](#prs)
+  - [WIP](#wip)
+  - [RFC](#rfc)
+  - [CI/CD jobs](#cicd-jobs)
+- [Rules of Thumb](#rules-of-thumb)
 
 ## Code of Conduct
 One of our core values at Mutt is that **we are an open team**. We all make mistakes and need help fixing them. We foster psychological safety. We clearly express it when we don’t know something and ask for advice.
@@ -41,12 +38,12 @@ Before submitting an issue, first check on the [issues tracker](https://gitlab.c
 
 ### Labels
 
-| name              | description               | shortcuts                                                                                                                                                                                                                         |
-| ----------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bug`             | Report a bug              | [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=bug) for `bug` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Bug) one                             |
-| `feature-request` | Request for a new feature | [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=feature-request) for `feature-request` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Feature) one |
-| `enhancement`     | Propose an enhancement    | [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=enhancement) for `enhancement` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Enhancement) one     |
-| `discussion`      | Start a new discussion    | [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=discussion) for `discussion` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Discussion) one        |
+| name | description | shortcuts |
+| ---------- | ----------- | ------ |
+| `bug` | Report a bug | [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=bug) for `bug` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Bug) one
+|`feature-request`|Request for a new feature|[Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=feature-request) for `feature-request` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Feature) one
+|`enhancement`|Propose an enhancement|[Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=enhancement) for `enhancement` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Enhancement) one
+|`discussion`|Start a new discussion|[Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=discussion) for `discussion` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Discussion) one
 
 ### Security issues
 If you find a security related bug or any kind of security rellated issue, **please DO NOT file a public issue**. Sensitive security-related issues should be reported to privately to the repo owner along with a PoC if possible. You can [send us an email](mailto:security@muttdata.ai) and we'll go from there.
