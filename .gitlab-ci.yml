@@ -25,21 +25,27 @@ test:
   - python -c 'from muttlib import gdrive'
   - pip install nox
   - nox --sessions tests
-
+  only:
+    refs:
+      - merge_requests
 
 lint:
   stage: test_stage
   script:
     - pip install nox
     - nox --sessions cop
-
+  only:
+    refs:
+      - merge_requests
 
 bandit:
   stage: test_stage
   script:
     - pip install nox
     - nox --sessions bandit
-
+  only:
+    refs:
+      - merge_requests
 
 pages:
   stage: deploy_stage
@@ -54,7 +60,8 @@ pages:
     paths:
     - public
   only:
-  - master
+    refs:
+      - master
 
 
 # Deploy from master to package registry
@@ -64,9 +71,6 @@ pages:
 # not to upload to gitlab's PYPI
 deploy:
   stage: deploy_stage
-  only:
-    refs:
-      - master
   script:
     - pip install twine
     - python setup.py sdist bdist_wheel
@@ -74,7 +78,9 @@ deploy:
     - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
     - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
     - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
-
+  only:
+    refs:
+      - master
 
 check_version:
   stage: validate
@@ -91,4 +97,4 @@ check_version:
     refs:
       - merge_requests
     variables:
-      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master-ci-test"
