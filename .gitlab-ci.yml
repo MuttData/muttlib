@@ -66,7 +66,6 @@ pages:
     refs:
       - master
 
-
 # Deploy from master to package registry
 # If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
 # package registry, thus using the required variables to do so
