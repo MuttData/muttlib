@@ -28,6 +28,7 @@ test:
   only:
     refs:
       - merge_requests
+      - master-ci-test
 
 lint:
   stage: test_stage
@@ -37,6 +38,7 @@ lint:
   only:
     refs:
       - merge_requests
+      - master-ci-test
 
 bandit:
   stage: test_stage
@@ -46,6 +48,7 @@ bandit:
   only:
     refs:
       - merge_requests
+      - master-ci-test
 
 pages:
   stage: deploy_stage
