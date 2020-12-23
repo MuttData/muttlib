@@ -6,6 +6,7 @@ import abc
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
+from contextlib import closing
 
 import muttlib.utils as utils
 
@@ -151,11 +152,14 @@ class BaseClient(abc.ABC):
     @parse_sql_statement_decorator
     def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
         """Execute sql statement."""
+        if params is not None:
+            sql = sql.format(**params)
+
         if connection is not None:
             # It's not our job to close the passed connection
             return connection.execute(sql)
 
-        with self._engine.connect() as connection:
+        with self._connect() as connection:
             # Create and destroy a connection, as to avoid dangling connections
             return connection.execute(sql)
 
@@ -177,13 +181,33 @@ class BaseClient(abc.ABC):
         """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
 
-        if connection:
-            # It's not our job to close the passed connection
-            df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
+        column_names = df.columns.tolist()
+        chunksize = kwargs.get("chunksize", 10_000)
 
-        with self._connect() as connection:
-            # Create and destroy a connection, as to avoid dangling connections
-            df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
+        if if_exists == "fail" or if_exists == "replace":
+            raise NotImplementedError
+
+        if index:
+            raise NotImplementedError
+
+        insert_stmt = """
+            INSERT INTO {table} ({columns})
+            VALUES {values_chunk}
+        """
+
+        def _to_sql_tuple(d):
+            return f"({', '.join(map(str, d.values()))})"
+
+        def df_chunksize_iterator(df, chunksize=10_000):
+            for start in range(0, len(df), chunksize):
+                yield df[start : start + chunksize]
+
+        for chunk in df_chunksize_iterator(df, chunksize):
+            values = map(_to_sql_tuple, chunk.to_dict(orient="records"))
+            chunk_insert_stmt = insert_stmt.format(
+                table=table, columns=column_names, values_chunk=",\n".join(values)
+            )
+            self.execute(chunk_insert_stmt, connection=connection)
 
 
 class EngineBaseClient(BaseClient):
@@ -202,6 +226,20 @@ class EngineBaseClient(BaseClient):
             db_uri = custom_uri or self._db_uri
             self._engine = create_engine(db_uri, connect_args=connect_args, echo=echo)
         return self._engine
+
+    def insert_from_frame(
+        self, df, table, if_exists='append', index=False, connection=None, **kwargs
+    ):
+        """Insert from a Pandas dataframe."""
+        # TODO: Validate types here?
+
+        if connection:
+            # It's not our job to close the passed connection
+            df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
+        else:
+            with self._connect() as connection:
+                # Create and destroy a connection, as to avoid dangling connections
+                df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
 
 
 class ClientBaseClient(BaseClient):
