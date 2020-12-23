@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Union
 
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import ClientBaseClient
 import muttlib.utils as utils
 
 logger = logging.getLogger(__name__)
@@ -16,8 +16,8 @@ except ModuleNotFoundError:
 
 BIGQUERY_DB_TYPE = 'bigquery'
 
-# class BigQueryClient(ClientBasedClient):
-class BigQueryClient(BaseClient):
+
+class BigQueryClient(ClientBaseClient):
     def __init__(
         self,
         db: str,
@@ -89,19 +89,25 @@ class BigQueryClient(BaseClient):
         return self.client
 
     def close(self):
-        """Close connection"""
+        """Close connection."""
         if self.client is not None:
             self.client.close()
 
     def execute(self, sql, params=None, client=None):  # pylint: disable=W0613
         """Execute sql statement.
 
-        sql: str or path
+        Parameters
+        ----------
+        sql : str or path
             SQL query string or path to file with Select statements.
-        params: dict
+        params : dict, optional
             parameters to add into the SQL query to execute.
-        client: google.cloud.bigquery.client
+        client : google.cloud.bigquery.client, optional
             client to the database, if it's already created.
+
+        Returns
+        -------
+        google.cloud.bigquery.job.QueryJob
         """
         if client is None:
             client = self._connect()
@@ -110,17 +116,24 @@ class BigQueryClient(BaseClient):
         if params is not None:
             sql = sql.format(**params)
         logger.info(f"Executing query:\n{sql}")
-        return self.client.query(sql)
+
+        return client.query(sql)
 
     def to_frame(self, sql, params=None, client=None):
         """Return sql execution as Pandas dataframe.
 
-        sql: str or path
+        Parameters
+        ----------
+        sql : str or path
             SQL query string or path to file with Select statements.
-        params: dict
+        params : dict, optional
             parameters to add into the SQL query to execute.
-        client: google.cloud.bigquery.client
+        client : google.cloud.bigquery.client
             client to the database, if it's already created.
+
+        Returns
+        -------
+        pandas.DataFrame
         """
         if client is None:
             client = self._connect()
@@ -138,11 +151,11 @@ class BigQueryClient(BaseClient):
         ----------
         df: pd.DataFrame
             Dataframe with data to be inserted.
-        create_first: bool
+        create_first: bool, optional
             Whether to create table before attempting insertion.
-        create_sql: str or path
+        create_sql: str or path, optional
             SQL query string or path to file with create statements.
-        client: google.cloud.bigquery.client
+        client: google.cloud.bigquery.client, optional
             client to the database, if it's already created.
         """
         table_id = f"{self.project}.{self.db}.{self.table}"
@@ -164,11 +177,11 @@ class BigQueryClient(BaseClient):
 
         Parameters
         ----------
-        table_id: str
+        table_id: str, optional
             project.dataset.table name to create.
-        sql: str or path
+        sql: str or path, optional
             SQL query string or path to file with create statements.
-        client: google.cloud.bigquery.client
+        client: google.cloud.bigquery.client, optional
             client to the database, if it's already created.
         """
         if client is None:
