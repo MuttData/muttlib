@@ -2,7 +2,7 @@ import logging
 
 from sqlalchemy.types import VARCHAR
 
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import EngineBaseClient
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ except ModuleNotFoundError:
 ORACLE_DB_TYPE = 'oracle'
 
 
-class OracleClient(BaseClient):
+class OracleClient(EngineBaseClient):
     """Create Oracle DB client."""
 
     default_dialect = 'oracle'
@@ -23,6 +23,10 @@ class OracleClient(BaseClient):
     def __init__(self, schema=None, **kwargs):
         super().__init__(**kwargs)
         self.schema = schema
+
+    @property
+    def conn_str(self):
+        return self._db_uri
 
     @property
     def _db_uri(self):
