@@ -50,9 +50,7 @@ class BigQueryClient(ClientBaseClient):
         self.table = table
 
     def _read_cred(
-        self,
-        auth: Optional[str],
-        auth_file: Optional[Union[str, Path]],
+        self, auth: Optional[str], auth_file: Optional[Union[str, Path]],
     ):
         """Create valid OAuth2 credentials for bigquery.
 
