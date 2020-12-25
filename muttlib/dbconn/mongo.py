@@ -3,7 +3,7 @@ import logging
 from pandas.io.json import json_normalize
 
 logger = logging.getLogger(__name__)
-from dbconn.base import ClientBaseClient
+from muttlib.dbconn.base import ClientBaseClient
 
 try:
     import pymongo
