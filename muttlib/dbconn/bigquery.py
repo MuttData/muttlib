@@ -89,7 +89,7 @@ class BigQueryClient(BaseClient):
             )
         return self.client
 
-    def _close(self):
+    def close(self):
         """Close connection."""
         if self.client is not None:
             self.client.close()
