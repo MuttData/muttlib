@@ -3,13 +3,7 @@ image: python:3.7
 before_script:
   - apt-get update
 
-stages:
-  - validate
-  - test_stage
-  - deploy_stage
-
 test:
-  stage: test_stage
   script:
   - pip install .
   - python -c 'from muttlib import dbconn, utils'
@@ -21,101 +15,18 @@ test:
   - python -c 'from muttlib import gsheetsconn'
   - pip install .[gcd]
   - python -c 'from muttlib import gcd'
-  - pip install .[gdrive]
-  - python -c 'from muttlib import gdrive'
-  - pip install nox
-  - nox --sessions tests
-  rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-lint:
-  stage: test_stage
-  script:
-    - pip install nox
-    - nox --sessions cop
-  rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-
-bandit:
-  stage: test_stage
-  script:
-    - pip install nox
-    - nox --sessions bandit
-  rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
+  - python setup.py test
 
 pages:
-  stage: deploy_stage
+  stage: deploy
   script:
-  - pip install .
-  - pip install .[all] --use-deprecated=legacy-resolver
+  - pip install .[dev]
   - cd docs
-  - make html -e SPHINXOPTS=-W
+  - make html
   - cd ..
   - mv docs/build/html/ public/
   artifacts:
     paths:
     - public
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-      when: always
-    - when: never
-
-
-# Deploy from master to package registry
-# If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
-# package registry, thus using the required variables to do so
-# The package will be uploaded to PYPI_URL, which can be overrided
-# not to upload to gitlab's PYPI
-deploy:
-  stage: deploy_stage
-  script:
-    - pip install twine
-    - python setup.py sdist bdist_wheel
-    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
-    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
-    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-      when: always
-    - when: never
-
-
-
-check_version:
-  stage: validate
-  script:
-    - pip install packaging
-    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- muttlib/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
-    - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
-    - exit_status=$?
-    - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
-    - exit $exit_status
-  rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-check_changelog:
-  stage: validate
-  script:
-    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- CHANGELOG.md | awk 'BEGIN{if(val==""){print "0"}else{print $1}}'
-    - if [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" & exit 1; else exit 0; fi;
-  rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
+  only:
+  - master

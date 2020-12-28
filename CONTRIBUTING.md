@@ -202,6 +202,7 @@ Also called MRs (Merge Requests) in gitlab.
 	- Open a [WIP](#WIP) PR to allow discussion and let others know where you're at with the issue
 - Work on it 🤓
 - When ready change the PR to [RFC](#RFC)
+  - Make sure you run the pipelines once the PR leaves *Draft mode*, i.e on the [Merge Result.](https://docs.gitlab.com/ee/ci/merge_request_pipelines/pipelines_for_merged_results/).
 - You'll need at least one approval to merge
 	- Merge will be disabled if the [CI/CD pipelines are failing](#cicd-jobs)
 	- If you can't merge it yourself, ask your last approver to merge it
