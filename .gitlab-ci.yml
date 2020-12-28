@@ -107,7 +107,7 @@ check_changelog:
     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
     - added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- CHANGELOG.md | awk 'BEGIN{if(val==""){print "0"}else{print $1}}')
-    - if [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" & exit 1; else echo "Changelog has beed modified" & exit 0; fi;
+    - if [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has beed modified" && exit 0; fi;
   only:
     refs:
       - merge_requests
