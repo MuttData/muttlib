@@ -26,7 +26,7 @@ extra_dependencies = {
         'jinjasql',
         'matplotlib',
         'numpy',
-        'pandas',
+        'pandas==1.1.5',
         'seaborn',
     ],
     'gdrive': ['oauth2client', 'requests'],
@@ -95,7 +95,7 @@ setuptools.setup(
     test_suite='test',
     install_requires=[
         'jinja2',
-        'pandas>=1.0.0',
+        'pandas==1.1.5',
         'progressbar2',
         'pyyaml',
         'scikit-learn',
