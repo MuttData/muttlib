@@ -1,9 +1,10 @@
+from contextlib import closing
 import json
 import logging
 from pathlib import Path
 from typing import Optional, Union
 
-from muttlib.dbconn.base import ClientBaseClient
+from muttlib.dbconn.base import BaseClient
 import muttlib.utils as utils
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,9 @@ except ModuleNotFoundError:
 BIGQUERY_DB_TYPE = 'bigquery'
 
 
-class BigQueryClient(ClientBaseClient):
+class BigQueryClient(BaseClient):
+    """BigQuery Client."""
+
     def __init__(
         self,
         db: str,
@@ -50,7 +53,9 @@ class BigQueryClient(ClientBaseClient):
         self.table = table
 
     def _read_cred(
-        self, auth: Optional[str], auth_file: Optional[Union[str, Path]],
+        self,
+        auth: Optional[str],
+        auth_file: Optional[Union[str, Path]],
     ):
         """Create valid OAuth2 credentials for bigquery.
 
@@ -86,7 +91,7 @@ class BigQueryClient(ClientBaseClient):
             )
         return self.client
 
-    def close(self):
+    def _close(self):
         """Close connection."""
         if self.client is not None:
             self.client.close()
@@ -107,15 +112,16 @@ class BigQueryClient(ClientBaseClient):
         -------
         google.cloud.bigquery.job.QueryJob
         """
-        if client is None:
-            client = self._connect()
-
         sql = utils.path_or_string(sql)
         if params is not None:
             sql = sql.format(**params)
         logger.info(f"Executing query:\n{sql}")
 
-        return client.query(sql)
+        if client is not None:
+            return client.query(sql)
+
+        with closing(self._connect()) as client:
+            return client.query(sql)
 
     def to_frame(self, sql, params=None, client=None):
         """Return sql execution as Pandas dataframe.
@@ -133,9 +139,6 @@ class BigQueryClient(ClientBaseClient):
         -------
         pandas.DataFrame
         """
-        if client is None:
-            client = self._connect()
-
         return self.execute(sql, params, client).to_dataframe()
 
     def insert_from_frame(
@@ -159,14 +162,20 @@ class BigQueryClient(ClientBaseClient):
         table_id = f"{self.project}.{self.db}.{self.table}"
         logger.info(f"Going to insert data into {table_id}")
 
-        if client is None:
-            client = self._connect()
+        if client is not None:
+            if create_first:
+                self._create_table(table_id, create_sql, client)
 
-        if create_first:
-            self._create_table(table_id, create_sql, client)
+            job = client.load_table_from_dataframe(df, table_id)
+            job.result()  # Wait for the job to complete.
 
-        job = client.load_table_from_dataframe(df, table_id)
-        job.result()  # Wait for the job to complete.
+        else:
+            with closing(self._connect()) as client:
+                if create_first:
+                    self._create_table(table_id, create_sql, client)
+
+                job = client.load_table_from_dataframe(df, table_id)
+                job.result()  # Wait for the job to complete.
 
         logger.info(f"Inserted {len(df)} records into {table_id}")
 
