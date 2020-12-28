@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+
+## [0.28.2] - 2020-12-22
+
+CI/CD Pipelines updated, now [Merged Results](https://docs.gitlab.com/ee/ci/merge_request_pipelines/pipelines_for_merged_results) are activated.
+
+Added to PR workflow explanation in CONTRIBUTING.md.
+
+Closes #121 - Fix detached pipelines.
+
 ## [0.28.0] - 2020-12-10
 
 Modify string filter `format_in_clause`, now supporting string values.
