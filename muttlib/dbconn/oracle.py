@@ -3,6 +3,7 @@ import logging
 from sqlalchemy.types import VARCHAR
 
 from muttlib.dbconn.base import EngineBaseClient
+import deprecated
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ class OracleClient(EngineBaseClient):
         return db_uri
 
     @property  # type: ignore
-    @deprecated
+    @deprecated(reason="Use conn_str", version="1.0.0")
     def _db_uri(self):
         return self.conn_str
 
