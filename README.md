@@ -28,9 +28,9 @@ Current modules:
 - [Credits](#contributing)
 - [License](#license)
 
-### From Gitlab package registry
+### Installing from PyPi
 ```bash
-pip install muttlib --extra-index-url https://gitlab.com/api/v4/projects/10542840/packages/pypi/simple
+pip install muttlib
 ```
 
 Check below for available extras.
@@ -41,38 +41,44 @@ Base lib:
 
 To install base lib:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+pip install muttlib
 ```
 
 Parquet and Feather support:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[pyarrow]
+pip install muttlib[pyarrow]
 ```
 
 IPython utils:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+pip install muttlib[ipynb-utils]
 ```
 
 Forecast:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[forecast]
+pip install muttlib[forecast]
 ```
 
 Misc DB support for dbconn:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[mysql]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
+pip install muttlib[oracle]
+pip install muttlib[hive]
+pip install muttlib[postgres]
+pip install muttlib[mysql]
+pip install muttlib[sqlserver]
+pip install muttlib[moongo]
+pip install muttlib[ibis]
 ```
 
-Install custom branch:
+Install custom branch from GitHub mirror:
 ```bash
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
+github.com/MuttData/muttlib
+```
+
+Install custom branch from Gitlab main repo:
+```bash
+pip install -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 ## Usage
