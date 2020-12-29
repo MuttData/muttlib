@@ -29,20 +29,13 @@ Current modules:
 - [License](#license)
 
 ### Installing from PyPi
+
+Base lib:
 ```bash
 pip install muttlib
 ```
 
 Check below for available extras.
-
-### From repo
-
-Base lib:
-
-To install base lib:
-```bash
-pip install muttlib
-```
 
 Parquet and Feather support:
 ```bash
