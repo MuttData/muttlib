@@ -46,7 +46,6 @@ extra_dependencies = {
         'flake8==3.7.8',
         'pylint==2.4.4',
         'nox',
-        'deprecated',
     ],
     'test': [
         'freezegun',
@@ -94,6 +93,7 @@ setuptools.setup(
     + holidays_dep,
     test_suite='test',
     install_requires=[
+        'deprecated',
         'jinja2',
         'pandas==1.1.5',
         'progressbar2',
