@@ -67,13 +67,12 @@ pip install muttlib[ibis]
 
 From GitHub mirror:
 ```bash
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
-github.com/MuttData/muttlib
+pip install -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 From Gitlab main repo:
 ```bash
-pip install -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
+pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 ## Usage
