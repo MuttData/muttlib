@@ -26,15 +26,16 @@ class OracleClient(EngineBaseClient):
 
     @property
     def conn_str(self):
-        return self._db_uri
-
-    @property
-    def _db_uri(self):
         dsn = cx_Oracle.makedsn(  # pylint: disable=I1101
             self.host, self.port, service_name=self.database
         )
         db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
         return db_uri
+
+    @property  # type: ignore
+    @deprecated
+    def _db_uri(self):
+        return self.conn_str
 
     def _connect(self):
         connect_args = {'encoding': 'UTF-8', 'nencoding': 'UTF-8'}
