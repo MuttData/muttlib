@@ -63,13 +63,15 @@ pip install muttlib[moongo]
 pip install muttlib[ibis]
 ```
 
-Install custom branch from GitHub mirror:
+### Installing custom branches from the repos
+
+From GitHub mirror:
 ```bash
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 github.com/MuttData/muttlib
 ```
 
-Install custom branch from Gitlab main repo:
+From Gitlab main repo:
 ```bash
 pip install -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
