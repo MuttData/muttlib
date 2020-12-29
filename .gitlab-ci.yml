@@ -100,3 +100,18 @@ check_version:
       - merge_requests
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+
+check_changelog:
+  stage: validate
+  script:
+    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -- CHANGELOG.md | awk '{print $1}')
+    - if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+  only:
+    refs:
+      - merge_requests
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+
+
