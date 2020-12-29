@@ -145,7 +145,7 @@ class BaseClient(abc.ABC):
 
     @staticmethod
     def _cursor_columns(cursor):
-        # This can be moved out of the class
+        # TODO: This can be moved out of the class
         if hasattr(cursor, 'keys'):
             return cursor.keys()
         else:
