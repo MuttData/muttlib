@@ -1,6 +1,6 @@
 import logging
 
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import EngineBaseClient
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ except ModuleNotFoundError:
     logger.debug("No MySql support.")
 
 
-class MySqlClient(BaseClient):
+class MySqlClient(EngineBaseClient):
     """Create MySql DB client."""
 
     default_driver = 'pymysql'
