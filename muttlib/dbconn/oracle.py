@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.types import VARCHAR
 
 from muttlib.dbconn.base import EngineBaseClient
-import deprecated
+from deprecated import deprecated
 
 logger = logging.getLogger(__name__)
 
