@@ -59,7 +59,7 @@ pip install muttlib[hive]
 pip install muttlib[postgres]
 pip install muttlib[mysql]
 pip install muttlib[sqlserver]
-pip install muttlib[moongo]
+pip install muttlib[mongo]
 pip install muttlib[ibis]
 ```
 
