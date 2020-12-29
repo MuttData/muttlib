@@ -166,7 +166,7 @@ class BaseClient(abc.ABC):
             return connection.execute(sql)
 
     def to_frame(self, sql, params=None, connection=None):
-        """Return sql execution as Pandas dataframe."""
+        """Execute SQL statement and return as Pandas dataframe."""
         with closing(self.execute(sql, params, connection)) as cursor:
             if not cursor:
                 return
