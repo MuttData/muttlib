@@ -53,7 +53,9 @@ class BigQueryClient(BaseClient):
         self.table = table
 
     def _read_cred(
-        self, auth: Optional[str], auth_file: Optional[Union[str, Path]],
+        self,
+        auth: Optional[str],
+        auth_file: Optional[Union[str, Path]],
     ):
         """Create valid OAuth2 credentials for bigquery.
 
@@ -75,7 +77,7 @@ class BigQueryClient(BaseClient):
             return service_account.Credentials.from_service_account_info(dict_creds)
 
     def _connect(self):
-        """Create a BigQuery Client
+        """Create a BigQuery Client.
 
         Returns
         ----------
@@ -94,7 +96,7 @@ class BigQueryClient(BaseClient):
         if self.client is not None:
             self.client.close()
 
-    def execute(self, sql, params=None, client=None):  # pylint: disable=W0613
+    def execute(self, sql, params=None, client=None):  # pylint: disable=W0221
         """Execute sql statement.
 
         Parameters
@@ -121,7 +123,7 @@ class BigQueryClient(BaseClient):
         with closing(self._connect()) as client:
             return client.query(sql)
 
-    def to_frame(self, sql, params=None, client=None):
+    def to_frame(self, sql, params=None, client=None):  # pylint: disable=W0221
         """Return sql execution as Pandas dataframe.
 
         Parameters
@@ -139,13 +141,14 @@ class BigQueryClient(BaseClient):
         """
         return self.execute(sql, params, client).to_dataframe()
 
-    def insert_from_frame(
+    def insert_from_frame(  # pylint: disable=W0221
         self, df, create_first=True, create_sql=None, client=None, **kwargs
     ):
-        """Insert from a Pandas dataframe. If it is an existing table,
-        the schema of the DataFrame must match the schema of the destination table.
-        If the table does not yet exist, the schema is inferred from the DataFrame.
+        """Insert from a Pandas dataframe.
 
+        If it is an existing table, the schema of the DataFrame must match the schema
+        of the destination table. If the table does not yet exist,
+        the schema is inferred from the DataFrame.
         Parameters
         ----------
         df: pd.DataFrame
