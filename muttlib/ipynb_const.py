@@ -1,4 +1,17 @@
-"""Constants for ipython exploratory notebooks."""
+"""Constants for ipython exploratory notebooks.
+
+DeprecationWarning:
+
+This module will be removed from muttlib in version 1.0.0
+"""
+import warnings
+
+warnings.warn(
+    "This module will be removed from muttlib in version 1.0.0",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 from datetime import datetime
 
 import numpy as np
