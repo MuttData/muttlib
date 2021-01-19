@@ -14,11 +14,25 @@ Example using timeRangeConf:
 > print(trc.start_date, trc.end_date, trc.future_date, trc.is_monthly())
 2015-07-02 00:00:00 2019-07-01 00:00:00 2020-06-30 00:00:00 True
 
+DeprecationWarning:
+
+This module will be removed from muttlib in version 1.0.0
 """
+import warnings
+
+warnings.warn(
+    "This module will be removed from muttlib in version 1.0.0",
+    DeprecationWarning,
+    stacklevel=2,
+)
 from muttlib.utils import create_forecaster_dates
 from sklearn.base import BaseEstimator
+from deprecated import deprecated
 
 
+@deprecated(
+    reason="'AttributeHelperMixin' will be removed from muttlib in version 1.0.0"
+)
 class AttributeHelperMixin(BaseEstimator):
     """Helper mixing to handle params, metrics and artifacts from processing steps.
 
@@ -67,6 +81,9 @@ class AttributeHelperMixin(BaseEstimator):
         return self._metrics
 
 
+@deprecated(
+    reason="'TimeRangeConfiguration' will be removed from muttlib in version 1.0.0"
+)
 class TimeRangeConfiguration(AttributeHelperMixin):
     """Time configurations that should remain constant when reprocessing."""
 
