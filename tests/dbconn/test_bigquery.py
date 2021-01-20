@@ -31,9 +31,9 @@ def test_bigquery_close(dummy_db_credentials):
         bq_cli.client = client
         bq_cli.execute("SELECT *")
 
-        assert bq_close.call_count == 0
-        bq_cli.close()
         assert bq_close.call_count == 1
+        bq_cli.close()
+        assert bq_close.call_count == 2
 
 
 def test_execute(dummy_db_credentials):
