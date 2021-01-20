@@ -11,6 +11,12 @@ Refactored `BigQueryClient` client to support external clients as arguments and 
 
 Also complying with BaseClient interface.
 
+## [0.31.0] - 2021-01-19
+`ipynb_const` module deprecation. It will be removed from `muttlib` in version 1.0.0.
+
+## [0.30.0] - 2021-01-19
+`gcd` module deprecation. It will be removed from `muttlib` in version 1.0.0.
+
 ## [0.29.1] - 2020-12-29
 Update README with PyPi install instructions.
 
