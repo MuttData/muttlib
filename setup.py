@@ -11,6 +11,7 @@ holidays_dep = ['holidays>=0.10.2']
 
 #  define 'extra_dependencies'
 extra_dependencies = {
+    'athena': ['PyAthena[SQLAlchemy]'],
     'pyarrow': pyarrow_dep,
     'oracle': ['cx_Oracle'],
     'hive': ['pyhive>=0.6.1'],

@@ -1,97 +1,70 @@
+"""Presto Client."""
+
 from contextlib import closing
 import logging
 import re
 from time import sleep
 
-from muttlib.dbconn.base import BaseClient
-import muttlib.utils as utils
 import pandas as pd
 import progressbar
+
+from muttlib.dbconn.base import BaseClient
+import muttlib.utils as utils
 
 logger = logging.getLogger(__name__)
 try:
     from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
-    from pyhive import hive
+    from pyhive import presto as pyhive_presto
 except ModuleNotFoundError:
-    logger.debug("No Hive support.")
-
-HIVE_DB_TYPE = 'hive'
+    logger.debug("No Presto support.")
 
 
-class HiveClient(BaseClient):
-    """Wrapper around PyHive's hive module.
+class PrestoClient(BaseClient):
+    """Wrapper around PyHive's Presto module.
 
     Parameters
     ----------
     host: str
         Host url.
     port: int, Optional
-        Port to connect to the HiveServer. Defaults to 10000.
-    auth: str, Optional
-        Authentication protocol or layer. Defaults to "NOSASL".
-    database: str, Optional
-        Name of database to connect to.
-    username: str, Optional
-        Hive username.
-    password: str, Optional
-        Use with `auth="LDAP"` or `auth="CUSTOM"` only.
-
-    Notes
-    ----------
-    Refer to PyHive's docstrings for better context on parameters' descriptions:
-    https://github.com/dropbox/PyHive/blob/2c2446bf905ea321aac9dcdd3fa033909ff0b0b5/pyhive/hive.py#L105
-
+        Port to connect to the Presto server. Defaults to 443.
     """
 
     def __init__(
         self,
         host,
-        port=10_000,
-        auth='NOSASL',
-        database='default',
+        port=443,
+        protocol="https",
+        catalog="hive",
+        schema="default",
         username=None,
         password=None,
+        requests_kwargs=None,
     ):
         super().__init__(
-            host=host,
-            port=port,
-            database=database,
-            username=username,
-            password=password,
+            host=host, port=port, username=username, password=password,
         )
-        self.auth = auth
+        self.protocol = protocol
+        self.catalog = catalog
+        self.schema = schema
+        self.requests_kwargs = requests_kwargs
 
     def _connect(self):
-        """Instance a connection to the database.
-
-        Returns
-        ----------
-        pyhive.hive.Connection
-        """
-        return hive.connect(
+        """Instance a connection to the database."""
+        return pyhive_presto.connect(
             host=self.host,
             port=self.port,
-            auth=self.auth,
-            database=self.database,
             username=self.username,
-            password=self.password,
+            catalog=self.catalog,
+            schema=self.schema,
+            protocol=self.protocol,
+            requests_kwargs=self.requests_kwargs,
         )
 
     def execute(
-        self,
-        sql,
-        params=None,
-        connection=None,
-        show_progress=True,
-        dry_run=False,
-        async_=False,
+        self, sql, params=None, connection=None, show_progress=True, dry_run=False,
     ):
-        """Execute sql statement.
-
-        Returns
-        ----------
-        pyhive.hive.Cursor or None
-        """
+        """Execute sql statement."""
         sql = utils.path_or_string(sql)
         if params is not None:
             sql = sql.format(**params)
@@ -107,7 +80,7 @@ class HiveClient(BaseClient):
             should_close = True
 
         cursor = connection.cursor()
-        cursor.execute(sql, async_=async_)
+        cursor.execute(sql)
 
         if show_progress:
             self._show_query_progress(cursor)
@@ -150,4 +123,4 @@ class HiveClient(BaseClient):
 
 # Backward compatiblity alias.
 # TODO: Deprecate this.
-HiveDb = HiveClient
+PrestoDb = PrestoClient
