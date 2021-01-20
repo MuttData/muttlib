@@ -1,10 +1,10 @@
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import EngineBaseClient
 
 SQLSERVER_DB_TYPE = 'sql_server'
 SQLSERVER_DIALECT = "mssql"
 
 
-class SqlServerClient(BaseClient):
+class SqlServerClient(EngineBaseClient):
     """SQLServer client."""
 
     default_dialect = SQLSERVER_DIALECT

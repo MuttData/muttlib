@@ -2,7 +2,8 @@ import logging
 
 from sqlalchemy.types import VARCHAR
 
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import EngineBaseClient
+from deprecated import deprecated
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ except ModuleNotFoundError:
 ORACLE_DB_TYPE = 'oracle'
 
 
-class OracleClient(BaseClient):
+class OracleClient(EngineBaseClient):
     """Create Oracle DB client."""
 
     default_dialect = 'oracle'
@@ -25,12 +26,17 @@ class OracleClient(BaseClient):
         self.schema = schema
 
     @property
-    def _db_uri(self):
+    def conn_str(self):
         dsn = cx_Oracle.makedsn(  # pylint: disable=I1101
             self.host, self.port, service_name=self.database
         )
         db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
         return db_uri
+
+    @property  # type: ignore
+    @deprecated(reason="Use conn_str", version="1.0.0")
+    def _db_uri(self):
+        return self.conn_str
 
     def _connect(self):
         connect_args = {'encoding': 'UTF-8', 'nencoding': 'UTF-8'}

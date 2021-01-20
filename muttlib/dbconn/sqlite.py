@@ -1,9 +1,9 @@
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import EngineBaseClient
 
 SQLITE_DB_TYPE = 'sqlite'
 
 
-class SqliteClient(BaseClient):
+class SqliteClient(EngineBaseClient):
     """Create SQLite DB client."""
 
     default_dialect = 'sqlite'

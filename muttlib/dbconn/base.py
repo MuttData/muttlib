@@ -1,8 +1,11 @@
 """Module to get and use multiple Big Data DB connections."""
+import abc
+from contextlib import closing
 from functools import wraps
 import logging
 from typing import Optional
 
+from deprecated import deprecated
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
@@ -51,7 +54,7 @@ def format_drivername(dialect: str, driver: Optional[str] = None):
     return '+'.join(parts)
 
 
-class BaseClient:
+class BaseClient(abc.ABC):
     """Create BaseClient for DBs."""
 
     default_dialect: Optional[str] = None  # To be defined by subclasses.
@@ -81,7 +84,6 @@ class BaseClient:
             port=port,
             database=database,
         )
-        self._engine = None
 
     # This variable is used to list class attributes to be forwarded to
     # `self.conn_url` for backward compatibility.
@@ -129,22 +131,21 @@ class BaseClient:
         return _cls.__setattr__(target, attr, value)
 
     @property
+    def conn_str(self):
+        return str(self.conn_url)
+
+    @property  # type: ignore
+    @deprecated(reason="Use conn_str", version="1.0.0")
     def _db_uri(self):
         return str(self.conn_url)
 
-    def get_engine(self, custom_uri=None, connect_args=None, echo=False):
-        """Create engine or return existing one."""
-        connect_args = {} if connect_args is None else connect_args
-        if not self._engine:
-            db_uri = custom_uri or self._db_uri
-            self._engine = create_engine(db_uri, connect_args=connect_args, echo=echo)
-        return self._engine
-
+    @abc.abstractmethod
     def _connect(self):
-        return self.get_engine().connect()
+        raise NotImplementedError
 
     @staticmethod
     def _cursor_columns(cursor):
+        # TODO: This can be moved out of the class
         if hasattr(cursor, 'keys'):
             return cursor.keys()
         else:
@@ -153,25 +154,95 @@ class BaseClient:
     @parse_sql_statement_decorator
     def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
         """Execute sql statement."""
-        if connection is None:
-            connection = self._connect()
-        return connection.execute(sql)
+        if params is not None:
+            sql = sql.format(**params)
 
-    def to_frame(self, *args, **kwargs):
-        """Return sql execution as Pandas dataframe."""
-        cursor = self.execute(*args, **kwargs)
-        if not cursor:
-            return
-        data = cursor.fetchall()
-        if data:
-            df = pd.DataFrame(data, columns=self._cursor_columns(cursor))
-        else:
-            df = pd.DataFrame()
-        return df
+        if connection is not None:
+            # It's not our job to close the passed connection
+            return connection.execute(sql)
 
-    def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
+        with self._connect() as connection:
+            # Create and destroy a connection, as to avoid dangling connections
+            return connection.execute(sql)
+
+    def to_frame(self, sql, params=None, connection=None):
+        """Execute SQL statement and return as Pandas dataframe."""
+        with closing(self.execute(sql, params, connection)) as cursor:
+            if not cursor:
+                return
+            data = cursor.fetchall()
+            if data:
+                df = pd.DataFrame(data, columns=self._cursor_columns(cursor))
+            else:
+                df = pd.DataFrame()
+            return df
+
+    def insert_from_frame(
+        self, df, table, if_exists='append', index=False, connection=None, **kwargs
+    ):
         """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
-        connection = self._connect()
-        with connection:
+
+        column_names = df.columns.tolist()
+        chunksize = kwargs.get("chunksize", 10_000)
+
+        if if_exists == "fail" or if_exists == "replace":
+            raise NotImplementedError
+
+        if index:
+            raise NotImplementedError
+
+        insert_stmt = """
+            INSERT INTO {table} ({columns})
+            VALUES {values_chunk}
+        """
+
+        def _to_sql_tuple(d):
+            return f"({', '.join(map(str, d.values()))})"
+
+        def df_chunksize_iterator(df, chunksize=10_000):
+            for start in range(0, len(df), chunksize):
+                yield df[start : start + chunksize]
+
+        for chunk in df_chunksize_iterator(df, chunksize):
+            values = map(_to_sql_tuple, chunk.to_dict(orient="records"))
+            chunk_insert_stmt = insert_stmt.format(
+                table=table, columns=column_names, values_chunk=",\n".join(values)
+            )
+            self.execute(chunk_insert_stmt, connection=connection)
+
+
+class EngineBaseClient(BaseClient):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._engine = None
+
+    def _connect(self):
+        return self.get_engine().connect()
+
+    def get_engine(self, custom_uri=None, connect_args=None, echo=False):
+        """Create engine or return existing one."""
+        if not self._engine:
+            if connect_args is None:
+                connect_args = {}
+            db_uri = custom_uri or self._db_uri
+            self._engine = create_engine(db_uri, connect_args=connect_args, echo=echo)
+        return self._engine
+
+    def insert_from_frame(
+        self, df, table, if_exists='append', index=False, connection=None, **kwargs
+    ):
+        """Insert from a Pandas dataframe."""
+        # TODO: Validate types here?
+
+        if connection:
+            # It's not our job to close the passed connection
             df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
+        else:
+            with self._connect() as connection:
+                # Create and destroy a connection, as to avoid dangling connections
+                df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
+
+
+class ClientBaseClient(BaseClient):
+    pass
