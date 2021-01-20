@@ -30,6 +30,8 @@ if current_backend != 'TkAgg':
     )
 import matplotlib.pyplot as plt  # NOQA
 
+from deprecated import deprecated
+
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -64,6 +66,7 @@ def convert_to_snake_case(raw_string: str):
     return raw_string
 
 
+@deprecated
 def list_to_sql_tuple(l: List) -> str:
     """Create an sql-string synthax-valid tuple from python list."""
     assert len(l) > 0
@@ -71,6 +74,7 @@ def list_to_sql_tuple(l: List) -> str:
     return f'({placeholders:s})'
 
 
+@deprecated
 def describe_table(table_name: str, db_connector) -> pandas.DataFrame:
     """Describe table sql template.
 
@@ -89,6 +93,7 @@ def describe_table(table_name: str, db_connector) -> pandas.DataFrame:
     return desc
 
 
+@deprecated
 def write_to_clipboard(output) -> None:
     """Write str to clipboard using UTF-8 encoding.
 
@@ -107,6 +112,7 @@ def write_to_clipboard(output) -> None:
     process.communicate(output.encode('utf-8'))
 
 
+@deprecated
 def list_vals_contains_str(value_list: list, filter_value: str) -> list:
     """Filter string list containing certain string match in lowercase.
 
@@ -249,6 +255,7 @@ def col_sample_display(
         plt.title(query_str)
 
 
+@deprecated
 def get_one_to_one_relationship(df: pandas.DataFrame, factor_id: str, factor_name: str):
     """Do for a given factor, which we understand as a categorical column.
 
@@ -667,6 +674,7 @@ def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     return rv
 
 
+@deprecated
 def wrap_list_values_quotes(value_list: list):
     """Wraps all values in a list with single quotes
 
