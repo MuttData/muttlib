@@ -26,7 +26,7 @@ extra_dependencies = {
         'jinjasql',
         'matplotlib',
         'numpy',
-        'pandas==1.1.5',
+        'pandas==1.2.1',
         'seaborn',
     ],
     'gdrive': ['oauth2client', 'requests'],
