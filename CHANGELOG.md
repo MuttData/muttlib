@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.33.0] - 2021-01-20
+
+New `plotting` module. An auxiliary toolkit for plotting that includes:
+
+- `create_forecast_figure`: Plot trend, forecast and anomalies with history, anomaly and forecast phases.
+
 ## [0.32.0] - 2021-01-19
 
 Refactored `BigQueryClient` client to support external clients as arguments and automatic closing of client when managed by itself.
