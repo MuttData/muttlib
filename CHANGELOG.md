@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.34.0] - 2021-01-26
+
+Deprecate from `utils` module:
+- `read_yaml`
+- `non_empty_dirs`
+- `is_readable_path`
+- `dict_to_namedtuple`
+- `wrap_list_values_quotes`
+- `get_fathers_mothers_kids_day`
+- `get_friends_day`
+- `is_special_day`
+- `get_semi_month_pay_days`
+- `none_or_empty_pandas`
+- `in_clause_requirement`
+- `split_on_letter`
+
+
+`ipynb_utils` module deprecation. It will be removed from `muttlib` in version 1.0.0.
+Some features will be migrated to `utils` module.
+
 ## [0.33.0] - 2021-01-20
 
 New `plotting` module. An auxiliary toolkit for plotting that includes:
