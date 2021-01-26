@@ -26,7 +26,7 @@ extra_dependencies = {
         'jinjasql',
         'matplotlib',
         'numpy',
-        'pandas==1.1.5',
+        'pandas==1.2.1',
         'seaborn',
     ],
     'gdrive': ['oauth2client', 'requests'],
@@ -54,6 +54,7 @@ extra_dependencies = {
         'pytest-xdist',
         'pytest-cov',
         'pytest-html',
+        'pytest-mpl==0.12',
         'betamax',
         'betamax-serializers',
     ]
@@ -95,7 +96,7 @@ setuptools.setup(
     install_requires=[
         'deprecated',
         'jinja2',
-        'pandas==1.1.5',
+        'pandas==1.2.1',
         'progressbar2',
         'pyyaml',
         'scikit-learn',

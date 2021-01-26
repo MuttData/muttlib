@@ -1,3 +1,4 @@
+from contextlib import closing
 import json
 import logging
 from pathlib import Path
@@ -18,6 +19,8 @@ BIGQUERY_DB_TYPE = 'bigquery'
 
 
 class BigQueryClient(BaseClient):
+    """BigQuery Client."""
+
     def __init__(
         self,
         db: str,
@@ -72,7 +75,7 @@ class BigQueryClient(BaseClient):
             return service_account.Credentials.from_service_account_info(dict_creds)
 
     def _connect(self):
-        """Create a BigQuery Client
+        """Create a BigQuery Client.
 
         Returns
         ----------
@@ -87,80 +90,111 @@ class BigQueryClient(BaseClient):
         return self.client
 
     def close(self):
-        """Close connection"""
+        """Close connection."""
         if self.client is not None:
             self.client.close()
 
-    def execute(self, sql, params=None):  # pylint: disable=W0613
+    def execute(self, sql, params=None, client=None):  # pylint: disable=W0221
         """Execute sql statement.
 
-        sql: str or path
+        Parameters
+        ----------
+        sql : str or path
             SQL query string or path to file with Select statements.
-        params: dict
+        params : dict, optional
             parameters to add into the SQL query to execute.
-        client: google.cloud.bigquery.client
+        client : google.cloud.bigquery.client, optional
             client to the database, if it's already created.
-        """
-        if self.client is None:
-            self.client = self._connect()
 
+        Returns
+        -------
+        google.cloud.bigquery.job.QueryJob
+        """
         sql = utils.path_or_string(sql)
         if params is not None:
             sql = sql.format(**params)
         logger.info(f"Executing query:\n{sql}")
-        return self.client.query(sql)
 
-    def to_frame(self, sql, params=None):
+        if client is not None:
+            return client.query(sql)
+
+        with closing(self._connect()) as client:
+            return client.query(sql)
+
+    def to_frame(self, sql, params=None, client=None):  # pylint: disable=W0221
         """Return sql execution as Pandas dataframe.
 
-        sql: str or path
+        Parameters
+        ----------
+        sql : str or path
             SQL query string or path to file with Select statements.
-        params: dict
+        params : dict, optional
             parameters to add into the SQL query to execute.
-        client: google.cloud.bigquery.client
+        client : google.cloud.bigquery.client
             client to the database, if it's already created.
+
+        Returns
+        -------
+        pandas.DataFrame
         """
-        return self.execute(sql, params).to_dataframe()
+        return self.execute(sql, params, client).to_dataframe()
 
-    def insert_from_frame(
-        self, df, create_first=True, create_sql=None,
+    def insert_from_frame(  # pylint: disable=W0221
+        self, df, create_first=True, create_sql=None, client=None, **kwargs
     ):
-        """Insert from a Pandas dataframe. If it is an existing table,
-        the schema of the DataFrame must match the schema of the destination table.
-        If the table does not yet exist, the schema is inferred from the DataFrame.
+        """Insert from a Pandas dataframe.
 
+        If it is an existing table, the schema of the DataFrame must match the schema
+        of the destination table. If the table does not yet exist,
+        the schema is inferred from the DataFrame.
         Parameters
         ----------
         df: pd.DataFrame
             Dataframe with data to be inserted.
-        create_first: bool
+        create_first: bool, optional
             Whether to create table before attempting insertion.
-        create_sql: str or path
+        create_sql: str or path, optional
             SQL query string or path to file with create statements.
+        client: google.cloud.bigquery.client, optional
+            client to the database, if it's already created.
         """
         table_id = f"{self.project}.{self.db}.{self.table}"
         logger.info(f"Going to insert data into {table_id}")
 
-        if create_first:
-            self._create_table(table_id, create_sql)
+        if client is not None:
+            if create_first:
+                self._create_table(table_id, create_sql, client)
 
-        job = self._connect().load_table_from_dataframe(df, table_id)
-        job.result()  # Wait for the job to complete.
+            job = client.load_table_from_dataframe(df, table_id)
+            job.result()  # Wait for the job to complete.
+
+        else:
+            with closing(self._connect()) as client:
+                if create_first:
+                    self._create_table(table_id, create_sql, client)
+
+                job = client.load_table_from_dataframe(df, table_id)
+                job.result()  # Wait for the job to complete.
 
         logger.info(f"Inserted {len(df)} records into {table_id}")
 
-    def _create_table(self, table_id, sql):
+    def _create_table(self, table_id, sql, client=None):
         """Create table if it doesn't exist.
 
         Parameters
         ----------
-        table_id: str
+        table_id: str, optional
             project.dataset.table name to create.
-        sql: str or path
+        sql: str or path, optional
             SQL query string or path to file with create statements.
+        client: google.cloud.bigquery.client, optional
+            client to the database, if it's already created.
         """
+        if client is None:
+            client = self._connect()
+
         try:
-            self._connect().get_table(table_id)  # Make an API request.
+            client.get_table(table_id)  # Make an API request.
         except exceptions.NotFound:
-            self.execute(sql, params={'table_id': table_id})
+            self.execute(sql, params={'table_id': table_id}, client=client)
             logger.info(f"Created {table_id}")

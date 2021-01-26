@@ -7,12 +7,9 @@ def tests(session):
     """Run all tests."""
     session.install("pip==20.3.1")
     session.install(".[all]", "--use-deprecated=legacy-resolver")
-
-    cmd = ["pytest", "-n", "auto"]
-
+    cmd = ["pytest", "-n", "auto", "--mpl"]
     if session.posargs:
         cmd.extend(session.posargs)
-
     session.run(*cmd)
 
 

@@ -9,6 +9,7 @@ from deprecated import deprecated
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
+from contextlib import closing
 
 import muttlib.utils as utils
 
@@ -137,6 +138,7 @@ class BaseClient(abc.ABC):
     @property  # type: ignore
     @deprecated(reason="Use conn_str", version="1.0.0")
     def _db_uri(self):
+        # TODO: deprecate in favour of non-hidden conn_str
         return str(self.conn_url)
 
     @abc.abstractmethod
