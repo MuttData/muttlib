@@ -307,7 +307,7 @@ def get_one_to_one_relationship(df: pandas.DataFrame, factor_id: str, factor_nam
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'sum_count_aggregation' will be migrated to 'utils' module in version 1.0.0"
 )
 def sum_count_aggregation(
     df: pandas.DataFrame,
@@ -354,7 +354,7 @@ def sum_count_aggregation(
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'sum_count_time_series' will be migrated to 'utils' module in version 1.0.0"
 )
 def sum_count_time_series(
     df: pandas.DataFrame,
@@ -411,7 +411,7 @@ def sum_count_time_series(
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'category_reductor' will be migrated to 'utils' module in version 1.0.0"
 )
 def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
     """Reduce a categorical col's levels.
@@ -532,7 +532,7 @@ def get_string_named_placeholders(s):
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'load_sql_query' will be migrated to 'utils' module in version 1.0.0"
 )
 def load_sql_query(sql, query_context_params=None):
     """Read sql file or string and format with a dictionary of params.
@@ -572,7 +572,7 @@ def load_sql_query(sql, query_context_params=None):
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'get_sql_stats_aggr' will be migrated to 'utils' module in version 1.0.0"
 )
 def get_sql_stats_aggr(
     input_expression, as_name=None, with_std=False, with_ndv=False, with_count=False
@@ -613,7 +613,7 @@ def get_sql_stats_aggr(
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'get_null_count_aggr' will be migrated to 'utils' module in version 1.0.0"
 )
 def get_null_count_aggr(
     columns_list, as_name='null_count', no_ending_comma=False, empty_string_null=False
@@ -705,7 +705,7 @@ def get_matching_columns(cols: list, regex_list: list) -> list:
 
 
 @deprecated(
-    reason="'get_one_to_one_relationship' will be migrated to 'utils' module in version 1.0.0"
+    reason="'get_sqlserver_hashed_sample_clause' will be migrated to 'utils' module in version 1.0.0"
 )
 def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     """Get SQL Server-valid synthax for hashed-sampling an id clause.on
