@@ -156,6 +156,6 @@ class HiveClient(BaseClient):
         return progress
 
 
-@deprecated(reason="'HiveDb' will be deprecated in favor of 'HiveClient' in version 1.0.0"")
+@deprecated(reason="'HiveDb' will be deprecated in favor of 'HiveClient' in version 1.0.0")
 class HiveDb(HiveClient):
     pass
