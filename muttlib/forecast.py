@@ -20,47 +20,49 @@ The most relevant docstrings are on:
 Simple examples can be taken from the tests.
 A complex example doing a grid search can be seen here:
 
-> import pandas as pd
-> from sklearn.model_selection import GridSearchCV, ParameterGrid
-> from muttlib.forecast import SkProphet, StepsSelectorEstimator
->
-> # The grid has to be turned into a list if used in a StepsSelectorEstimator
-> # as it has to be copyable for get / set params
-> prophet_grid = list(ParameterGrid({
->     'sk_date_column': ['date'],
->     'sk_yhat_only': [True],
->     'sk_extra_regressors': [
->         [],
->         [{'name': 'b'}],
->         ],
->     'prophet_kwargs': [
->         dict(daily_seasonality='auto'),
->         dict(daily_seasonality=True),
->         ],
->     }))
->
-> days_selector_grid = {
->     'estimator_class': [SkProphet],
->     'amount_of_steps': [90, 120],
->     'sort_col': ['date'],
->     'estimator_kwargs': prophet_grid,
-> }
->
-> # To instance GridSearchCV, we need to pass an initialized estimator
-> # (for example, a `StepsSelectorEstimator`)
-> initial_estimator = StepsSelectorEstimator(
->     SkProphet,
->     days_selector_grid['amount_of_steps'][0],
->     prophet_grid[0])
-> cv = GridSearchCV(
->     initial_estimator,
->     days_selector_grid,
->     cv=2,
->     scoring='r2')
->
-> X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
-> y = pd.Series([1, 1, 0, 1, 0])
-> cv.fit(X, y)
+.. highlight:: python
+.. code-block:: python
+    import pandas as pd
+    from sklearn.model_selection import GridSearchCV, ParameterGrid
+    from muttlib.forecast import SkProphet, StepsSelectorEstimator
+
+    # The grid has to be turned into a list if used in a StepsSelectorEstimator
+    # as it has to be copyable for get / set params
+    prophet_grid = list(ParameterGrid({
+        'sk_date_column': ['date'],
+        'sk_yhat_only': [True],
+        'sk_extra_regressors': [
+            [],
+            [{'name': 'b'}],
+            ],
+        'prophet_kwargs': [
+            dict(daily_seasonality='auto'),
+            dict(daily_seasonality=True),
+            ],
+        }))
+
+    days_selector_grid = {
+        'estimator_class': [SkProphet],
+        'amount_of_steps': [90, 120],
+        'sort_col': ['date'],
+        'estimator_kwargs': prophet_grid,
+    }
+
+    # To instance GridSearchCV, we need to pass an initialized estimator
+    # (for example, a `StepsSelectorEstimator`)
+    initial_estimator = StepsSelectorEstimator(
+        SkProphet,
+        days_selector_grid['amount_of_steps'][0],
+        prophet_grid[0])
+    cv = GridSearchCV(
+        initial_estimator,
+        days_selector_grid,
+        cv=2,
+        scoring='r2')
+
+    X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
+    y = pd.Series([1, 1, 0, 1, 0])
+    cv.fit(X, y)
 
 TODO:
   - At the moment, given FBProphet's current version we have that the model's
