@@ -25,7 +25,7 @@ extra_dependencies = {
         'jinja2',
         'jinjasql',
         'matplotlib',
-        'numpy==1.9.5',
+        'numpy==1.19.5',
         'pandas==1.2.1',
         'seaborn',
     ],
@@ -102,7 +102,7 @@ setuptools.setup(
         'scikit-learn',
         'scipy',
         'sqlalchemy',
-        'numpy==1.9.5',
+        'numpy==1.19.5',
     ],
     extras_require=extra_dependencies,
 )
