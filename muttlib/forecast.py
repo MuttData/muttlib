@@ -25,7 +25,7 @@ A complex example doing a grid search can be seen here:
     import pandas as pd
     from sklearn.model_selection import GridSearchCV, ParameterGrid
     from muttlib.forecast import SkProphet, StepsSelectorEstimator
-    
+
     # The grid has to be turned into a list if used in a StepsSelectorEstimator
     # as it has to be copyable for get / set params
     prophet_grid = list(ParameterGrid({
@@ -40,14 +40,14 @@ A complex example doing a grid search can be seen here:
             dict(daily_seasonality=True),
             ],
         }))
-    
+
     days_selector_grid = {
         'estimator_class': [SkProphet],
         'amount_of_steps': [90, 120],
         'sort_col': ['date'],
         'estimator_kwargs': prophet_grid,
     }
-    
+
     # To instance GridSearchCV, we need to pass an initialized estimator
     # (for example, a `StepsSelectorEstimator`)
     initial_estimator = StepsSelectorEstimator(
@@ -59,7 +59,7 @@ A complex example doing a grid search can be seen here:
         days_selector_grid,
         cv=2,
         scoring='r2')
-    
+
     X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
     y = pd.Series([1, 1, 0, 1, 0])
     cv.fit(X, y)
