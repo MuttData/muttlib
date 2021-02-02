@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Fix module dosctring formatting in `forecast.py`.
 
+## [0.33.1] - 2021-01-27
+
+`HiveDb` class deprecared in favor of `HiveClient`.
+
 ## [0.33.0] - 2021-01-20
 
 New `plotting` module. An auxiliary toolkit for plotting that includes:
