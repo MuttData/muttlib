@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Fix module dosctring formatting in `forecast.py`.
 
+Pin Numpy version to fix a bug with PyArrow (https://github.com/Azure/MachineLearningNotebooks/issues/1314).
+
+Nit on `utils`  to make mypy happy.
+
 ## [0.33.1] - 2021-01-27
 
 `HiveDb` class deprecared in favor of `HiveClient`.
