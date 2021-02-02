@@ -20,8 +20,8 @@ The most relevant docstrings are on:
 Simple examples can be taken from the tests.
 A complex example doing a grid search can be seen here:
 
-.. highlight:: python
 .. code-block:: python
+
     import pandas as pd
     from sklearn.model_selection import GridSearchCV, ParameterGrid
     from muttlib.forecast import SkProphet, StepsSelectorEstimator
@@ -63,6 +63,7 @@ A complex example doing a grid search can be seen here:
     X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
     y = pd.Series([1, 1, 0, 1, 0])
     cv.fit(X, y)
+
 
 TODO:
   - At the moment, given FBProphet's current version we have that the model's
