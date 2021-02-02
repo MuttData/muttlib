@@ -817,7 +817,7 @@ def df_get_typed_cols(df, col_type='cat', protected_cols: List[str] = None):
     if col_type == 'cat':  # Work in cases, else dont define include var
         include = ['object', 'category']
     elif col_type == 'num':
-        include = [np.number]
+        include = ['number']
     elif col_type == 'date':
         include = ['datetime']
     elif col_type in ('bool', 'timedelta'):
