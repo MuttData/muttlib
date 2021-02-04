@@ -582,7 +582,8 @@ def get_default_jinja_template(path_or_str, filters=None, **kwargs):
     """Create Jinja specific template.."""
     if filters is None:
         filters = {"inclause": format_in_clause}
-    environment = jinja2.Environment(**{**DEFAULT_JINJA_ENV_ARGS, **kwargs})
+    # The following line is labeled with nosec so that bandit doesn't fail. In DEFAULT_JINJA_ENV_ARGS, autoescape is set to True.
+    environment = jinja2.Environment(**{**DEFAULT_JINJA_ENV_ARGS, **kwargs})  # nosec
     environment.filters = {**environment.filters, **filters}
     return environment.from_string(path_or_string(path_or_str))
 
