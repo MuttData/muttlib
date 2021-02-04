@@ -565,6 +565,19 @@ def format_in_clause(
     return clause
 
 
+def template(path_or_str, **kwargs):
+    """Create jinja specific template.."""
+    environment = jinja2.Environment(
+        autoescape=True,
+        line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
+        trim_blocks=kwargs.pop('trim_blocks', True),
+        lstrip_blocks=kwargs.pop('lstrip_blocks', True),
+        **kwargs,
+    )
+    environment.filters['inclause'] = format_in_clause
+    return environment.from_string(path_or_string(path_or_str))
+
+
 def get_default_jinja_template(path_or_str, filters=None, **kwargs):
     """Create Jinja specific template.."""
     if filters is None:
