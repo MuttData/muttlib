@@ -309,7 +309,7 @@ def test_template_basic(tmpdir):
     p = tmpdir.mkdir("sub").join("template_test.html")
     p.write(tmp_template)
 
-    assert str_template == utils.template(p).render(
+    assert str_template == utils.get_default_jinja_template(p).render(
         name="Inigo Montoya", daddy="father", acction="die"
     )
 
@@ -319,8 +319,7 @@ def test_template_macros(tmpdir):
     # testing macros
     macro = "{% macro test_macro(name) %}" "Hello lil {{ name }}" "{% endmacro %}"
     p.write(macro)
-
-    out = utils.template(p).module.test_macro("John")
+    out = utils.get_default_jinja_template(p).module.test_macro("John")
     assert 'Hello lil John' == out
 
 
