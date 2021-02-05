@@ -373,6 +373,7 @@ def get_first_fortnight_last_day(ds):
     return last_sunday_first_fortnight
 
 
+@deprecated(reason="'get_obj_hash' will be removed from muttlib in version 1.0.0")
 def get_obj_hash(d, length=10):
     """Return SHAKE 256 hash from hashable obj.
 
@@ -500,6 +501,7 @@ def hash_str(s, length=8):
     return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
 
 
+@deprecated(reason="'setup_logging' will be removed from muttlib in version 1.0.0")
 def setup_logging(log_config, logger_name='root', level='INFO'):
     """Setup logging config."""
     log_config['loggers'][logger_name]['level'] = level
@@ -578,7 +580,7 @@ def format_in_clause(
 
         (1.12,1,'a')
     """
-    if not in_clause_requirement(iterable):
+    if not isinstance(iterable, (list, tuple)):
         raise BadInClauseException(
             f"Value passed is not a list or tuple: '{iterable}'. "
             f"Where the query uses the '| inclause'."
@@ -589,6 +591,7 @@ def format_in_clause(
     return clause
 
 
+@deprecated(reason="'template' will be removed from muttlib in version 1.0.0")
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
@@ -612,6 +615,9 @@ def get_default_jinja_template(path_or_str, filters=None, **kwargs):
     return environment.from_string(path_or_string(path_or_str))
 
 
+@deprecated(
+    reason="'render_jinja_template' will be removed from muttlib in version 1.0.0"
+)
 def render_jinja_template(path_or_str, jparams: Dict = None):
     """
     Render a query via jinja, from a str or a sql-like file.
