@@ -314,7 +314,7 @@ def test_old_template_basic(tmpdir):
     )
 
 
-def test_template_basic(tmpdir):
+def test_get_default_jinja_template_basic(tmpdir):
     tmp_template = (
         "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
     )
@@ -337,7 +337,7 @@ def test_old_template_macros(tmpdir):
     assert 'Hello lil John' == out
 
 
-def test_template_macros(tmpdir):
+def test_get_default_jinja_template_macros(tmpdir):
     p = tmpdir.mkdir("sub").join("macros_test.html")
     # testing macros
     macro = "{% macro test_macro(name) %}" "Hello lil {{ name }}" "{% endmacro %}"
