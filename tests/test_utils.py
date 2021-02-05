@@ -300,7 +300,7 @@ def test_df_info_to_str():
     assert result == expected
 
 
-def test_template_basic(tmpdir):
+def test_old_template_basic(tmpdir):
     tmp_template = (
         "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
     )
@@ -314,13 +314,35 @@ def test_template_basic(tmpdir):
     )
 
 
-def test_template_macros(tmpdir):
+def test_get_default_jinja_template_basic(tmpdir):
+    tmp_template = (
+        "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
+    )
+    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
+
+    p = tmpdir.mkdir("sub").join("template_test.html")
+    p.write(tmp_template)
+
+    assert str_template == utils.get_default_jinja_template(p).render(
+        name="Inigo Montoya", daddy="father", acction="die"
+    )
+
+
+def test_old_template_macros(tmpdir):
     p = tmpdir.mkdir("sub").join("macros_test.html")
     # testing macros
     macro = "{% macro test_macro(name) %}" "Hello lil {{ name }}" "{% endmacro %}"
     p.write(macro)
-
     out = utils.template(p).module.test_macro("John")
+    assert 'Hello lil John' == out
+
+
+def test_get_default_jinja_template_macros(tmpdir):
+    p = tmpdir.mkdir("sub").join("macros_test.html")
+    # testing macros
+    macro = "{% macro test_macro(name) %}" "Hello lil {{ name }}" "{% endmacro %}"
+    p.write(macro)
+    out = utils.get_default_jinja_template(p).module.test_macro("John")
     assert 'Hello lil John' == out
 
 

@@ -3,6 +3,7 @@ import logging
 import re
 from time import sleep
 
+from deprecated import deprecated
 import pandas as pd
 import progressbar
 
@@ -155,6 +156,8 @@ class HiveClient(BaseClient):
         return progress
 
 
-# Backward compatiblity alias.
-# TODO: Deprecate this.
-HiveDb = HiveClient
+@deprecated(
+    reason="'HiveDb' will be deprecated in favor of 'HiveClient' in version 1.0.0"
+)
+class HiveDb(HiveClient):
+    pass
