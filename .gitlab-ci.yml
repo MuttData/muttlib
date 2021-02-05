@@ -88,8 +88,9 @@ deploy:
 release:
   stage: release_stage
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  needs:
-    - job: deploy
+  only:
+    refs:
+      - master
   release:
     tag_name: ${MAJOR}_${MINOR}_${REVISION}
     description: '$CI_PROJECT_DIR/CHANGELOG.md'
