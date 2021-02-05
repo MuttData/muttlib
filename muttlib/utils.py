@@ -23,6 +23,9 @@ from pandas.tseries import offsets
 from scipy.stats import iqr
 import yaml
 
+from deprecated import deprecated
+
+
 logger = logging.getLogger(f'utils.{__name__}')
 
 DEFAULT_JINJA_ENV_ARGS = dict(
@@ -30,6 +33,7 @@ DEFAULT_JINJA_ENV_ARGS = dict(
 )
 
 
+@deprecated(reason="'read_yaml' will be removed from muttlib in version 1.0.0")
 def read_yaml(f):
     """Read a yaml file."""
     with open(f, 'r') as file:
@@ -42,11 +46,13 @@ def make_dirs(dir_path):
     return dir_path
 
 
+@deprecated(reason="'non_empty_dirs' will be removed from muttlib in version 1.0.0")
 def non_empty_dirs(path):
     """List all non-empty directories for a given path."""
     return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
 
 
+@deprecated(reason="'is_readable_path' will be removed from muttlib in version 1.0.0")
 def is_readable_path(str_or_path):
     """Check if string or Path passed corresponds to a readable file.
 
@@ -227,6 +233,7 @@ def convert_to_snake_case(name: str):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
+@deprecated(reason="'dict_to_namedtuple' will be removed from muttlib in version 1.0.0")
 def dict_to_namedtuple(name, d):
     """Convert dictionary to namedtuple object."""
     return namedtuple(name, d.keys())(**d)
@@ -244,6 +251,9 @@ def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
             return orde
 
 
+@deprecated(
+    reason="'wrap_list_values_quotes' will be removed from muttlib in version 1.0.0"
+)
 def wrap_list_values_quotes(lis):
     """Wraps all values in a list with single quotes."""
     return [f"'{val}'" for val in lis]
@@ -280,6 +290,9 @@ def range_datetime(datetime_start, datetime_end, timeskip=None):
         datetime_start += timeskip
 
 
+@deprecated(
+    reason="'get_fathers_mothers_kids_day' will be removed from muttlib in version 1.0.0"
+)
 def get_fathers_mothers_kids_day(year: int):
     """Get three dates for a given year input."""
     august_first = str_to_datetime(f'{year}-08-01')
@@ -303,11 +316,13 @@ def get_fathers_mothers_kids_day(year: int):
     return FATHERS_DAY, MOTHERS_DAY, KIDS_DAY
 
 
+@deprecated(reason="'get_friends_day' will be removed from muttlib in version 1.0.0")
 def get_friends_day(year: int):
     """Get arg-style friends date."""
     return str_to_datetime(f'{year}-07-20')
 
 
+@deprecated(reason="'is_special_day' will be removed from muttlib in version 1.0.0")
 def is_special_day(ds, timestamps_inclause):
     """
     Flag a date or date-string-like object as a special day.
@@ -328,6 +343,9 @@ def is_special_day(ds, timestamps_inclause):
         return 0
 
 
+@deprecated(
+    reason="'get_semi_month_pay_days' will be removed from muttlib in version 1.0.0"
+)
 def get_semi_month_pay_days(start_date, end_date):
     """Get half and end of month friday pay-days for salary workers."""
     first_monthly_fridays = pd.date_range(
@@ -355,6 +373,7 @@ def get_first_fortnight_last_day(ds):
     return last_sunday_first_fortnight
 
 
+@deprecated(reason="'get_obj_hash' will be removed from muttlib in version 1.0.0")
 def get_obj_hash(d, length=10):
     """Return SHAKE 256 hash from hashable obj.
 
@@ -461,6 +480,9 @@ def robust_standarize_values(values):
     return (values - values.median()) / iqr(values)
 
 
+@deprecated(
+    reason="'none_or_empty_pandas' will be removed from muttlib in version 1.0.0"
+)
 def none_or_empty_pandas(obj):
     """Check if object is None or empty pd.Dataframe / pd.Series."""
     if obj is None:
@@ -479,6 +501,7 @@ def hash_str(s, length=8):
     return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
 
 
+@deprecated(reason="'setup_logging' will be removed from muttlib in version 1.0.0")
 def setup_logging(log_config, logger_name='root', level='INFO'):
     """Setup logging config."""
     log_config['loggers'][logger_name]['level'] = level
@@ -500,6 +523,9 @@ class BadInClauseException(JinjaTemplateException):
     """Dummy doc."""
 
 
+@deprecated(
+    reason="'in_clause_requirement' will be removed from muttlib in version 1.0.0"
+)
 def in_clause_requirement(obj):
     """Check object list or tuple iterables."""
     return isinstance(obj, (list, tuple))
@@ -554,7 +580,7 @@ def format_in_clause(
 
         (1.12,1,'a')
     """
-    if not in_clause_requirement(iterable):
+    if not isinstance(iterable, (list, tuple)):
         raise BadInClauseException(
             f"Value passed is not a list or tuple: '{iterable}'. "
             f"Where the query uses the '| inclause'."
@@ -565,6 +591,7 @@ def format_in_clause(
     return clause
 
 
+@deprecated(reason="'template' will be removed from muttlib in version 1.0.0")
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
@@ -588,6 +615,9 @@ def get_default_jinja_template(path_or_str, filters=None, **kwargs):
     return environment.from_string(path_or_string(path_or_str))
 
 
+@deprecated(
+    reason="'render_jinja_template' will be removed from muttlib in version 1.0.0"
+)
 def render_jinja_template(path_or_str, jparams: Dict = None):
     """
     Render a query via jinja, from a str or a sql-like file.
@@ -920,6 +950,7 @@ def dedup_list(li: list):
     return new_list
 
 
+@deprecated(reason="'split_on_letter' will be removed from muttlib in version 1.0.0")
 def split_on_letter(s):
     """Split string on groups of letters"""
     return tuple(filter(None, re.split(r'([aA-zZ]+)', s)))

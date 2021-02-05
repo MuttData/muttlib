@@ -25,6 +25,28 @@ Nit on `utils`  to make mypy happy.
 
 `HiveDb` class deprecared in favor of `HiveClient`.
 
+## [0.34.0] - 2021-01-26
+
+Deprecate from `utils` module:
+- `read_yaml`
+- `non_empty_dirs`
+- `dict_to_namedtuple`
+- `wrap_list_values_quotes`
+- `get_fathers_mothers_kids_day`
+- `get_friends_day`
+- `is_special_day`
+- `get_semi_month_pay_days`
+- `get_obj_hash`
+- `none_or_empty_pandas`
+- `setup_logging`
+- `in_clause_requirement`
+- `split_on_letter`
+- `template`
+- `render_jinja_template`
+
+`ipynb_utils` module deprecation. It will be removed from `muttlib` in version 1.0.0.
+Some features will be migrated to `utils` module.
+
 ## [0.33.0] - 2021-01-20
 
 New `plotting` module. An auxiliary toolkit for plotting that includes:
