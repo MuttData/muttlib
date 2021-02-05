@@ -25,6 +25,10 @@ import yaml
 
 logger = logging.getLogger(f'utils.{__name__}')
 
+DEFAULT_JINJA_ENV_ARGS = dict(
+    autoescape=True, line_statement_prefix="%", trim_blocks=True, lstrip_blocks=True,
+)
+
 
 def read_yaml(f):
     """Read a yaml file."""
@@ -574,6 +578,16 @@ def template(path_or_str, **kwargs):
     return environment.from_string(path_or_string(path_or_str))
 
 
+def get_default_jinja_template(path_or_str, filters=None, **kwargs):
+    """Create Jinja specific template.."""
+    if filters is None:
+        filters = {"inclause": format_in_clause}
+    # The following line is labeled with nosec so that bandit doesn't fail. In DEFAULT_JINJA_ENV_ARGS, autoescape is set to True.
+    environment = jinja2.Environment(**{**DEFAULT_JINJA_ENV_ARGS, **kwargs})  # nosec
+    environment.filters = {**environment.filters, **filters}
+    return environment.from_string(path_or_string(path_or_str))
+
+
 def render_jinja_template(path_or_str, jparams: Dict = None):
     """
     Render a query via jinja, from a str or a sql-like file.
@@ -602,7 +616,7 @@ def render_jinja_template(path_or_str, jparams: Dict = None):
     pat = Path(path_or_str).expanduser().resolve().as_posix()
     if is_readable_path(pat):
         logger.debug(f'Loading jinja template from {pat}.')
-    return template(path_or_str).render(**jparams)
+    return get_default_jinja_template(path_or_str).render(**jparams)
 
 
 def get_cloudera_sql_stats_aggr(
