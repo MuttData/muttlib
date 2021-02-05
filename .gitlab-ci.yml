@@ -7,6 +7,7 @@ stages:
   - validate
   - test_stage
   - deploy_stage
+  - release_stage
 
 test:
   stage: test_stage
@@ -84,14 +85,16 @@ deploy:
     refs:
       - master
 
-release_job:
-  stage: release
+release:
+  stage: release_stage
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   needs:
     - job: deploy
   release:
     tag_name: ${MAJOR}_${MINOR}_${REVISION}
     description: '$CI_PROJECT_DIR/CHANGELOG.md'
+  script:
+    - echo 'running release job'
 
 check_version:
   stage: validate
@@ -122,5 +125,3 @@ check_changelog:
       - merge_requests
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-
-
