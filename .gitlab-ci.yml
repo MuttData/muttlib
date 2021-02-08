@@ -89,12 +89,12 @@ release:
   stage: release_stage
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   release:
-    tag_name: ${MAJOR}_${MINOR}_${REVISION}
+    tag_name: $TAG
     description: '$CI_PROJECT_DIR/CHANGELOG.md'
   script:
     - echo 'running release job'
   before_script:
-    - ''
+    - 'TAG=$(grep __version__ muttlib/__init__.py | cut -d "=" -f 2)'
 
 check_version:
   stage: validate
