@@ -6,8 +6,8 @@ before_script:
 stages:
   - validate
   - test_stage
-  - deploy_stage
   - release_stage
+  - deploy_stage
 
 test:
   stage: test_stage
