@@ -6,6 +6,7 @@ before_script:
 stages:
   - validate
   - test_stage
+  - version_stage
   - release_stage
   - deploy_stage
 
@@ -85,18 +86,25 @@ deploy:
     refs:
       - master
 
+tag_release_version:
+  stage: version_stage
+  script:
+    - echo "TAG=$(grep __version__ muttlib/__init__.py | cut -d "''" -f 2)" >> variables.env
+  artifacts:
+    reports:
+      dotenv: variables.env
+
 release:
   stage: release_stage
   image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: tag_release_version
+      artifacts: true
   release:
-    tag_name: "v$TAG"
+    tag_name: "$TAG"
     description: './CHANGELOG.md'
   script:
-    - echo "running release job v$TAG"
-  before_script:
-    - ''
-  variables:
-    TAG='grep __version__ muttlib/__init__.py | cut -d "''" -f 2'
+    - echo "running release job $TAG"
 
 check_version:
   stage: validate
