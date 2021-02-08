@@ -93,6 +93,8 @@ release:
     description: '$CI_PROJECT_DIR/CHANGELOG.md'
   script:
     - echo 'running release job'
+  before_script:
+    - ''
 
 check_version:
   stage: validate
