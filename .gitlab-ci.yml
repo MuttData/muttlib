@@ -89,10 +89,14 @@ deploy:
 tag_release_version:
   stage: version_stage
   script:
-    - echo "TAG=$(grep __version__ muttlib/__init__.py | cut -d "''" -f 2)" >> variables.env
+    - echo "TAG=v$(grep __version__ muttlib/__init__.py | cut -d "''" -f 2)" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env
+  only:
+    refs:
+      - merge_requests
+      - master
 
 release:
   stage: release_stage
@@ -101,12 +105,16 @@ release:
     - job: tag_release_version
       artifacts: true
   release:
-    tag_name: "$TAG"
+    tag_name: '$TAG'
     description: './CHANGELOG.md'
   script:
-    - echo "running release job $TAG"
+    - echo 'running release job for $TAG'
   before_script:
     - ''
+  only:
+    refs:
+      - merge_requests
+      - master
 
 check_version:
   stage: validate
