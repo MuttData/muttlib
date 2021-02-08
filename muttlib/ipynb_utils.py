@@ -1,4 +1,16 @@
-"""Helper functions for ipynb visualizations and explorations."""
+"""Helper functions for ipynb visualizations and explorations.
+
+DeprecationWarning:
+
+This module will be removed from muttlib in version 1.0.0
+"""
+import warnings
+
+warnings.warn(
+    "This module will be removed from muttlib in version 1.0.0",
+    DeprecationWarning,
+    stacklevel=2,
+)
 import re
 import _string
 import subprocess
@@ -30,11 +42,16 @@ if current_backend != 'TkAgg':
     )
 import matplotlib.pyplot as plt  # NOQA
 
+from deprecated import deprecated
+
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
 
 
+@deprecated(
+    reason="'convert_to_snake_case' will be migrated to 'utils' module in version 1.0.0"
+)
 def convert_to_snake_case(raw_string: str):
     """Convert string to snake_case.
 
@@ -64,6 +81,7 @@ def convert_to_snake_case(raw_string: str):
     return raw_string
 
 
+@deprecated(reason="'list_to_sql_tuple' will be removed from muttlib in version 1.0.0")
 def list_to_sql_tuple(l: List) -> str:
     """Create an sql-string synthax-valid tuple from python list."""
     assert len(l) > 0
@@ -71,6 +89,7 @@ def list_to_sql_tuple(l: List) -> str:
     return f'({placeholders:s})'
 
 
+@deprecated(reason="'describe_table' will be removed from muttlib in version 1.0.0")
 def describe_table(table_name: str, db_connector) -> pandas.DataFrame:
     """Describe table sql template.
 
@@ -89,6 +108,7 @@ def describe_table(table_name: str, db_connector) -> pandas.DataFrame:
     return desc
 
 
+@deprecated(reason="'write_to_clipboard' will be removed from muttlib in version 1.0.0")
 def write_to_clipboard(output) -> None:
     """Write str to clipboard using UTF-8 encoding.
 
@@ -107,6 +127,9 @@ def write_to_clipboard(output) -> None:
     process.communicate(output.encode('utf-8'))
 
 
+@deprecated(
+    reason="'list_vals_contains_str' will be removed from muttlib in version 1.0.0"
+)
 def list_vals_contains_str(value_list: list, filter_value: str) -> list:
     """Filter string list containing certain string match in lowercase.
 
@@ -133,6 +156,7 @@ def list_vals_contains_str(value_list: list, filter_value: str) -> list:
     return [s for s in value_list if filter_value.lower() in s.lower()]
 
 
+@deprecated(reason="'ab_split' will be migrated to 'utils' module in version 1.0.0")
 def ab_split(id_obj: str, salt: str, control_group_size: float):
     """Split object into test or control group based on the ID and salt.
 
@@ -168,6 +192,9 @@ def ab_split(id_obj: str, salt: str, control_group_size: float):
     return split > control_group_size
 
 
+@deprecated(
+    reason="'col_sample_display' will be migrated to 'utils' module in version 1.0.0"
+)
 def col_sample_display(
     df: pandas.DataFrame,
     col: str,
@@ -249,6 +276,9 @@ def col_sample_display(
         plt.title(query_str)
 
 
+@deprecated(
+    reason="'get_one_to_one_relationship' will be removed from muttlib in version 1.0.0"
+)
 def get_one_to_one_relationship(df: pandas.DataFrame, factor_id: str, factor_name: str):
     """Do for a given factor, which we understand as a categorical column.
 
@@ -276,6 +306,9 @@ def get_one_to_one_relationship(df: pandas.DataFrame, factor_id: str, factor_nam
     return rv
 
 
+@deprecated(
+    reason="'sum_count_aggregation' will be migrated to 'utils' module in version 1.0.0"
+)
 def sum_count_aggregation(
     df: pandas.DataFrame,
     group_cols: List,
@@ -320,6 +353,9 @@ def sum_count_aggregation(
     return counts
 
 
+@deprecated(
+    reason="'sum_count_time_series' will be migrated to 'utils' module in version 1.0.0"
+)
 def sum_count_time_series(
     df: pandas.DataFrame,
     date_col: str,
@@ -374,6 +410,9 @@ def sum_count_time_series(
     return time_series
 
 
+@deprecated(
+    reason="'category_reductor' will be migrated to 'utils' module in version 1.0.0"
+)
 def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
     """Reduce a categorical col's levels.
 
@@ -424,6 +463,7 @@ def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
     return rv
 
 
+@deprecated(reason="'clean_numeric_col' will be removed from muttlib in version 1.0.0")
 def clean_numeric_col(df, numeric_col, **kwds):
     """Clean/cast a numeric.column from object/string type.
 
@@ -448,6 +488,9 @@ def clean_numeric_col(df, numeric_col, **kwds):
     return partial(pandas.to_numeric, errors='raise')(df[numeric_col], **kwds)
 
 
+@deprecated(
+    reason="'optimize_numeric_types' will be removed from muttlib in version 1.0.0"
+)
 def optimize_numeric_types(df: pandas.DataFrame):
     """Cast numeric columns to more memory friendly types.
 
@@ -466,6 +509,9 @@ def optimize_numeric_types(df: pandas.DataFrame):
     return df
 
 
+@deprecated(
+    reason="'get_string_named_placeholders' will be removed from muttlib in version 1.0.0"
+)
 def get_string_named_placeholders(s):
     """Output list of placeholders in a formatted string.
 
@@ -485,6 +531,9 @@ def get_string_named_placeholders(s):
     return rv
 
 
+@deprecated(
+    reason="'load_sql_query' will be migrated to 'utils' module in version 1.0.0"
+)
 def load_sql_query(sql, query_context_params=None):
     """Read sql file or string and format with a dictionary of params.
 
@@ -522,6 +571,9 @@ def load_sql_query(sql, query_context_params=None):
     return sql
 
 
+@deprecated(
+    reason="'get_sql_stats_aggr' will be migrated to 'utils' module in version 1.0.0"
+)
 def get_sql_stats_aggr(
     input_expression, as_name=None, with_std=False, with_ndv=False, with_count=False
 ):
@@ -560,6 +612,9 @@ def get_sql_stats_aggr(
     return rv
 
 
+@deprecated(
+    reason="'get_null_count_aggr' will be migrated to 'utils' module in version 1.0.0"
+)
 def get_null_count_aggr(
     columns_list, as_name='null_count', no_ending_comma=False, empty_string_null=False
 ):
@@ -595,6 +650,9 @@ def get_null_count_aggr(
     return rv
 
 
+@deprecated(
+    reason="'get_include_exclude_columns' will be removed migrated to from muttlib  module.0.0 because is already"
+)
 def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
     """Filter list by inclusion and exclusion regexes.
 
@@ -621,6 +679,9 @@ def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None
     return sorted(list(ret))
 
 
+@deprecated(
+    reason="'get_matching_columns' will be removed migrated to from muttlib  module.0.0 because is already"
+)
 def get_matching_columns(cols: list, regex_list: list) -> list:
     """Match a list of columns with a nuber of regexes.
 
@@ -643,6 +704,9 @@ def get_matching_columns(cols: list, regex_list: list) -> list:
     return ret
 
 
+@deprecated(
+    reason="'get_sqlserver_hashed_sample_clause' will be migrated to 'utils' module in version 1.0.0"
+)
 def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     """Get SQL Server-valid synthax for hashed-sampling an id clause.on
 
@@ -667,6 +731,9 @@ def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     return rv
 
 
+@deprecated(
+    reason="'wrap_list_values_quotes' will be removed from muttlib in version 1.0.0"
+)
 def wrap_list_values_quotes(value_list: list):
     """Wraps all values in a list with single quotes
 
