@@ -89,9 +89,7 @@ stages:
 tag_release_version:
   stage: version_stage
   script:
-    - ls
-    - echo "TAG=v$(grep __version__ ./muttlib/__init__.py | cut -d "''" -f 2)"
-    - echo "TAG=v$(grep __version__ ./muttlib/__init__.py | cut -d "''" -f 2)" >> variables.env
+    - echo "TAG=v$(grep __version__ ./muttlib/__init__.py | cut -d "'" -f 2)" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env
@@ -100,7 +98,7 @@ tag_release_version:
       - merge_requests
       - master
 
-.release:
+release:
   stage: release_stage
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   needs:
@@ -109,7 +107,6 @@ tag_release_version:
   release:
     tag_name: '$TAG'
     description: './CHANGELOG.md'
-    ref: '$CI_COMMIT_SHA'
   script:
     - echo 'running release job for $TAG'
   before_script:
