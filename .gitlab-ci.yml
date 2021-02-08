@@ -94,7 +94,7 @@ release:
   script:
     - echo "running release job v$TAG"
   before_script:
-    - 'TAG=$(grep __version__ muttlib/__init__.py | cut -d "=" -f 2)'
+    - 'TAG=$(grep __version__ muttlib/__init__.py | cut -d "'" -f 2)'
 
 check_version:
   stage: validate
