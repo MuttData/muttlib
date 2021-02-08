@@ -105,6 +105,8 @@ release:
     description: './CHANGELOG.md'
   script:
     - echo "running release job $TAG"
+  before_script:
+    - ''
 
 check_version:
   stage: validate
