@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from unittest.mock import ANY
 
 import pandas as pd
 import pytest
@@ -56,7 +57,22 @@ def test_execute_with_incomplete_params_fails(dummy_db_credentials):
 
         q = """
         SELECT * FROM {table}
-        WHERE CONDITION = {condition1}
+        WHERE {condition1}
         """
         with pytest.raises(KeyError):
             hive_cli.execute(q, connection=connection, params={"table": "test"})
+
+
+def test_execute_with_params(dummy_db_credentials):
+    with patch("pyhive.hive.Connection") as connection:
+        hive_cli = HiveClient(**dummy_db_credentials)
+
+        q = """
+        SELECT * FROM {table}
+        WHERE {condition1}
+        """
+        params = {"table": "test", "condition1": "id = 1"}
+        hive_cli.execute(q, connection=connection, params=params)
+        connection.cursor().execute.assert_called_once_with(
+            q.format(**params), async_=ANY
+        )
