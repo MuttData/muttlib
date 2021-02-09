@@ -89,4 +89,22 @@ def test_execute_closes_connection(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection:
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *")
-        connection().close.assert_called()
+        connection().close.assert_called_once()
+
+
+def test_execute_shows_progress(dummy_db_credentials):
+    with patch("pyhive.hive.Connection") as connection, patch(
+        "muttlib.dbconn.HiveClient._show_query_progress"
+    ) as progress:
+        hive_cli = HiveClient(**dummy_db_credentials)
+        hive_cli.execute("SELECT *")
+        progress.assert_called_once()
+
+
+def test_execute_does_not_show_progress(dummy_db_credentials):
+    with patch("pyhive.hive.Connection") as connection, patch(
+        "muttlib.dbconn.HiveClient._show_query_progress"
+    ) as progress:
+        hive_cli = HiveClient(**dummy_db_credentials)
+        hive_cli.execute("SELECT *", show_progress=False)
+        progress.assert_not_called()
