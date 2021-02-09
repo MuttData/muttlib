@@ -23,6 +23,18 @@ def test_init_without_host_fails(dummy_db_credentials):
         HiveClient(**dummy_db_credentials)
 
 
+def test_init_with_password(dummy_db_credentials):
+    dummy_db_credentials["password"] = "password"
+    dummy_db_credentials["auth"] = "CUSTOM"
+    hive_cli = HiveClient(**dummy_db_credentials)
+    assert hive_cli.password == dummy_db_credentials["password"]
+    assert hive_cli.auth == dummy_db_credentials["auth"]
+    dummy_db_credentials["auth"] = "LDAP"
+    hive_cli = HiveClient(**dummy_db_credentials)
+    assert hive_cli.password == dummy_db_credentials["password"]
+    assert hive_cli.auth == dummy_db_credentials["auth"]
+
+
 def test_init_with_password_fails(dummy_db_credentials):
     dummy_db_credentials["password"] = "password"
     with pytest.raises(ValueError):
