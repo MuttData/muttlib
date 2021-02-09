@@ -48,3 +48,15 @@ def test_execute(dummy_db_credentials):
         connection.cursor().execute.assert_not_called()
         hive_cli.execute("SELECT *", connection=connection)
         connection.cursor().execute.assert_called_once()
+
+
+def test_execute_with_incomplete_params_fails(dummy_db_credentials):
+    with patch("pyhive.hive.Connection") as connection:
+        hive_cli = HiveClient(**dummy_db_credentials)
+
+        q = """
+        SELECT * FROM {table}
+        WHERE CONDITION = {condition1}
+        """
+        with pytest.raises(KeyError):
+            hive_cli.execute(q, connection=connection, params={"table": "test"})
