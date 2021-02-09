@@ -57,6 +57,10 @@ class HiveClient(BaseClient):
         username=None,
         password=None,
     ):
+        if (auth not in ["LDAP", "CUSTOM"]) and password:
+            raise ValueError(
+                "Password should be set if and only if in LDAP or CUSTOM mode; Remove password or use one of those modes"
+            )
         super().__init__(
             host=host,
             port=port,

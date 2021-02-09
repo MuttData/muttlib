@@ -23,6 +23,12 @@ def test_init_without_host_fails(dummy_db_credentials):
         HiveClient(**dummy_db_credentials)
 
 
+def test_init_with_password_fails(dummy_db_credentials):
+    dummy_db_credentials["password"] = "password"
+    with pytest.raises(ValueError):
+        hive_cli = HiveClient(**dummy_db_credentials)
+
+
 def test_execute(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection:
         hive_cli = HiveClient(**dummy_db_credentials)
