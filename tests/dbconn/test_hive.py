@@ -76,3 +76,17 @@ def test_execute_with_params(dummy_db_credentials):
         connection.cursor().execute.assert_called_once_with(
             q.format(**params), async_=ANY
         )
+
+
+def test_execute_does_not_close_connection(dummy_db_credentials):
+    with patch("pyhive.hive.Connection") as connection:
+        hive_cli = HiveClient(**dummy_db_credentials)
+        hive_cli.execute("SELECT *", connection=connection)
+        connection.close.assert_not_called()
+
+
+def test_execute_closes_connection(dummy_db_credentials):
+    with patch("pyhive.hive.Connection") as connection:
+        hive_cli = HiveClient(**dummy_db_credentials)
+        hive_cli.execute("SELECT *")
+        connection().close.assert_called()
