@@ -10,7 +10,7 @@ stages:
   - release_stage
   - deploy_stage
 
-test:
+.test:
   stage: test_stage
   script:
   - pip install .
@@ -32,7 +32,7 @@ test:
       - merge_requests
       - master
 
-lint:
+.lint:
   stage: test_stage
   script:
     - pip install nox
@@ -42,7 +42,7 @@ lint:
       - merge_requests
       - master
 
-bandit:
+.bandit:
   stage: test_stage
   script:
     - pip install nox
@@ -52,7 +52,7 @@ bandit:
       - merge_requests
       - master
 
-pages:
+.pages:
   stage: deploy_stage
   script:
   - pip install .
@@ -73,7 +73,7 @@ pages:
 # package registry, thus using the required variables to do so
 # The package will be uploaded to PYPI_URL, which can be overrided
 # not to upload to gitlab's PYPI
-deploy:
+.deploy:
   stage: deploy_stage
   script:
     - pip install twine
@@ -95,6 +95,7 @@ tag_release_version:
       dotenv: variables.env
   only:
     refs:
+      - merge_requests
       - master
 
 release:
@@ -112,9 +113,10 @@ release:
     - ''
   only:
     refs:
+      - merge_requests
       - master
 
-check_version:
+.check_version:
   stage: validate
   script:
     - pip install packaging
@@ -131,7 +133,7 @@ check_version:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
 
-check_changelog:
+.check_changelog:
   stage: validate
   script:
     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
