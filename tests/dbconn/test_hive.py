@@ -14,16 +14,13 @@ def dummy_db_credentials():
         "auth": "NOSASL",
         "database": "example",
         "username": "user",
-        "password": "password",
     }
 
 
 def test_execute(dummy_db_credentials):
-    with patch("pyhive.hive.Connection") as connection, patch(
-        "pyhive.hive.Cursor"
-    ) as hive_query:
+    with patch("pyhive.hive.Connection") as connection:
         hive_cli = HiveClient(**dummy_db_credentials)
 
-        assert hive_query.call_count == 0
+        connection.cursor().execute.assert_not_called()
         hive_cli.execute("SELECT *", connection=connection)
-        assert hive_query.call_count == 1
+        connection.cursor().execute.assert_called_once()
