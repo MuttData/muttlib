@@ -45,6 +45,9 @@ class HiveClient(BaseClient):
 
     """
 
+    default_dialect = "hive"
+    default_driver = ""
+
     def __init__(
         self,
         host,
