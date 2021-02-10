@@ -1,8 +1,8 @@
-from unittest.mock import patch
-from unittest.mock import ANY
+from unittest.mock import patch, ANY, MagicMock
 
 import pandas as pd
 import pytest
+from itertools import repeat, chain
 
 from muttlib.dbconn import HiveClient
 
@@ -94,17 +94,25 @@ def test_execute_closes_connection(dummy_db_credentials):
 
 def test_execute_shows_progress(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection, patch(
-        "muttlib.dbconn.HiveClient._show_query_progress"
+        "progressbar.ProgressBar"
     ) as progress:
+        status = MagicMock()
+        # first time return true, then always false
+        status.operationState.__eq__.side_effect = chain([True], repeat(False))
+        cursor = MagicMock()
+        cursor.poll.return_value = status
+        connection.return_value.cursor.return_value = cursor
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *")
         progress.assert_called_once()
+        progress.return_value.update.assert_called_once()
+        progress.return_value.finish.assert_called_once()
 
 
 def test_execute_does_not_show_progress(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection, patch(
-        "muttlib.dbconn.HiveClient._show_query_progress"
-    ) as progress:
+        "progressbar.ProgressBar"
+    ) as progress, patch("pyhive.hive.Cursor") as cursor:
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *", show_progress=False)
         progress.assert_not_called()
