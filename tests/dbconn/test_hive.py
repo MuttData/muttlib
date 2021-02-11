@@ -129,7 +129,7 @@ def test_execute_shows_progress(dummy_db_credentials):
 def test_execute_does_not_show_progress(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection, patch(
         "progressbar.ProgressBar"
-    ) as progress, patch("pyhive.hive.Cursor") as cursor:
+    ) as progress:
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *", show_progress=False)
         progress.assert_not_called()
