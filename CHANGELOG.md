@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Add docstrings to `file_processing.py`.
 
+## [0.35.2] - 2021-02-09
+
+Added tests for HiveClient.
+
 ## [0.35.1] - 2021-02-08
 
 Added release job to `GitLab CI`.
