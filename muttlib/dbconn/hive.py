@@ -109,8 +109,6 @@ class HiveClient(BaseClient):
                 if e not in params:
                     # If the sql string has an unformatted key then fail
                     raise
-                else:
-                    pass
         if dry_run:
             logger.debug(f"Query dry-run:{sql}")
             return
