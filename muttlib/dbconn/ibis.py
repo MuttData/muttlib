@@ -8,6 +8,8 @@ import pandas as pd
 from muttlib.dbconn.base import parse_sql_statement_decorator
 import muttlib.utils as utils
 
+from deprecated import deprecated
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -25,7 +27,7 @@ class IbisClient:
 
     Parameters
     ----------
-    host : str, optional
+    host : str
         Host name of the impalad node or load blancer.
     port : int, optional
         Impala's HiveServer2 port
@@ -130,8 +132,15 @@ class IbisClient:
         client.set_options(self.options)
         return client
 
+    @deprecated
     def execute(self, client, sql, return_cursor=False):
         """Execute raw sql statement."""
+        return client.raw_sql(sql, results=return_cursor)
+
+    def execute_new(self, sql, client=None, return_cursor=False):
+        """Execute raw sql statement."""
+        if client is None:
+            client = self._connect()
         return client.raw_sql(sql, results=return_cursor)
 
     @parse_sql_statement_decorator
