@@ -77,9 +77,10 @@ def test_execute_with_params(dummy_db_credentials):
         WHERE {condition1}
         """
         params = {"table": "test", "condition1": "id = 1"}
-        hive_cli.execute(q, connection=connection, params=params)
+        hive_cli.execute(q, connection=connection, params=params, async_=False)
+        connection.cursor.assert_called_once()
         connection.cursor.return_value.execute.assert_called_once_with(
-            q.format(**params), async_=ANY
+            q.format(**params), async_=False
         )
 
 
