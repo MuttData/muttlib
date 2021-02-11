@@ -44,11 +44,16 @@ def test_init_with_password_fails(dummy_db_credentials):
 
 def test_execute(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection:
-        hive_cli = HiveClient(**dummy_db_credentials)
+        cursor = MagicMock()
+        connection.cursor.return_value = cursor
 
-        connection.cursor().execute.assert_not_called()
-        hive_cli.execute("SELECT *", connection=connection)
-        connection.cursor().execute.assert_called_once()
+        hive_cli = HiveClient(**dummy_db_credentials)
+        q = "SELECT *"
+
+        cursor.execute.assert_not_called()
+        hive_cli.execute(q, connection=connection, async_=False)
+        connection.cursor.assert_called_once()
+        cursor.execute.assert_called_once_with(q, async_=False)
 
 
 def test_execute_with_incomplete_params_fails(dummy_db_credentials):
@@ -73,23 +78,33 @@ def test_execute_with_params(dummy_db_credentials):
         """
         params = {"table": "test", "condition1": "id = 1"}
         hive_cli.execute(q, connection=connection, params=params)
-        connection.cursor().execute.assert_called_once_with(
+        connection.cursor.return_value.execute.assert_called_once_with(
             q.format(**params), async_=ANY
         )
 
 
 def test_execute_does_not_close_connection(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection:
+        cursor = MagicMock()
+        connection.cursor.return_value = cursor
+
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *", connection=connection)
+        connection.cursor.assert_called_once()
         connection.close.assert_not_called()
+        cursor.execute.assert_called_once()
 
 
 def test_execute_closes_connection(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection:
+        cursor = MagicMock()
+        connection.return_value.cursor.return_value = cursor
+
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *")
-        connection().close.assert_called_once()
+        connection.return_value.cursor.assert_called_once()
+        connection.return_value.close.assert_called_once()
+        cursor.execute.assert_called_once()
 
 
 def test_execute_shows_progress(dummy_db_credentials):
