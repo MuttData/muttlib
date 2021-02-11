@@ -45,6 +45,9 @@ class HiveClient(BaseClient):
 
     """
 
+    default_dialect = "hive"
+    default_driver = ""
+
     def __init__(
         self,
         host,
@@ -54,6 +57,10 @@ class HiveClient(BaseClient):
         username=None,
         password=None,
     ):
+        if (auth not in ["LDAP", "CUSTOM"]) and password:
+            raise ValueError(
+                "Password should be set if and only if in LDAP or CUSTOM mode; Remove password or use one of those modes"
+            )
         super().__init__(
             host=host,
             port=port,
@@ -102,8 +109,6 @@ class HiveClient(BaseClient):
                 if e not in params:
                     # If the sql string has an unformatted key then fail
                     raise
-                else:
-                    pass
         if dry_run:
             logger.debug(f"Query dry-run:{sql}")
             return
