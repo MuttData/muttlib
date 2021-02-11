@@ -13,7 +13,7 @@ holidays_dep = ['holidays>=0.10.2']
 extra_dependencies = {
     'pyarrow': pyarrow_dep,
     'oracle': ['cx_Oracle'],
-    'hive': ['pyhive>=0.6.1'],
+    'hive': ['pyhive>=0.6.1', 'thrift'],
     'postgres': ['psycopg2-binary'],
     'mysql': ['pymysql'],
     'sqlserver': ['pymssql'],
