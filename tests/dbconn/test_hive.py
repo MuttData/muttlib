@@ -1,4 +1,4 @@
-from unittest.mock import patch, ANY, MagicMock
+from unittest.mock import patch, ANY, MagicMock, call
 
 import pandas as pd
 import pytest
@@ -96,16 +96,33 @@ def test_execute_shows_progress(dummy_db_credentials):
     with patch("pyhive.hive.Connection") as connection, patch(
         "progressbar.ProgressBar"
     ) as progress:
+        iterations = 4
         status = MagicMock()
         # first time return true, then always false
-        status.operationState.__eq__.side_effect = chain([True], repeat(False))
+        status.operationState.__eq__.side_effect = chain(
+            [True] * iterations, repeat(False)
+        )
+        status.progressUpdateResponse = None
         cursor = MagicMock()
         cursor.poll.return_value = status
         connection.return_value.cursor.return_value = cursor
+        cursor.fetch_logs.side_effect = [
+            [f"text ({i}/{iterations*10}) more_text"]
+            for i in range(10, (iterations + 1) * 10, 10)
+        ]
+
         hive_cli = HiveClient(**dummy_db_credentials)
         hive_cli.execute("SELECT *")
         progress.assert_called_once()
-        progress.return_value.update.assert_called_once()
+        assert progress.return_value.update.call_count == iterations
+        # this seems to be hardcoded in HiveClient
+        max_value = 100
+        progress.return_value.update.assert_has_calls(
+            [
+                call(v * max_value)
+                for v in [i / iterations for i in range(1, iterations + 1)]
+            ]
+        )
         progress.return_value.finish.assert_called_once()
 
 
