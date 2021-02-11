@@ -24,18 +24,29 @@ def test_temp_hdfs_path_changes_config():
         config.set_option.assert_called_once_with("temp_hdfs_path", temp_hdfs_path)
 
 
-def test_execute_with_no_client_establishes_connection():
+def test_execute_with_no_client():
     with patch("ibis.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
-        ibis_cli.execute_new(q)
+        ibis_cli.execute_new(q, return_cursor=False)
         impala.connect.assert_called_once()
+        impala.connect.return_value.raw_sql.assert_called_once_with(q, results=False)
 
 
-def test_execute_with_client_does_not_establish_connection():
+def test_execute_with_client():
     with patch("ibis.impala") as impala:
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
-        ibis_cli.execute_new(q, client=client)
+        ibis_cli.execute_new(q, client=client, return_cursor=False)
         impala.connect.assert_not_called()
+        client.raw_sql.assert_called_once_with(q, results=False)
+
+
+def test_execute_returns_cursor():
+    with patch("ibis.impala") as impala:
+        ibis_cli = IbisClient("host")
+        client = MagicMock()
+        q = "SELECT *"
+        ret = ibis_cli.execute_new(q, client=client, return_cursor=True)
+        client.raw_sql.assert_called_once_with(q, results=True)
