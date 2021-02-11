@@ -50,3 +50,11 @@ def test_execute_returns_cursor():
         q = "SELECT *"
         ret = ibis_cli.execute_new(q, client=client, return_cursor=True)
         client.raw_sql.assert_called_once_with(q, results=True)
+
+
+def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
+    with patch("ibis.impala") as impala:
+        ibis_cli = IbisClient("host")
+        q = "SELECT *"
+        with pytest.raises(ValueError):
+            ibis_cli.to_frame(q, via_hdfs=True)
