@@ -76,3 +76,15 @@ def test_to_frame_via_hdfs_and_refresh_cache():
         q = "SELECT *"
         ibis_cli.to_frame(q, via_hdfs=True, cache_dir=MagicMock(), refresh_cache=True)
         rm.assert_called_once()
+
+
+# def test_to_frame_creates_tmp_table():
+#     with patch("ibis.impala") as impala:
+#         local_tmp_table_dir = MagicMock()
+#         local_tmp_table_dir.exists.return_value = False
+#         cache_dir = MagicMock()
+#         cache_dir.__truediv__.return_value = local_tmp_table_dir
+#         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
+#         q = "SELECT *"
+#         ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir, refresh_cache=True)
+#         assert False
