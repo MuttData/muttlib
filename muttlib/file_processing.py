@@ -49,7 +49,7 @@ class RenameByResult:
         fn : str or Path
             Path to the file to processes.
         fn_arg : str
-            When used as decorator this is name of the argument with the path
+            When used as decorator this is the name of the argument with the path
             to be renamed.
         ok_unless_exception : bool
             Considers any result successful unless an exception happens.
