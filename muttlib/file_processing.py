@@ -1,3 +1,8 @@
+"""Utilities to facilitate file processing.
+
+This module provides convenient functions and classes for renaming files after
+successful operations and paralellized processing of new files.
+"""
 from concurrent.futures import Future, ProcessPoolExecutor, wait as wait_futures
 import functools
 import glob
@@ -20,9 +25,10 @@ class FileNotReady(Exception):
 
 
 class RenameByResult:
-    """Rename given file based on result to avoid reprocessing.
+    """Renames given file based on result to avoid reprocessing.
 
-    Rename input file based on the value passed to set_result at exit.
+    This class can be used as instance manager or decorator
+    input file based on the value passed to set_result at exit.
     """
 
     def __init__(
@@ -34,17 +40,17 @@ class RenameByResult:
         done_prefix=DONE_PREFIX,
         fail_prefix=FAIL_PREFIX,
     ):
-        """Setup instance to work as either contextmanager or decorator.
+        """Initialize instance.
 
-        Either fn or decorate_arg must be provided.
+        Either fn or fn_arg must be provided.
 
         Parameters
         ----------
         fn : str or Path
             Path to the file to processes.
         fn_arg : str
-            When used as decorator this name of the argument from which the path will
-            be taken.
+            When used as decorator this is name of the argument with the path
+            to be renamed.
         ok_unless_exception : bool
             Considers any result successful unless an exception happens.
         ready_prefix : str
@@ -54,10 +60,6 @@ class RenameByResult:
         fail_prefix : str
             Preffix to set if call failed.
 
-        Returns
-        -------
-        list of Any
-            Returns with the results of applying the function to each file.
         """
 
         if not (fn or fn_arg):
