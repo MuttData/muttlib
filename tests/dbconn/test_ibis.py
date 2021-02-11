@@ -62,12 +62,17 @@ def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
 
 def test_to_frame_via_hdfs_and_no_cache_dir_fails():
     with patch("ibis.impala") as impala:
-        ibis_cli = IbisClient(
-            "host",
-            hdfs_host=MagicMock(),
-            hdfs_port=MagicMock(),
-            hdfs_username=MagicMock(),
-        )
+        ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="",)
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*dir.*"):
             ibis_cli.to_frame(q, via_hdfs=True)
+
+
+def test_to_frame_via_hdfs_and_refresh_cache():
+    with patch("ibis.impala") as impala, patch("shutil.rmtree") as rm, patch(
+        "pyarrow.parquet.read_table"
+    ) as pq:
+        ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
+        q = "SELECT *"
+        ibis_cli.to_frame(q, via_hdfs=True, cache_dir=MagicMock(), refresh_cache=True)
+        rm.assert_called_once()
