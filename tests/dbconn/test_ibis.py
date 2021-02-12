@@ -142,9 +142,11 @@ def test_to_frame_no_hdfs_returns_non_empty_df():
         values = [[1, 2], [3, 4]]
         columns = [["column1"], ["column2"]]
         test_df = pd.DataFrame(values, columns=[c[0] for c in columns])
-        impala.connect.return_value.raw_sql.return_value.description.return_value = (
-            columns
-        )
+        impala.connect.return_value.raw_sql.return_value.description = columns
         impala.connect.return_value.raw_sql.return_value.fetchall.return_value = values
         df = ibis_cli.to_frame(q)
         assert df.equals(test_df)
+        impala.connect.return_value.raw_sql.assert_called_once_with(q, results=True)
+        impala.connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
+        impala.connect.return_value.raw_sql.return_value.release.assert_called_once()
+        impala.connect.return_value.close.assert_called_once()
