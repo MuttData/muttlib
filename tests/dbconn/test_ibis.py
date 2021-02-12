@@ -150,3 +150,16 @@ def test_to_frame_no_hdfs_returns_non_empty_df():
         impala.connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
         impala.connect.return_value.raw_sql.return_value.release.assert_called_once()
         impala.connect.return_value.close.assert_called_once()
+
+
+def test_to_frame_no_hdfs_fails_and_closes_connection():
+    with patch("ibis.impala") as impala:
+        ibis_cli = IbisClient("host")
+        q = "example query"
+        impala.connect.return_value.raw_sql.side_effect = ValueError("test error")
+        with pytest.raises(ValueError, match=r"test error"):
+            df = ibis_cli.to_frame(q)
+            impala.connect.return_value.raw_sql.assert_called_once_with(q, results=True)
+            impala.connect.return_value.raw_sql.return_value.fetchall.assert_not_called()
+            impala.connect.return_value.raw_sql.return_value.release.assert_not_called()
+            impala.connect.return_value.close.assert_called_once()
