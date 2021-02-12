@@ -92,7 +92,6 @@ def test_to_frame_creates_tmp_table():
         queries = [
             x.args[0] for x in impala.connect.return_value.raw_sql.call_args_list
         ]
-        print(queries)
         # assert all queries were made to ibis_tmp
         assert all("ibis_tmp" in q for q in queries)
         assert queries[0].lower().strip().startswith("drop table if exists")
