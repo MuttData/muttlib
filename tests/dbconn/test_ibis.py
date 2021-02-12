@@ -1,6 +1,7 @@
 from unittest.mock import patch, MagicMock
 
 import pytest
+import urllib.parse
 
 from muttlib.dbconn import IbisClient
 
@@ -78,13 +79,23 @@ def test_to_frame_via_hdfs_and_refresh_cache():
         rm.assert_called_once()
 
 
-# def test_to_frame_creates_tmp_table():
-#     with patch("ibis.impala") as impala:
-#         local_tmp_table_dir = MagicMock()
-#         local_tmp_table_dir.exists.return_value = False
-#         cache_dir = MagicMock()
-#         cache_dir.__truediv__.return_value = local_tmp_table_dir
-#         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
-#         q = "SELECT *"
-#         ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir, refresh_cache=True)
-#         assert False
+def test_to_frame_creates_tmp_table():
+    with patch("ibis.impala") as impala, patch("muttlib.dbconn.ibis.urlparse") as parse:
+        local_tmp_table_dir = MagicMock()
+        local_tmp_table_dir.exists.return_value = False
+        local_tmp_table_dir.glob.return_value = [MagicMock(return_value=True)]
+        cache_dir = MagicMock()
+        cache_dir.__truediv__.return_value = local_tmp_table_dir
+        ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
+        q = "SELECT *"
+        ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir)
+        queries = [
+            x.args[0] for x in impala.connect.return_value.raw_sql.call_args_list
+        ]
+        print(queries)
+        # assert all queries were made to ibis_tmp
+        assert all("ibis_tmp" in q for q in queries)
+        assert queries[0].lower().strip().startswith("drop table if exists")
+        assert queries[1].lower().strip().startswith("create table")
+        assert queries[2].lower().strip().startswith("insert")
+        assert queries[3].lower().strip().startswith("drop table if exists")
