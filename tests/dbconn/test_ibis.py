@@ -87,14 +87,17 @@ def test_to_frame_creates_tmp_table():
         cache_dir = MagicMock()
         cache_dir.__truediv__.return_value = local_tmp_table_dir
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
-        q = "SELECT *"
+        q = "example query"
         ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir)
         queries = [
             x.args[0] for x in impala.connect.return_value.raw_sql.call_args_list
         ]
         # assert all queries were made to ibis_tmp
         assert all("ibis_tmp" in q for q in queries)
+        # assert query order
         assert queries[0].lower().strip().startswith("drop table if exists")
         assert queries[1].lower().strip().startswith("create table")
         assert queries[2].lower().strip().startswith("insert")
         assert queries[3].lower().strip().startswith("drop table if exists")
+        # assert insert query has sql statement
+        assert q in queries[2].lower()
