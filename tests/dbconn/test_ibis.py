@@ -80,7 +80,7 @@ def test_to_frame_via_hdfs_and_refresh_cache():
         rm.assert_called_once()
 
 
-def test_to_frame_creates_tmp_table():
+def test_to_frame_via_hdfs_creates_tmp_table():
     with patch("ibis.impala") as impala, patch(
         "muttlib.dbconn.ibis.urlparse"
     ) as parse, patch("muttlib.utils.make_dirs") as make_dirs, patch(
@@ -107,7 +107,7 @@ def test_to_frame_creates_tmp_table():
         assert q in queries[2].lower()
 
 
-def test_to_frame_create_tmp_table_fails():
+def test_to_frame_via_hdfs_create_tmp_table_fails():
     with patch("ibis.impala") as impala, patch("muttlib.dbconn.ibis.urlparse") as parse:
         local_tmp_table_dir = MagicMock()
         local_tmp_table_dir.exists.return_value = False
