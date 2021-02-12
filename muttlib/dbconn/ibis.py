@@ -200,6 +200,7 @@ class IbisClient:
                 data = cursor.fetchall()
                 if data:
                     df = pd.DataFrame(data)
+                    print(cursor.description)
                     df.columns = [c[0] for c in cursor.description]
                 else:
                     df = pd.DataFrame()
