@@ -101,3 +101,18 @@ def test_to_frame_creates_tmp_table():
         assert queries[3].lower().strip().startswith("drop table if exists")
         # assert insert query has sql statement
         assert q in queries[2].lower()
+
+
+def test_to_frame_create_tmp_table_fails():
+    with patch("ibis.impala") as impala, patch("muttlib.dbconn.ibis.urlparse") as parse:
+        local_tmp_table_dir = MagicMock()
+        local_tmp_table_dir.exists.return_value = False
+        cache_dir = MagicMock()
+        cache_dir.__truediv__.return_value = local_tmp_table_dir
+        ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
+        q = "example query"
+        impala.connect.return_value.hdfs.get.side_effect = Exception()
+        with pytest.raises(ValueError, match=r".*HDFS.*"):
+            ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir)
+            # assert retries
+            assert impala.connect.return_value.hdfs.get.call_count > 1
