@@ -116,3 +116,16 @@ def test_to_frame_create_tmp_table_fails():
             ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir)
             # assert retries
             assert impala.connect.return_value.hdfs.get.call_count > 1
+
+
+def test_to_frame_no_hdfs_returns_empty_df():
+    with patch("ibis.impala") as impala:
+        ibis_cli = IbisClient("host")
+        q = "example query"
+        impala.connect.return_value.raw_sql.return_value.fetchall.return_value = None
+        df = ibis_cli.to_frame(q)
+        assert df.empty
+        impala.connect.return_value.raw_sql.assert_called_once_with(q, results=True)
+        impala.connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
+        impala.connect.return_value.raw_sql.return_value.release.assert_called_once()
+        impala.connect.return_value.close.assert_called_once()
