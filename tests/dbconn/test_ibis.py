@@ -164,6 +164,20 @@ def test_to_frame_via_hdfs_create_tmp_table_fails():
         assert impala.connect.return_value.hdfs.get.call_count > 1
 
 
+def test_to_frame_via_hdfs_and_erase_cache_dir():
+    with patch("ibis.impala") as impala, patch("shutil.rmtree") as rm, patch(
+        "pyarrow.parquet.read_table"
+    ) as pq:
+        local_tmp_table_dir = MagicMock()
+        local_tmp_table_dir.exists.return_value = True
+        q = "SELECT *"
+        call_to_frame_with_cache_dir(
+            q, local_tmp_table_dir, to_frame_kwargs={"erase_cache_dir": True}
+        )
+        impala.connect.assert_called_once()
+        rm.assert_called_once_with(local_tmp_table_dir, ignore_errors=True)
+
+
 def test_to_frame_no_hdfs_returns_empty_df():
     with patch("ibis.impala") as impala:
         ibis_cli = IbisClient("host")
