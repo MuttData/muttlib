@@ -95,7 +95,6 @@ def test_to_frame_via_hdfs_creates_tmp_table():
         q = "example query"
         ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir)
         queries = [x[0][0] for x in impala.connect.return_value.raw_sql.call_args_list]
-        print(queries)
         # assert all queries were made to ibis_tmp
         assert all("ibis_tmp" in q for q in queries)
         # assert query order
