@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.35.4] - 2021-02-12
 
-Added tests for `IbisClient`. Deprecated `IbisClient.execute`
+Added tests for `IbisClient`. Deprecated `IbisClient.execute` in favor of `IbisClient.execute_new`, which will conform to the rest of the client.
 
 ## [0.35.3] - 2021-02-11
 
