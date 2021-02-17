@@ -7,13 +7,25 @@ import urllib.parse
 from muttlib.dbconn import IbisClient
 
 
-def call_to_frame_with_cache_dir(q, local_tmp_table_dir, **to_frame_kwargs):
-    with patch("muttlib.utils.hash_str", return_value="123") as hashed_q:
+def call_to_frame_with_cache_dir(
+    q,
+    local_tmp_table_dir,
+    hash_str_return_value="123",
+    to_frame_kwargs={},
+    client_kwargs={},
+):
+    with patch(
+        "muttlib.utils.hash_str", return_value=hash_str_return_value
+    ) as hashed_q:
         cache_dir = MagicMock()
         cache_dir.__truediv__.return_value = local_tmp_table_dir
-        ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
+        ibis_cli = IbisClient(
+            "host", hdfs_host="", hdfs_port="", hdfs_username="", **client_kwargs
+        )
         ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir, **to_frame_kwargs)
-        cache_dir.__truediv__.assert_called_once_with("ibis_tmp_123")
+        cache_dir.__truediv__.assert_called_once_with(
+            f"ibis_tmp_{hashed_q.return_value}"
+        )
 
 
 def test_init_without_host_fails():
@@ -88,7 +100,7 @@ def test_to_frame_via_hdfs_and_refresh_cache():
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
         q = "SELECT *"
         call_to_frame_with_cache_dir(
-            q, local_tmp_table_dir=MagicMock(), refresh_cache=True
+            q, local_tmp_table_dir=MagicMock(), to_frame_kwargs={"refresh_cache": True}
         )
         impala.connect.assert_called_once()
         rm.assert_called_once()
@@ -100,20 +112,37 @@ def test_to_frame_via_hdfs_creates_tmp_table():
     ) as parse, patch("muttlib.utils.make_dirs") as make_dirs, patch(
         "muttlib.dbconn.ibis.pq"
     ) as pq:
+        q = "example query"
+        test_db = "example_db"
+        hashed_sql = "321"
         local_tmp_table_dir = MagicMock()
         local_tmp_table_dir.exists.return_value = False
         local_tmp_table_dir.glob.return_value = [MagicMock(return_value=True)]
-        q = "example query"
-        call_to_frame_with_cache_dir(q, local_tmp_table_dir)
+        call_to_frame_with_cache_dir(
+            q,
+            local_tmp_table_dir,
+            hash_str_return_value=hashed_sql,
+            client_kwargs={"hdfs_database": test_db},
+        )
         impala.connect.assert_called_once()
         queries = [x[0][0] for x in impala.connect.return_value.raw_sql.call_args_list]
         # assert all queries were made to ibis_tmp
-        assert all("ibis_tmp" in q for q in queries)
+        assert all(f"ibis_tmp_{hashed_sql}" in x for x in queries)
         # assert query order
-        assert queries[0].lower().strip().startswith("drop table if exists")
+        assert (
+            queries[0]
+            .lower()
+            .strip()
+            .startswith(f"drop table if exists {test_db}.ibis_tmp_{hashed_sql}")
+        )
         assert queries[1].lower().strip().startswith("create table")
         assert queries[2].lower().strip().startswith("insert")
-        assert queries[3].lower().strip().startswith("drop table if exists")
+        assert (
+            queries[3]
+            .lower()
+            .strip()
+            .startswith(f"drop table if exists {test_db}.ibis_tmp_{hashed_sql}")
+        )
         # assert insert query has sql statement
         assert q in queries[2].lower()
 
@@ -127,12 +156,8 @@ def test_to_frame_via_hdfs_create_tmp_table_fails():
         impala.connect.return_value.hdfs.get.side_effect = Exception()
         local_tmp_table_dir = MagicMock()
         local_tmp_table_dir.exists.return_value = False
-        # cache_dir = MagicMock()
-        # cache_dir.__truediv__.return_value = local_tmp_table_dir
-        # ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
         q = "example query"
         with pytest.raises(ValueError, match=r".*HDFS.*") as e:
-            # ibis_cli.to_frame(q, via_hdfs=True, cache_dir=cache_dir)
             call_to_frame_with_cache_dir(q, local_tmp_table_dir)
         # assert retries
         impala.connect.assert_called_once()
