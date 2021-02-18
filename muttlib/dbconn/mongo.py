@@ -14,7 +14,25 @@ MONGO_DB_TYPE = 'mongo'
 
 
 class MongoClient:
-    """MongoDb client."""
+    """MongoDb client.
+
+     Parameters
+    ----------
+    username : str, optional
+        user to authenticate
+    password : str, optional
+        password to authenticate
+    database : str, optional
+        Default database
+    host : str, optional
+        Host name of the mongodb instance.
+    port: int, optional
+        Port number of the mongodb instance.
+    seeds: list of str, optional
+        DNS-constructed seed list: https://docs.mongodb.com/manual/reference/glossary/#term-seed-list
+    replica_set: str,optional
+        A cluster of MongoDB servers that implements replication and automated failover.
+    """
 
     def __init__(
         self,
