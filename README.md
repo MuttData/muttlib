@@ -15,7 +15,6 @@ Current modules:
   utilities for forecasting problems, allowing wider and easier grid search for
   hyperparameters.
 - `utils`: A single version of miscellaneous functions needed every now and then.
-- `ipynb_const` and `ipynb_utils`: Utilities when doing exploratory work (helpful for jupyter notebooks).
 - `gsheetsconn`: Module to make data interactions to/from Google Sheets <> Pandas.
 - `gdrive`: Module that provides a UNIX-ish interface to GDrive.
 - `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks.
