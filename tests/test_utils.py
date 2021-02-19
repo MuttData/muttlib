@@ -4,12 +4,14 @@ from collections import OrderedDict, deque, namedtuple  # noqa: F401
 import datetime
 from pathlib import Path
 from textwrap import dedent
+import io
 
 import numpy as np
 import pandas as pd
 from pandas._testing import assert_frame_equal
 from pandas.tseries import offsets
 import pytest
+from unittest import mock
 
 from muttlib import utils
 
@@ -37,7 +39,7 @@ def get_second_df_diff_deviations_functions(params=None):
 def sample_df():
     base_date = np.datetime64('2020-01-01')
     n_rows = 100 ** 2
-    with np_temp_seed():
+    with utils.numpy_temp_seed():
         df = pd.DataFrame(
             {
                 'id': np.arange(n_rows),
@@ -1137,12 +1139,12 @@ def test_numpy_temp_seed():
 
 
 def test_ab_split(sample_df):
-    expected_dist = round(numpy.random.uniform(0, 1), 2)
+    expected_dist = round(np.random.uniform(0, 1), 2)
     expected_dist_err = 0.05
     sample_df['test_group'] = sample_df.id.apply(
         lambda id: utils.ab_split(id, 'E1F53135E559C253', expected_dist)
     )
-    split_dist = 1 - numpy.mean(sample_df.test_group.astype(int))
+    split_dist = 1 - np.mean(sample_df.test_group.astype(int))
     assert (
         expected_dist + expected_dist_err >= split_dist
         and expected_dist - expected_dist_err <= split_dist
@@ -1169,7 +1171,7 @@ def test_col_sample_display(sample_df):
 
 
 def test_sum_count_aggregation(sample_df):
-    expected_df = pandas.DataFrame(
+    expected_df = pd.DataFrame(
         {
             'robin_count': {1: 2536, 2: 2486, 3: 2477, 4: 2501},
             'robin_count_perc': {1: 0.2536, 2: 0.2486, 3: 0.2477, 4: 0.2501},
