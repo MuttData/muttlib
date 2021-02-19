@@ -2,7 +2,7 @@
 import nox
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(reuse_venv=True, python=["3.7", "3.8"])
 def tests(session):
     """Run all tests."""
     session.install("pip==20.3.1")

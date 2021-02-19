@@ -19,7 +19,7 @@ extra_dependencies = {
     'sqlserver': ['pymssql'],
     'mongo': ['pymongo'],
     'bigquery': ['google-cloud-bigquery'],
-    'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
+    'ibis': ['ibis-framework', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
         'flake8-bugbear',
