@@ -95,6 +95,8 @@ setuptools.setup(
         'sqlalchemy',
         'numpy==1.19.5',
         'jinjasql',
+        'IPython',
+        'matplotlib',
     ],
     extras_require=extra_dependencies,
 )
