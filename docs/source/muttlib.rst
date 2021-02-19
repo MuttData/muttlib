@@ -28,14 +28,6 @@ muttlib.forecast module
    :undoc-members:
    :show-inheritance:
 
-muttlib.gcd module
-------------------
-
-.. automodule:: muttlib.gcd
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 muttlib.gsheetsconn module
 --------------------------
 

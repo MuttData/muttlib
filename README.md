@@ -17,7 +17,6 @@ Current modules:
 - `utils`: A single version of miscellaneous functions needed every now and then.
 - `gsheetsconn`: Module to make data interactions to/from Google Sheets <> Pandas.
 - `gdrive`: Module that provides a UNIX-ish interface to GDrive.
-- `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks.
 
 ## Table of Contents
 
