@@ -44,22 +44,6 @@ muttlib.gsheetsconn module
    :undoc-members:
    :show-inheritance:
 
-muttlib.ipynb\_const module
----------------------------
-
-.. automodule:: muttlib.ipynb_const
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-muttlib.ipynb\_utils module
----------------------------
-
-.. automodule:: muttlib.ipynb_utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 muttlib.utils module
 --------------------
 
