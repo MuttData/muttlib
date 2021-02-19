@@ -3,7 +3,6 @@ import logging
 import re
 from time import sleep
 
-from deprecated import deprecated
 import pandas as pd
 import progressbar
 
@@ -159,10 +158,3 @@ class HiveClient(BaseClient):
             progress, total = m.groups()
             progress = int(progress) / int(total)
         return progress
-
-
-@deprecated(
-    reason="'HiveDb' will be deprecated in favor of 'HiveClient' in version 1.0.0"
-)
-class HiveDb(HiveClient):
-    pass

@@ -5,7 +5,6 @@ from functools import wraps
 import logging
 from typing import Optional
 
-from deprecated import deprecated
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
@@ -133,12 +132,6 @@ class BaseClient(abc.ABC):
 
     @property
     def conn_str(self):
-        return str(self.conn_url)
-
-    @property  # type: ignore
-    @deprecated(reason="Use conn_str", version="1.0.0")
-    def _db_uri(self):
-        # TODO: deprecate in favour of non-hidden conn_str
         return str(self.conn_url)
 
     @abc.abstractmethod

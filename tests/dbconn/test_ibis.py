@@ -51,7 +51,7 @@ def test_execute_with_no_client():
     with patch("ibis.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
-        ibis_cli.execute_new(q, return_cursor=False)
+        ibis_cli.execute(q, return_cursor=False)
         impala.connect.assert_called_once()
         impala.connect.return_value.raw_sql.assert_called_once_with(q, results=False)
 
@@ -61,7 +61,7 @@ def test_execute_with_client():
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
-        ibis_cli.execute_new(q, client=client, return_cursor=False)
+        ibis_cli.execute(q, client=client, return_cursor=False)
         impala.connect.assert_not_called()
         client.raw_sql.assert_called_once_with(q, results=False)
 
@@ -71,7 +71,7 @@ def test_execute_returns_cursor():
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
-        ret = ibis_cli.execute_new(q, client=client, return_cursor=True)
+        ret = ibis_cli.execute(q, client=client, return_cursor=True)
         client.raw_sql.assert_called_once_with(q, results=True)
 
 
