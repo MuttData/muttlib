@@ -220,7 +220,7 @@ class EngineBaseClient(BaseClient):
         if not self._engine:
             if connect_args is None:
                 connect_args = {}
-            db_uri = custom_uri or self._db_uri
+            db_uri = custom_uri or self.conn_str
             self._engine = create_engine(db_uri, connect_args=connect_args, echo=echo)
         return self._engine
 
