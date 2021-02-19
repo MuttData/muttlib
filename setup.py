@@ -20,15 +20,6 @@ extra_dependencies = {
     'mongo': ['pymongo'],
     'bigquery': ['google-cloud-bigquery'],
     'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
-    'ipynb-utils': [
-        'IPython',
-        'jinja2',
-        'jinjasql',
-        'matplotlib',
-        'numpy==1.19.5',
-        'pandas==1.2.1',
-        'seaborn',
-    ],
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
         'flake8-bugbear',
@@ -103,6 +94,7 @@ setuptools.setup(
         'scipy',
         'sqlalchemy',
         'numpy==1.19.5',
+        'jinjasql',
     ],
     extras_require=extra_dependencies,
 )
