@@ -1013,7 +1013,7 @@ def test_load_sql_query(tmp_path):
         "WHERE hero = {{ hero }}\n"
         "AND hero_version = {{ version }}\n"
     )
-    sql_path = tmp_path / 'TestIpynbUtils.load_sql_query.sql'
+    sql_path = tmp_path / 'TestUtils.load_sql_query.sql'
     sql_path.write_text(sql_tpl)
     sql_fn = str(sql_path)
     assert utils.load_sql_query(sql_fn, {'hero': 'batman', 'version': 'iron'}) == (

@@ -41,11 +41,6 @@ Parquet and Feather support:
 pip install muttlib[pyarrow]
 ```
 
-IPython utils:
-```bash
-pip install muttlib[ipynb-utils]
-```
-
 Forecast:
 ```bash
 pip install muttlib[forecast]
