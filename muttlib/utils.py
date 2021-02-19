@@ -1,5 +1,5 @@
 """Project agnostic utility functions."""
-from collections import OrderedDict, deque, namedtuple
+from collections import OrderedDict, deque
 import contextlib
 from copy import deepcopy
 import csv
@@ -22,11 +22,8 @@ import numpy as np
 import pandas as pd
 from pandas.tseries import offsets
 from scipy.stats import iqr
-import yaml
 from IPython.display import display
 import matplotlib.pyplot as plt  # NOQA
-
-from deprecated import deprecated
 
 
 logger = logging.getLogger(f'utils.{__name__}')
@@ -39,52 +36,20 @@ NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
 
 
-@deprecated(reason="'read_yaml' will be removed from muttlib in version 1.0.0")
-def read_yaml(f):
-    """Read a yaml file."""
-    with open(f, 'r') as file:
-        return yaml.safe_load(file.read())
-
-
 def make_dirs(dir_path):
     """Add a return value to mkdir."""
     Path.mkdir(Path(dir_path), exist_ok=True, parents=True)
     return dir_path
 
 
-@deprecated(reason="'non_empty_dirs' will be removed from muttlib in version 1.0.0")
-def non_empty_dirs(path):
-    """List all non-empty directories for a given path."""
-    return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
-
-
-@deprecated(reason="'is_readable_path' will be removed from muttlib in version 1.0.0")
-def is_readable_path(str_or_path):
-    """Check if string or Path passed corresponds to a readable file.
-
-    Args:
-        str_or_path (str, Path): A string or a path to be checked.
-    Returns:
-        (bool): A bool indicating whether or not str_or_path corresponds to a
-        readable file.
-    """
-    try:
-        f = open(str_or_path)
-        f.close()
-    except (OSError, ValueError):
-        return False
-
-    return True
-
-
 def path_or_string(str_or_path):
     """Load file contents as string or return input str."""
     file_path = Path(str_or_path)
-    if is_readable_path(file_path):
+    try:
         with file_path.open('r') as f:
             return f.read()
-
-    return str_or_path
+    except (OSError, ValueError):
+        return str_or_path
 
 
 # PythonDecorators/decorator_function_with_arguments.py
@@ -239,12 +204,6 @@ def convert_to_snake_case(name: str):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
-@deprecated(reason="'dict_to_namedtuple' will be removed from muttlib in version 1.0.0")
-def dict_to_namedtuple(name, d):
-    """Convert dictionary to namedtuple object."""
-    return namedtuple(name, d.keys())(**d)
-
-
 def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
     """Converts a deque to an ordered dictionary using GEO ordered levels."""
     orde = OrderedDict()  # type: ignore # noqa
@@ -255,14 +214,6 @@ def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
         orde[level] = elem
         if target_level == level:
             return orde
-
-
-@deprecated(
-    reason="'wrap_list_values_quotes' will be removed from muttlib in version 1.0.0"
-)
-def wrap_list_values_quotes(lis):
-    """Wraps all values in a list with single quotes."""
-    return [f"'{val}'" for val in lis]
 
 
 def str_to_datetime(datetime_str):
@@ -296,100 +247,12 @@ def range_datetime(datetime_start, datetime_end, timeskip=None):
         datetime_start += timeskip
 
 
-@deprecated(
-    reason="'get_fathers_mothers_kids_day' will be removed from muttlib in version 1.0.0"
-)
-def get_fathers_mothers_kids_day(year: int):
-    """Get three dates for a given year input."""
-    august_first = str_to_datetime(f'{year}-08-01')
-    kids_dow_iteration = 3  # third sunday each August
-    KIDS_DAY = pd.date_range(
-        start=august_first, end=august_first + offsets.Day(21), freq='W-SUN'
-    )[kids_dow_iteration - 1]
-
-    october_first = august_first + offsets.MonthBegin(2)
-    mother_dow_iteration = 3  # third sunday each October
-    MOTHERS_DAY = pd.date_range(
-        start=october_first, end=october_first + offsets.Day(21), freq='W-SUN'
-    )[mother_dow_iteration - 1]
-
-    june_first = august_first - offsets.MonthBegin(2)
-    father_dow_iteration = 3  # third sunday each June
-    FATHERS_DAY = pd.date_range(
-        start=june_first, end=june_first + offsets.Day(21), freq='W-SUN'
-    )[father_dow_iteration - 1]
-
-    return FATHERS_DAY, MOTHERS_DAY, KIDS_DAY
-
-
-@deprecated(reason="'get_friends_day' will be removed from muttlib in version 1.0.0")
-def get_friends_day(year: int):
-    """Get arg-style friends date."""
-    return str_to_datetime(f'{year}-07-20')
-
-
-@deprecated(reason="'is_special_day' will be removed from muttlib in version 1.0.0")
-def is_special_day(ds, timestamps_inclause):
-    """
-    Flag a date or date-string-like object as a special day.
-
-    The default list of timestamps will be the `Celebration days` which are
-    those commercially imposed days (not easter, EOY, christmas, etc.) that are
-    not technically `Feriados` per se.
-    """
-    if isinstance(ds, str):
-        ds = str_to_datetime(ds).date()
-    else:
-        ds = ds.date()
-    # breakpoint()
-    dates_inclause = [d.date() for d in timestamps_inclause]
-    if ds in dates_inclause:
-        return 1
-    else:
-        return 0
-
-
-@deprecated(
-    reason="'get_semi_month_pay_days' will be removed from muttlib in version 1.0.0"
-)
-def get_semi_month_pay_days(start_date, end_date):
-    """Get half and end of month friday pay-days for salary workers."""
-    first_monthly_fridays = pd.date_range(
-        start=start_date, end=end_date, freq='BM'
-    ) + offsets.Week(
-        weekday=4
-    )  # move to end of month
-    # Beware fridays that are too faraway from middle/end of month
-    first_semimonth_pay_days = [
-        ts + offsets.Day(14) if ts.day <= 4 else ts + offsets.Day(7)
-        for ts in first_monthly_fridays
-    ]
-    second_semimonth_pay_days = [
-        ts + offsets.Day(14) for ts in first_semimonth_pay_days
-    ]
-    SEMIMONTH_PAY_DAYS = sorted(first_semimonth_pay_days + second_semimonth_pay_days)
-    return SEMIMONTH_PAY_DAYS
-
-
 def get_first_fortnight_last_day(ds):
     """Return the last day of the datestamp's fortnight for its month."""
     first_bday = ds + offsets.MonthBegin(1) - offsets.BMonthBegin(1)
     first_monday_second_fortnight = first_bday + offsets.BDay(10)
     last_sunday_first_fortnight = first_monday_second_fortnight - offsets.Day(1)
     return last_sunday_first_fortnight
-
-
-@deprecated(reason="'get_obj_hash' will be removed from muttlib in version 1.0.0")
-def get_obj_hash(d, length=10):
-    """Return SHAKE 256 hash from hashable obj.
-
-    Args:
-        d: dict containing all necesssary data
-        length: number of characters to return in the hash
-    """
-    shake = hashlib.shake_256()
-    shake.update(repr(d).encode('utf-8'))
-    return shake.hexdigest(int(length / 2))  # pylint: disable=too-many-function-args
 
 
 def query_yes_no(question, default='no'):
@@ -486,32 +349,9 @@ def robust_standarize_values(values):
     return (values - values.median()) / iqr(values)
 
 
-@deprecated(
-    reason="'none_or_empty_pandas' will be removed from muttlib in version 1.0.0"
-)
-def none_or_empty_pandas(obj):
-    """Check if object is None or empty pd.Dataframe / pd.Series."""
-    if obj is None:
-        return True
-    elif isinstance(obj, (pd.DataFrame, pd.Series)):
-        return obj.empty
-    else:
-        raise ValueError(
-            "Argument type should be one of: "
-            f"'{(type(None) , pd.Series, pd.DataFrame)}'. Type passed was {type(obj)}"
-        )
-
-
 def hash_str(s, length=8):
     """Hash a string."""
     return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
-
-
-@deprecated(reason="'setup_logging' will be removed from muttlib in version 1.0.0")
-def setup_logging(log_config, logger_name='root', level='INFO'):
-    """Setup logging config."""
-    log_config['loggers'][logger_name]['level'] = level
-    logging.config.dictConfig(log_config)
 
 
 def df_info_to_str(df):
@@ -527,14 +367,6 @@ class JinjaTemplateException(Exception):
 
 class BadInClauseException(JinjaTemplateException):
     """Dummy doc."""
-
-
-@deprecated(
-    reason="'in_clause_requirement' will be removed from muttlib in version 1.0.0"
-)
-def in_clause_requirement(obj):
-    """Check object list or tuple iterables."""
-    return isinstance(obj, (list, tuple))
 
 
 def _format_value_in_clause(value: Union[Number, str]) -> str:
@@ -597,20 +429,6 @@ def format_in_clause(
     return clause
 
 
-@deprecated(reason="'template' will be removed from muttlib in version 1.0.0")
-def template(path_or_str, **kwargs):
-    """Create jinja specific template.."""
-    environment = jinja2.Environment(
-        autoescape=True,
-        line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
-        trim_blocks=kwargs.pop('trim_blocks', True),
-        lstrip_blocks=kwargs.pop('lstrip_blocks', True),
-        **kwargs,
-    )
-    environment.filters['inclause'] = format_in_clause
-    return environment.from_string(path_or_string(path_or_str))
-
-
 def get_default_jinja_template(path_or_str, filters=None, **kwargs):
     """Create Jinja specific template.."""
     if filters is None:
@@ -619,40 +437,6 @@ def get_default_jinja_template(path_or_str, filters=None, **kwargs):
     environment = jinja2.Environment(**{**DEFAULT_JINJA_ENV_ARGS, **kwargs})  # nosec
     environment.filters = {**environment.filters, **filters}
     return environment.from_string(path_or_string(path_or_str))
-
-
-@deprecated(
-    reason="'render_jinja_template' will be removed from muttlib in version 1.0.0"
-)
-def render_jinja_template(path_or_str, jparams: Dict = None):
-    """
-    Render a query via jinja, from a str or a sql-like file.
-
-    Args:
-        path_or_str (str, Path): A string or a path object from which to load
-            the sql-like file, if one exists.
-        jparams (dict): The mapping of jinja placeholders {{}} to python values to be
-            replaced in the query.
-    Returns:
-        (str): A str where all possible jinja placeholders were replaced.
-
-    Notes:
-        Given that the first argument might both be a query in str form, a
-        path in string form, or a pure path, it must be said that the func will log
-        the path's location, if the arg is an existing file-path.
-        We do not use `pat.exists()` method as it breaks for long enough strings
-        (which might be queries)!
-    """
-    # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
-    #  share a method that checks is_valid_path()
-    # Standarize to pathlib object, supports str objects
-    if jparams is None:
-        jparams = dict()
-
-    pat = Path(path_or_str).expanduser().resolve().as_posix()
-    if is_readable_path(pat):
-        logger.debug(f'Loading jinja template from {pat}.')
-    return get_default_jinja_template(path_or_str).render(**jparams)
 
 
 def get_cloudera_sql_stats_aggr(
@@ -954,12 +738,6 @@ def dedup_list(li: list):
         if val not in new_list:
             new_list.append(val)
     return new_list
-
-
-@deprecated(reason="'split_on_letter' will be removed from muttlib in version 1.0.0")
-def split_on_letter(s):
-    """Split string on groups of letters"""
-    return tuple(filter(None, re.split(r'([aA-zZ]+)', s)))
 
 
 def create_forecaster_dates(end_date, forecast_train_window, forecast_future_window):

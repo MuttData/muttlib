@@ -96,18 +96,6 @@ def test_str_to_datetime(test_input, expected):
         utils.str_to_datetime("25/10/2019")
 
 
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [('look at me', utils.dict_to_namedtuple('mr', {'meeseeks': 'look at me'}))],
-)
-def test_dict_to_namedtuple(test_input, expected):
-    assert namedtuple('mr', 'meeseeks')(test_input) == expected
-
-
-def test_get_obj_hash():
-    assert '96107c8ce8' == utils.get_obj_hash({'meeseeks': 'look at me'})
-
-
 def test_get_ordered_factor_levels():
     lst = ['cat', 'dog', 'cat', 'dog', 'cat', 'dog', 'horse', 'dog', 'horse']
     df = pd.DataFrame({'olmcdonald': lst}, columns=['olmcdonald'])
@@ -152,28 +140,6 @@ def test_query_yes_no(monkeypatch):
     assert utils.query_yes_no("hit or miss?")
 
     utils.__builtins__["input"] = og
-
-
-def test_is_readable_path(tmpdir):
-    """Check is_readable_path."""
-    sub_dir = tmpdir.mkdir("sub")
-    this_file_exist = sub_dir.join("test.txt")
-    this_file_exist.write("True")
-    assert utils.is_readable_path(this_file_exist)
-
-    this_file_does_not_exists = sub_dir.join("not_existing.txt")
-    assert not utils.is_readable_path(this_file_does_not_exists)
-
-    assert not utils.is_readable_path(sub_dir)
-
-    some_str = 'just a random string'
-    assert not utils.is_readable_path(some_str)
-
-    some_str = 'a' * 300
-    assert not utils.is_readable_path(some_str)
-
-    some_str = 'a\x00a'
-    assert not utils.is_readable_path(some_str)
 
 
 def test_path_or_string(tmpdir):
@@ -254,65 +220,6 @@ def test_deque_to_geo_hierarchy_dict():
     )
 
 
-def test_read_yaml(tmpdir):
-    # generate a tmp file for this test
-    lst_test = ['meme', 'clap', 'review', 'clap']
-
-    p = tmpdir.mkdir("sub").join("yaml_test.yaml")
-    p.write(
-        """
-               - meme
-               - clap
-               - review
-               - clap
-            """
-    )
-    assert lst_test == utils.read_yaml(p)
-
-
-def test_get_fathers_mothers_kids_day():
-    dates = (
-        pd.Timestamp('2019-06-16'),
-        pd.Timestamp('2019-10-20'),
-        pd.Timestamp('2019-08-18'),
-    )
-    assert dates == utils.get_fathers_mothers_kids_day(2019)
-
-
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [
-        (datetime.datetime(2018, 1, 18), 0),
-        (datetime.datetime(2018, 6, 17), 1),
-        ('2018-01-18', 0),
-        ('2018-06-17', 1),
-    ],
-)
-def test_is_special_day(test_input, expected):
-    timestamps_inclause = (
-        pd.Timestamp('2018-06-17 00:00:00'),
-        pd.Timestamp('2018-10-21 00:00:00'),
-        pd.Timestamp('2018-08-19 00:00:00'),
-    )
-    assert utils.is_special_day(test_input, timestamps_inclause) == expected
-
-
-def test_get_friends_day():
-    # just pass a year(int) and gives you the "amigos's day
-    assert datetime.datetime(2018, 7, 20) == utils.get_friends_day(2018)
-
-
-def test_get_semi_month_pay_days():
-    dates = [
-        pd.Timestamp('2018-02-16 00:00:00'),
-        pd.Timestamp('2018-03-02 00:00:00'),
-        pd.Timestamp('2018-03-16 00:00:00'),
-        pd.Timestamp('2018-03-30 00:00:00'),
-    ]
-
-    assert dates == utils.get_semi_month_pay_days('2018-01-01', '2018-02-28')
-
-
 def test_df_info_to_str():
     # Almost the same `test_info_memory`:
     # https://github.com/pandas-dev/pandas/blob/4edf938aedf55b9e6fbfb3199f70f857e8ec7e41/pandas/tests/frame/test_repr_info.py#L209
@@ -336,20 +243,6 @@ def test_df_info_to_str():
     assert result == expected
 
 
-def test_old_template_basic(tmpdir):
-    tmp_template = (
-        "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
-    )
-    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
-
-    p = tmpdir.mkdir("sub").join("template_test.html")
-    p.write(tmp_template)
-
-    assert str_template == utils.template(p).render(
-        name="Inigo Montoya", daddy="father", acction="die"
-    )
-
-
 def test_get_default_jinja_template_basic(tmpdir):
     tmp_template = (
         "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
@@ -364,15 +257,6 @@ def test_get_default_jinja_template_basic(tmpdir):
     )
 
 
-def test_old_template_macros(tmpdir):
-    p = tmpdir.mkdir("sub").join("macros_test.html")
-    # testing macros
-    macro = "{% macro test_macro(name) %}" "Hello lil {{ name }}" "{% endmacro %}"
-    p.write(macro)
-    out = utils.template(p).module.test_macro("John")
-    assert 'Hello lil John' == out
-
-
 def test_get_default_jinja_template_macros(tmpdir):
     p = tmpdir.mkdir("sub").join("macros_test.html")
     # testing macros
@@ -380,29 +264,6 @@ def test_get_default_jinja_template_macros(tmpdir):
     p.write(macro)
     out = utils.get_default_jinja_template(p).module.test_macro("John")
     assert 'Hello lil John' == out
-
-
-def test_non_empty_dirs(tmpdir):
-    p = tmpdir.mkdir("sub").join("test.test")
-    p.write("the sins of the father")
-    assert [str(Path(p).parent)] == utils.non_empty_dirs(Path(p).parent)
-
-
-def test_render_jinja_template(tmpdir):
-    tmp_template = (
-        "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
-    )
-    params = {'name': 'Inigo Montoya', 'daddy': 'father', 'acction': 'die'}
-    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
-
-    p = tmpdir.mkdir("sub").join("template_test.html")
-    p.write(tmp_template)
-
-    assert str_template == utils.render_jinja_template(tmp_template, params)
-
-    long_str = 300 * 'a'
-    expected = long_str
-    assert expected == utils.render_jinja_template(long_str)
 
 
 def test_make_dirs(tmpdir):
@@ -467,12 +328,6 @@ def test_df_to_multi(tmpdir):
 def test_convert_to_snake_case():
     test_str = 'meme_review_best_news_source'
     assert test_str == utils.convert_to_snake_case("MemeReviewBestNewsSource")
-
-
-def test_wrap_list_values_quotes():
-    test_lst = ["'6'", "'7'", "'8'", "'9'", "'1'", "'3'", "'5'"]
-
-    assert test_lst == utils.wrap_list_values_quotes([6, 7, 8, 9, 1, 3, 5])
 
 
 def test_range_datetime():
@@ -560,25 +415,6 @@ def test_robust_standarize_values():
     assert df_test.equals(utils.robust_standarize_values(pd.Series([2, 4, 6, 8, 10])))
     with pytest.raises(TypeError):
         utils.robust_standarize_values([1, 2, 3, 4, 5])
-
-
-def test_none_or_empty_pandas():
-    assert utils.none_or_empty_pandas(None)
-    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
-    assert not utils.none_or_empty_pandas(df_test)
-    df_test = pd.DataFrame(np.linspace(-1.0, 1.0, num=5))
-    assert not utils.none_or_empty_pandas(df_test)
-    with pytest.raises(ValueError):
-        assert not utils.none_or_empty_pandas(34)
-
-
-def test_in_clause_requirement():
-    lst_test = [1, 2, 3, 4, 5]
-    tppl_test = (1, 2, 3, 4, 5)
-
-    assert utils.in_clause_requirement(lst_test)
-    assert utils.in_clause_requirement(tppl_test)
-    assert not utils.in_clause_requirement(34)
 
 
 @pytest.mark.parametrize(
@@ -806,11 +642,6 @@ def test_df_drop_single_factor_level():
     assert df_test.equals(utils.df_drop_single_factor_level(df))
 
 
-# this looks hard should I do it?
-# def test_setup_logging():
-# pass
-
-
 @pytest.mark.parametrize(
     "example_input, expected",
     [
@@ -883,22 +714,6 @@ def test_get_include_exclude_columns_empty_cols_list(
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
-
-
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [
-        ('foo', ("foo",)),
-        ("a0aa", ('a', '0', 'aa')),
-        ("cccc", ("cccc",)),
-        ("1235556", ("1235556",)),
-        ("AAaa3333 AA fff", ('AAaa', '3333 ', 'AA', ' ', 'fff')),
-        ("AAaa3333  fff", ('AAaa', '3333  ', 'fff')),
-    ],
-)
-def test_split_on_letter(test_input, expected):
-    # Testing various input strs to splitting
-    assert utils.split_on_letter(test_input) == expected
 
 
 @pytest.mark.parametrize(
