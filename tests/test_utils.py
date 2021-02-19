@@ -33,6 +33,40 @@ def get_second_df_diff_deviations_functions(params=None):
 
 
 # ------
+@pytest.fixture()
+def sample_df():
+    base_date = np.datetime64('2020-01-01')
+    n_rows = 100 ** 2
+    with np_temp_seed():
+        df = pd.DataFrame(
+            {
+                'id': np.arange(n_rows),
+                'batman': np.random.randint(1, 5, n_rows),
+                'robin': np.random.randint(1, 1000, n_rows),
+            }
+        )
+        df['str_robin'] = df.robin.astype(str)
+        df['riddler'] = df.batman.replace([1, 2, 3, 4], ['a', 'b', 'c', 'd'])
+        df['two_face'] = df.batman.apply(lambda x: base_date + np.random.choice(x))
+    return df
+
+
+@pytest.fixture()
+def sample_timeseries_df():
+    return pd.DataFrame(
+        {
+            'two_face': {
+                0: pd.Timestamp('2020-01-01 00:00:00'),
+                1: pd.Timestamp('2020-01-02 00:00:00'),
+                2: pd.Timestamp('2020-01-03 00:00:00'),
+                3: pd.Timestamp('2020-01-04 00:00:00'),
+            },
+            'batman_sum': {0: 9812, 1: 7703, 2: 5024, 3: 2404},
+            'batman_count': {0: 5173, 1: 2764, 2: 1462, 3: 601},
+            'robin_sum': {0: 2617661, 1: 1374750, 2: 726399, 3: 297004},
+            'robin_count': {0: 5173, 1: 2764, 2: 1462, 3: 601},
+        }
+    )
 
 
 @pytest.mark.parametrize(
@@ -1099,4 +1133,111 @@ def test_numpy_temp_seed():
     )
     assert (random_value_3_without_fixed_seed != random_value_1_with_fixed_seed) & (
         random_value_3_without_fixed_seed != random_value_2_with_fixed_seed
+    )
+
+
+def test_ab_split(sample_df):
+    expected_dist = round(numpy.random.uniform(0, 1), 2)
+    expected_dist_err = 0.05
+    sample_df['test_group'] = sample_df.id.apply(
+        lambda id: utils.ab_split(id, 'E1F53135E559C253', expected_dist)
+    )
+    split_dist = 1 - numpy.mean(sample_df.test_group.astype(int))
+    assert (
+        expected_dist + expected_dist_err >= split_dist
+        and expected_dist - expected_dist_err <= split_dist
+    )
+
+
+def test_col_sample_display(sample_df):
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(sample_df, 'batman', top_val=0.35)
+        assert 'Col is batman' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+        assert '4 [3 4 1 2]' in mock_stdout.getvalue()
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(sample_df, 'batman', quantile=0.25)
+        assert 'Col is batman' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+        assert '4 [3 4 1 2]' in mock_stdout.getvalue()
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(
+            df=sample_df, col='two_face', top_val=0.35, num_sample=15000
+        )
+        assert 'Col is two_face' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+
+
+def test_sum_count_aggregation(sample_df):
+    expected_df = pandas.DataFrame(
+        {
+            'robin_count': {1: 2536, 2: 2486, 3: 2477, 4: 2501},
+            'robin_count_perc': {1: 0.2536, 2: 0.2486, 3: 0.2477, 4: 0.2501},
+        }
+    )
+    agg_df = utils.sum_count_aggregation(sample_df, ['batman'], ['robin'], ['count'])
+    assert expected_df.equals(agg_df)
+
+
+def test_sum_count_time_series(sample_df, sample_timeseries_df):
+    df = utils.sum_count_time_series(sample_df, 'two_face', ['batman', 'robin'])
+    assert df.equals(sample_timeseries_df)
+
+
+def test_category_reductor(sample_df):
+    df = utils.category_reductor(sample_df, 'robin').copy()
+    assert df.describe()['unique'] == 8
+
+
+def test_load_sql_query(tmp_path):
+    sql_tpl = (
+        "SELECT age, favorite_food\n"
+        "FROM super_heroes\n"
+        "WHERE hero = {{ hero }}\n"
+        "AND hero_version = {{ version }}\n"
+    )
+    sql_path = tmp_path / 'TestIpynbUtils.load_sql_query.sql'
+    sql_path.write_text(sql_tpl)
+    sql_fn = str(sql_path)
+    assert utils.load_sql_query(sql_fn, {'hero': 'batman', 'version': 'iron'}) == (
+        "SELECT age, favorite_food\n"
+        "FROM super_heroes\n"
+        "WHERE hero = batman\n"
+        "AND hero_version = iron"
+    )
+
+
+def test_get_sql_stats_aggr():
+    assert utils.get_sql_stats_aggr(
+        'batman', as_name='batman', with_std=True, with_ndv=True, with_count=True
+    ) == (
+        "\n    "
+        "SUM(batman) as sum_batman,\n    "
+        "AVG(batman) as mean_batman,\n    "
+        "APPX_MEDIAN(batman) as median_batman,\n    "
+        "MIN(batman) as min_batman,\n    "
+        "MAX(batman) as max_batman,\n "
+        "STDDEV(batman) as std_batman,\n "
+        "NDV(batman) as unique_batman,\n "
+        "COUNT(1) as count_batman,"
+    )
+
+
+def test_get_null_count_aggr():
+    value_list = ['robin', 'batman']
+    assert utils.get_null_count_aggr(
+        value_list, no_ending_comma=True, empty_string_null=True
+    ) == (
+        "SUM( CASE WHEN robin = ''\n    "
+        "THEN 1 ELSE 0 END ) AS null_countrobin,\n"
+        "SUM( CASE WHEN batman = ''\n    "
+        "THEN 1 ELSE 0 END ) AS null_countbatman"
+    )
+
+
+def test_get_sqlserver_hashed_sample_clause():
+    assert utils.get_sqlserver_hashed_sample_clause(123456, 0.5) == (
+        "\n    "
+        "AND ABS(CAST(HASHBYTES('SHA1',\n        "
+        "123456) AS BIGINT)) % 100 <= 50"
     )
