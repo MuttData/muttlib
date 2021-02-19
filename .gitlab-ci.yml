@@ -15,8 +15,6 @@ test:
   script:
   - pip install .
   - python -c 'from muttlib import dbconn, utils'
-  - pip install .[ipynb-utils]
-  - python -c 'from muttlib import ipynb_const, ipynb_utils'
   - pip install .[forecast]
   - python -c 'from muttlib import forecast'
   - pip install .[gsheets]
