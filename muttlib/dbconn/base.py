@@ -5,7 +5,6 @@ from functools import wraps
 import logging
 from typing import Optional
 
-from deprecated import deprecated
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
@@ -135,12 +134,6 @@ class BaseClient(abc.ABC):
     def conn_str(self):
         return str(self.conn_url)
 
-    @property  # type: ignore
-    @deprecated(reason="Use conn_str", version="1.0.0")
-    def _db_uri(self):
-        # TODO: deprecate in favour of non-hidden conn_str
-        return str(self.conn_url)
-
     @abc.abstractmethod
     def _connect(self):
         raise NotImplementedError
@@ -227,7 +220,7 @@ class EngineBaseClient(BaseClient):
         if not self._engine:
             if connect_args is None:
                 connect_args = {}
-            db_uri = custom_uri or self._db_uri
+            db_uri = custom_uri or self.conn_str
             self._engine = create_engine(db_uri, connect_args=connect_args, echo=echo)
         return self._engine
 

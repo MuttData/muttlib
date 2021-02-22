@@ -15,14 +15,10 @@ test:
   script:
   - pip install .
   - python -c 'from muttlib import dbconn, utils'
-  - pip install .[ipynb-utils]
-  - python -c 'from muttlib import ipynb_const, ipynb_utils'
   - pip install .[forecast]
   - python -c 'from muttlib import forecast'
   - pip install .[gsheets]
   - python -c 'from muttlib import gsheetsconn'
-  - pip install .[gcd]
-  - python -c 'from muttlib import gcd'
   - pip install .[gdrive]
   - python -c 'from muttlib import gdrive'
   - pip install nox

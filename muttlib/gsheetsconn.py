@@ -70,8 +70,6 @@ from typing import List
 from typing import Any
 from pathlib import Path
 
-from muttlib.utils import split_on_letter
-
 logger = logging.getLogger(f'gsheetsconn.{__name__}')  # NOQA
 
 try:
@@ -220,7 +218,9 @@ class GSheetsClient:
         if first_cell_loc:
             first_cell_loc = first_cell_loc.upper()
             self._is_valid_cell_loc(first_cell_loc)
-            index_col, first_row = split_on_letter(first_cell_loc)
+            index_col, first_row = tuple(
+                filter(None, re.split(r'([aA-zZ]+)', first_cell_loc))
+            )
             first_row = int(first_row)
 
         if isinstance(index_col, str):

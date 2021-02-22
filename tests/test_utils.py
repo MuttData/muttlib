@@ -4,12 +4,14 @@ from collections import OrderedDict, deque, namedtuple  # noqa: F401
 import datetime
 from pathlib import Path
 from textwrap import dedent
+import io
 
 import numpy as np
 import pandas as pd
 from pandas._testing import assert_frame_equal
 from pandas.tseries import offsets
 import pytest
+from unittest import mock
 
 from muttlib import utils
 
@@ -33,6 +35,40 @@ def get_second_df_diff_deviations_functions(params=None):
 
 
 # ------
+@pytest.fixture()
+def sample_df():
+    base_date = np.datetime64('2020-01-01')
+    n_rows = 100 ** 2
+    with utils.numpy_temp_seed():
+        df = pd.DataFrame(
+            {
+                'id': np.arange(n_rows),
+                'batman': np.random.randint(1, 5, n_rows),
+                'robin': np.random.randint(1, 1000, n_rows),
+            }
+        )
+        df['str_robin'] = df.robin.astype(str)
+        df['riddler'] = df.batman.replace([1, 2, 3, 4], ['a', 'b', 'c', 'd'])
+        df['two_face'] = df.batman.apply(lambda x: base_date + np.random.choice(x))
+    return df
+
+
+@pytest.fixture()
+def sample_timeseries_df():
+    return pd.DataFrame(
+        {
+            'two_face': {
+                0: pd.Timestamp('2020-01-01 00:00:00'),
+                1: pd.Timestamp('2020-01-02 00:00:00'),
+                2: pd.Timestamp('2020-01-03 00:00:00'),
+                3: pd.Timestamp('2020-01-04 00:00:00'),
+            },
+            'batman_sum': {0: 9812, 1: 7703, 2: 5024, 3: 2404},
+            'batman_count': {0: 5173, 1: 2764, 2: 1462, 3: 601},
+            'robin_sum': {0: 2617661, 1: 1374750, 2: 726399, 3: 297004},
+            'robin_count': {0: 5173, 1: 2764, 2: 1462, 3: 601},
+        }
+    )
 
 
 @pytest.mark.parametrize(
@@ -58,18 +94,6 @@ def test_str_to_datetime(test_input, expected):
     assert utils.str_to_datetime(test_input) == expected
     with pytest.raises(ValueError):
         utils.str_to_datetime("25/10/2019")
-
-
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [('look at me', utils.dict_to_namedtuple('mr', {'meeseeks': 'look at me'}))],
-)
-def test_dict_to_namedtuple(test_input, expected):
-    assert namedtuple('mr', 'meeseeks')(test_input) == expected
-
-
-def test_get_obj_hash():
-    assert '96107c8ce8' == utils.get_obj_hash({'meeseeks': 'look at me'})
 
 
 def test_get_ordered_factor_levels():
@@ -116,28 +140,6 @@ def test_query_yes_no(monkeypatch):
     assert utils.query_yes_no("hit or miss?")
 
     utils.__builtins__["input"] = og
-
-
-def test_is_readable_path(tmpdir):
-    """Check is_readable_path."""
-    sub_dir = tmpdir.mkdir("sub")
-    this_file_exist = sub_dir.join("test.txt")
-    this_file_exist.write("True")
-    assert utils.is_readable_path(this_file_exist)
-
-    this_file_does_not_exists = sub_dir.join("not_existing.txt")
-    assert not utils.is_readable_path(this_file_does_not_exists)
-
-    assert not utils.is_readable_path(sub_dir)
-
-    some_str = 'just a random string'
-    assert not utils.is_readable_path(some_str)
-
-    some_str = 'a' * 300
-    assert not utils.is_readable_path(some_str)
-
-    some_str = 'a\x00a'
-    assert not utils.is_readable_path(some_str)
 
 
 def test_path_or_string(tmpdir):
@@ -218,65 +220,6 @@ def test_deque_to_geo_hierarchy_dict():
     )
 
 
-def test_read_yaml(tmpdir):
-    # generate a tmp file for this test
-    lst_test = ['meme', 'clap', 'review', 'clap']
-
-    p = tmpdir.mkdir("sub").join("yaml_test.yaml")
-    p.write(
-        """
-               - meme
-               - clap
-               - review
-               - clap
-            """
-    )
-    assert lst_test == utils.read_yaml(p)
-
-
-def test_get_fathers_mothers_kids_day():
-    dates = (
-        pd.Timestamp('2019-06-16'),
-        pd.Timestamp('2019-10-20'),
-        pd.Timestamp('2019-08-18'),
-    )
-    assert dates == utils.get_fathers_mothers_kids_day(2019)
-
-
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [
-        (datetime.datetime(2018, 1, 18), 0),
-        (datetime.datetime(2018, 6, 17), 1),
-        ('2018-01-18', 0),
-        ('2018-06-17', 1),
-    ],
-)
-def test_is_special_day(test_input, expected):
-    timestamps_inclause = (
-        pd.Timestamp('2018-06-17 00:00:00'),
-        pd.Timestamp('2018-10-21 00:00:00'),
-        pd.Timestamp('2018-08-19 00:00:00'),
-    )
-    assert utils.is_special_day(test_input, timestamps_inclause) == expected
-
-
-def test_get_friends_day():
-    # just pass a year(int) and gives you the "amigos's day
-    assert datetime.datetime(2018, 7, 20) == utils.get_friends_day(2018)
-
-
-def test_get_semi_month_pay_days():
-    dates = [
-        pd.Timestamp('2018-02-16 00:00:00'),
-        pd.Timestamp('2018-03-02 00:00:00'),
-        pd.Timestamp('2018-03-16 00:00:00'),
-        pd.Timestamp('2018-03-30 00:00:00'),
-    ]
-
-    assert dates == utils.get_semi_month_pay_days('2018-01-01', '2018-02-28')
-
-
 def test_df_info_to_str():
     # Almost the same `test_info_memory`:
     # https://github.com/pandas-dev/pandas/blob/4edf938aedf55b9e6fbfb3199f70f857e8ec7e41/pandas/tests/frame/test_repr_info.py#L209
@@ -300,20 +243,6 @@ def test_df_info_to_str():
     assert result == expected
 
 
-def test_old_template_basic(tmpdir):
-    tmp_template = (
-        "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
-    )
-    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
-
-    p = tmpdir.mkdir("sub").join("template_test.html")
-    p.write(tmp_template)
-
-    assert str_template == utils.template(p).render(
-        name="Inigo Montoya", daddy="father", acction="die"
-    )
-
-
 def test_get_default_jinja_template_basic(tmpdir):
     tmp_template = (
         "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
@@ -328,15 +257,6 @@ def test_get_default_jinja_template_basic(tmpdir):
     )
 
 
-def test_old_template_macros(tmpdir):
-    p = tmpdir.mkdir("sub").join("macros_test.html")
-    # testing macros
-    macro = "{% macro test_macro(name) %}" "Hello lil {{ name }}" "{% endmacro %}"
-    p.write(macro)
-    out = utils.template(p).module.test_macro("John")
-    assert 'Hello lil John' == out
-
-
 def test_get_default_jinja_template_macros(tmpdir):
     p = tmpdir.mkdir("sub").join("macros_test.html")
     # testing macros
@@ -344,29 +264,6 @@ def test_get_default_jinja_template_macros(tmpdir):
     p.write(macro)
     out = utils.get_default_jinja_template(p).module.test_macro("John")
     assert 'Hello lil John' == out
-
-
-def test_non_empty_dirs(tmpdir):
-    p = tmpdir.mkdir("sub").join("test.test")
-    p.write("the sins of the father")
-    assert [str(Path(p).parent)] == utils.non_empty_dirs(Path(p).parent)
-
-
-def test_render_jinja_template(tmpdir):
-    tmp_template = (
-        "Hello,my name is {{name}} you kill my {{daddy}} prepare to {{acction}}"
-    )
-    params = {'name': 'Inigo Montoya', 'daddy': 'father', 'acction': 'die'}
-    str_template = "Hello,my name is Inigo Montoya you kill my father prepare to die"
-
-    p = tmpdir.mkdir("sub").join("template_test.html")
-    p.write(tmp_template)
-
-    assert str_template == utils.render_jinja_template(tmp_template, params)
-
-    long_str = 300 * 'a'
-    expected = long_str
-    assert expected == utils.render_jinja_template(long_str)
 
 
 def test_make_dirs(tmpdir):
@@ -431,12 +328,6 @@ def test_df_to_multi(tmpdir):
 def test_convert_to_snake_case():
     test_str = 'meme_review_best_news_source'
     assert test_str == utils.convert_to_snake_case("MemeReviewBestNewsSource")
-
-
-def test_wrap_list_values_quotes():
-    test_lst = ["'6'", "'7'", "'8'", "'9'", "'1'", "'3'", "'5'"]
-
-    assert test_lst == utils.wrap_list_values_quotes([6, 7, 8, 9, 1, 3, 5])
 
 
 def test_range_datetime():
@@ -524,25 +415,6 @@ def test_robust_standarize_values():
     assert df_test.equals(utils.robust_standarize_values(pd.Series([2, 4, 6, 8, 10])))
     with pytest.raises(TypeError):
         utils.robust_standarize_values([1, 2, 3, 4, 5])
-
-
-def test_none_or_empty_pandas():
-    assert utils.none_or_empty_pandas(None)
-    df_test = pd.Series(np.linspace(-1.0, 1.0, num=5))
-    assert not utils.none_or_empty_pandas(df_test)
-    df_test = pd.DataFrame(np.linspace(-1.0, 1.0, num=5))
-    assert not utils.none_or_empty_pandas(df_test)
-    with pytest.raises(ValueError):
-        assert not utils.none_or_empty_pandas(34)
-
-
-def test_in_clause_requirement():
-    lst_test = [1, 2, 3, 4, 5]
-    tppl_test = (1, 2, 3, 4, 5)
-
-    assert utils.in_clause_requirement(lst_test)
-    assert utils.in_clause_requirement(tppl_test)
-    assert not utils.in_clause_requirement(34)
 
 
 @pytest.mark.parametrize(
@@ -770,11 +642,6 @@ def test_df_drop_single_factor_level():
     assert df_test.equals(utils.df_drop_single_factor_level(df))
 
 
-# this looks hard should I do it?
-# def test_setup_logging():
-# pass
-
-
 @pytest.mark.parametrize(
     "example_input, expected",
     [
@@ -847,22 +714,6 @@ def test_get_include_exclude_columns_empty_cols_list(
 # [WONT DO]
 # def test_local_df_cache():
 #     pass
-
-
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [
-        ('foo', ("foo",)),
-        ("a0aa", ('a', '0', 'aa')),
-        ("cccc", ("cccc",)),
-        ("1235556", ("1235556",)),
-        ("AAaa3333 AA fff", ('AAaa', '3333 ', 'AA', ' ', 'fff')),
-        ("AAaa3333  fff", ('AAaa', '3333  ', 'fff')),
-    ],
-)
-def test_split_on_letter(test_input, expected):
-    # Testing various input strs to splitting
-    assert utils.split_on_letter(test_input) == expected
 
 
 @pytest.mark.parametrize(
@@ -1099,4 +950,111 @@ def test_numpy_temp_seed():
     )
     assert (random_value_3_without_fixed_seed != random_value_1_with_fixed_seed) & (
         random_value_3_without_fixed_seed != random_value_2_with_fixed_seed
+    )
+
+
+def test_ab_split(sample_df):
+    expected_dist = round(np.random.uniform(0, 1), 2)
+    expected_dist_err = 0.05
+    sample_df['test_group'] = sample_df.id.apply(
+        lambda id: utils.ab_split(id, 'E1F53135E559C253', expected_dist)
+    )
+    split_dist = 1 - np.mean(sample_df.test_group.astype(int))
+    assert (
+        expected_dist + expected_dist_err >= split_dist
+        and expected_dist - expected_dist_err <= split_dist
+    )
+
+
+def test_col_sample_display(sample_df):
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(sample_df, 'batman', top_val=0.35)
+        assert 'Col is batman' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+        assert '4 [3 4 1 2]' in mock_stdout.getvalue()
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(sample_df, 'batman', quantile=0.25)
+        assert 'Col is batman' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+        assert '4 [3 4 1 2]' in mock_stdout.getvalue()
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        utils.col_sample_display(
+            df=sample_df, col='two_face', top_val=0.35, num_sample=15000
+        )
+        assert 'Col is two_face' in mock_stdout.getvalue()
+        assert 'Null count is 0, Null percentage is: 0.00%' in mock_stdout.getvalue()
+
+
+def test_sum_count_aggregation(sample_df):
+    expected_df = pd.DataFrame(
+        {
+            'robin_count': {1: 2536, 2: 2486, 3: 2477, 4: 2501},
+            'robin_count_perc': {1: 0.2536, 2: 0.2486, 3: 0.2477, 4: 0.2501},
+        }
+    )
+    agg_df = utils.sum_count_aggregation(sample_df, ['batman'], ['robin'], ['count'])
+    assert expected_df.equals(agg_df)
+
+
+def test_sum_count_time_series(sample_df, sample_timeseries_df):
+    df = utils.sum_count_time_series(sample_df, 'two_face', ['batman', 'robin'])
+    assert df.equals(sample_timeseries_df)
+
+
+def test_category_reductor(sample_df):
+    df = utils.category_reductor(sample_df, 'robin').copy()
+    assert df.describe()['unique'] == 8
+
+
+def test_load_sql_query(tmp_path):
+    sql_tpl = (
+        "SELECT age, favorite_food\n"
+        "FROM super_heroes\n"
+        "WHERE hero = {{ hero }}\n"
+        "AND hero_version = {{ version }}\n"
+    )
+    sql_path = tmp_path / 'TestUtils.load_sql_query.sql'
+    sql_path.write_text(sql_tpl)
+    sql_fn = str(sql_path)
+    assert utils.load_sql_query(sql_fn, {'hero': 'batman', 'version': 'iron'}) == (
+        "SELECT age, favorite_food\n"
+        "FROM super_heroes\n"
+        "WHERE hero = batman\n"
+        "AND hero_version = iron"
+    )
+
+
+def test_get_sql_stats_aggr():
+    assert utils.get_sql_stats_aggr(
+        'batman', as_name='batman', with_std=True, with_ndv=True, with_count=True
+    ) == (
+        "\n    "
+        "SUM(batman) as sum_batman,\n    "
+        "AVG(batman) as mean_batman,\n    "
+        "APPX_MEDIAN(batman) as median_batman,\n    "
+        "MIN(batman) as min_batman,\n    "
+        "MAX(batman) as max_batman,\n "
+        "STDDEV(batman) as std_batman,\n "
+        "NDV(batman) as unique_batman,\n "
+        "COUNT(1) as count_batman,"
+    )
+
+
+def test_get_null_count_aggr():
+    value_list = ['robin', 'batman']
+    assert utils.get_null_count_aggr(
+        value_list, no_ending_comma=True, empty_string_null=True
+    ) == (
+        "SUM( CASE WHEN robin = ''\n    "
+        "THEN 1 ELSE 0 END ) AS null_countrobin,\n"
+        "SUM( CASE WHEN batman = ''\n    "
+        "THEN 1 ELSE 0 END ) AS null_countbatman"
+    )
+
+
+def test_get_sqlserver_hashed_sample_clause():
+    assert utils.get_sqlserver_hashed_sample_clause(123456, 0.5) == (
+        "\n    "
+        "AND ABS(CAST(HASHBYTES('SHA1',\n        "
+        "123456) AS BIGINT)) % 100 <= 50"
     )
