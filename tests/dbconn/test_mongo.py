@@ -146,3 +146,26 @@ def test_to_frame_no_id():
         collection = MagicMock()
         mongo_cli.to_frame(collection, no_id=True)
         assert df.columns == ["ej_col"]
+
+
+def test_insert():
+    with patch("pymongo.MongoClient") as cli_mock:
+        params = {
+            "username": "mutt",
+            "password": "data",
+            "host": "example_host",
+            "database": "example_db",
+        }
+        mongo_cli = MongoClient(**params)
+        query = {"field1": "value1", "field2": "value2"}
+        collection = MagicMock()
+        example_id = 4321
+        id_mock = MagicMock(inserted_id=example_id)
+        cli_mock.return_value.__getitem__.return_value.__getitem__.return_value.insert_one.return_value = (
+            id_mock
+        )
+        ret_value = mongo_cli.insert(collection, query=query)
+        cli_mock.return_value.__getitem__.return_value.__getitem__.return_value.insert_one.assert_called_once_with(
+            query
+        )
+        assert ret_value == example_id
