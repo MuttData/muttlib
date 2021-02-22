@@ -57,11 +57,9 @@ class MongoClient:
     def _build_conn_uri(self):
         uri = 'mongodb://'
         if self.username is not None:
-            uri += f'{self.username}'
-        if self.password is not None:
-            uri += f':{self.password}@'
+            uri += f'{self.username}{":"+self.password if self.password else ""}@'
         if self.replica_set is None:
-            uri += f'{self.host}:{self.port}'
+            uri += f'{self.host}{":"+self.port if self.port else ""}'
         else:
             uri += ",".join(self.seeds)
         uri += f'/{self.database}'
