@@ -1,6 +1,6 @@
 import logging
 
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 
 logger = logging.getLogger(__name__)
 
