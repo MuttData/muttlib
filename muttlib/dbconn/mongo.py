@@ -58,7 +58,7 @@ class MongoClient:
         uri = 'mongodb://'
         if self.username is not None:
             uri += f'{self.username}{":"+self.password if self.password else ""}@'
-        if self.replica_set is None:
+        if self.seeds is None:
             uri += f'{self.host}{":"+self.port if self.port else ""}'
         else:
             uri += ",".join(self.seeds)
