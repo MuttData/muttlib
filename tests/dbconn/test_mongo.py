@@ -41,3 +41,18 @@ def test_to_frame_uri_with_host_username_and_database():
             f'mongodb://{params["username"]}@{params["host"]}/{params["database"]}'
         )
         cli_mock.return_value.__getitem__.assert_called_once_with(params["database"])
+
+
+def test_to_frame_uri_with_seeds():
+    with patch("pymongo.MongoClient") as cli_mock:
+        params = {
+            "seeds": ["db1.example.net:27017", "db2.example.net:2500"],
+            "database": "example_db",
+        }
+        mongo_cli = MongoClient(**params)
+        collection = MagicMock()
+        mongo_cli.to_frame(collection)
+        cli_mock.assert_called_once_with(
+            f'mongodb://{",".join(params["seeds"])}/{params["database"]}'
+        )
+        cli_mock.return_value.__getitem__.assert_called_once_with(params["database"])
