@@ -78,7 +78,7 @@ class MongoClient:
         collection = db[collection]
         find_func = getattr(collection, 'find')  # noqa
         res = find_func(query, fields)
-        if limit > 0:
+        if (type(limit) == int) and (limit > 0):
             res = res.limit(limit)
         return list(res)
 
