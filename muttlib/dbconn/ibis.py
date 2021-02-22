@@ -8,8 +8,6 @@ import pandas as pd
 from muttlib.dbconn.base import parse_sql_statement_decorator
 import muttlib.utils as utils
 
-from deprecated import deprecated
-
 logger = logging.getLogger(__name__)
 
 try:
@@ -117,7 +115,7 @@ class IbisClient:
             and self.hdfs_port is not None
             and self.hdfs_username is not None
         ):
-            self.hdfs_client = ibis.hdfs_connect(
+            self.hdfs_client = ibis.impala.hdfs_connect(
                 host=self.hdfs_host, port=self.hdfs_port, user=self.hdfs_username
             )
 
@@ -132,12 +130,7 @@ class IbisClient:
         client.set_options(self.options)
         return client
 
-    @deprecated
-    def execute(self, client, sql, return_cursor=False):
-        """Execute raw sql statement."""
-        return client.raw_sql(sql, results=return_cursor)
-
-    def execute_new(self, sql, client=None, return_cursor=False):
+    def execute(self, sql, client=None, return_cursor=False):
         """Execute raw sql statement."""
         if client is None:
             client = self._connect()
@@ -186,7 +179,7 @@ class IbisClient:
                     raise ValueError("Failed to query or pull parquet files from HDFS.")
                 finally:
                     logger.debug(f"Cleanup tmp table '{tmp_table}'.")
-                    self.execute(client, drop_stmt)
+                    self.execute(drop_stmt, client)
                     sleep(1)
                     client.drop_table(tmp_table, force=True)
 
@@ -212,7 +205,7 @@ class IbisClient:
         for i in range(1, self._max_retries + 1):
             try:
                 logger.debug(f"Try table drop if exists {tmp_table}...")
-                self.execute(client, drop_stmt)
+                self.execute(drop_stmt, client)
 
                 logger.debug(f"Creating {tmp_table}...")
                 create_sql = """
@@ -220,31 +213,29 @@ class IbisClient:
                 STORED AS parquet AS
                 SELECT * FROM (\n{{sql}}\n LIMIT 1) AS aux_{{tmp_table}}
                 """
-                create_stmt = utils.render_jinja_template(
-                    create_sql,
-                    jparams={
+                create_stmt = utils.get_default_jinja_template(create_sql).render(
+                    **{
                         'hdfs_database': self.hdfs_database,
                         'tmp_table': tmp_table,
                         'sql': sql,
-                    },
+                    }
                 )
 
-                self.execute(client, create_stmt)
+                self.execute(create_stmt, client)
 
                 logger.debug(f"Populating {tmp_table}...")
                 insert_sql = """
                 INSERT OVERWRITE {{hdfs_database}}.{{tmp_table}}
                 SELECT * FROM (\n{{sql}}\n) AS aux_{{tmp_table}}
                 """
-                insert_stmt = utils.render_jinja_template(
-                    insert_sql,
-                    jparams={
+                insert_stmt = utils.get_default_jinja_template(insert_sql).render(
+                    **{
                         'hdfs_database': self.hdfs_database,
                         'tmp_table': tmp_table,
                         'sql': sql,
-                    },
+                    }
                 )
-                self.execute(client, insert_stmt)
+                self.execute(insert_stmt, client)
                 return
 
             except Exception as e:
