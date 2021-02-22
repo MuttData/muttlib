@@ -74,7 +74,7 @@ def test_to_frame_uri_with_seeds_and_replica_set():
         cli_mock.return_value.__getitem__.assert_called_once_with(params["database"])
 
 
-def test_to_frame_with_query_and_fields():
+def test_to_frame_with_query_fields_and_limit():
     with patch("pymongo.MongoClient") as cli_mock:
         params = {
             "username": "mutt",
@@ -84,10 +84,14 @@ def test_to_frame_with_query_and_fields():
         }
         query = {"_id": 123}
         fields = ["field1", "field2"]
+        limit = 1
         mongo_cli = MongoClient(**params)
         collection = MagicMock()
-        mongo_cli.to_frame(collection, query=query, fields=fields)
+        mongo_cli.to_frame(collection, query=query, fields=fields, limit=limit)
         cli_mock.return_value.__getitem__.assert_called_once_with(params["database"])
         db = cli_mock.return_value.__getitem__.return_value
         db.__getitem__.assert_called_once_with(collection)
         db.__getitem__.return_value.find.assert_called_once_with(query, fields)
+        db.__getitem__.return_value.find.return_value.limit.assert_called_once_with(
+            limit
+        )
