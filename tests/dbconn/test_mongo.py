@@ -1,5 +1,6 @@
 from unittest.mock import patch, MagicMock
 
+import pandas as pd
 import pytest
 
 from muttlib.dbconn import MongoClient
@@ -127,3 +128,21 @@ def test_to_frame_with_invalid_limit():
         mongo_cli.to_frame(collection, limit=limit)
         db = cli_mock.return_value.__getitem__.return_value
         db.__getitem__.return_value.find.return_value.limit.assert_not_called()
+
+
+def test_to_frame_no_id():
+    with patch("pymongo.MongoClient") as cli_mock, patch(
+        "muttlib.dbconn.mongo.json_normalize"
+    ) as json_normalize:
+        df = pd.DataFrame(data=[[1, 2]], columns=["_id", "ej_col"])
+        json_normalize.return_value = df
+        params = {
+            "username": "mutt",
+            "password": "data",
+            "host": "example_host",
+            "database": "example_db",
+        }
+        mongo_cli = MongoClient(**params)
+        collection = MagicMock()
+        mongo_cli.to_frame(collection, no_id=True)
+        assert df.columns == ["ej_col"]
