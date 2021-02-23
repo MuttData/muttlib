@@ -1,6 +1,6 @@
 import logging
 
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,25 @@ MONGO_DB_TYPE = 'mongo'
 
 
 class MongoClient:
-    """MongoDb client."""
+    """MongoDb client.
+
+     Parameters
+    ----------
+    username : str, optional
+        user to authenticate
+    password : str, optional
+        password to authenticate
+    database : str, optional
+        Default database
+    host : str, optional
+        Host name of the mongodb instance.
+    port: int, optional
+        Port number of the mongodb instance.
+    seeds: list of str, optional
+        DNS-constructed seed list: https://docs.mongodb.com/manual/reference/glossary/#term-seed-list
+    replica_set: str,optional
+        A cluster of MongoDB servers that implements replication and automated failover.
+    """
 
     def __init__(
         self,
@@ -39,11 +57,9 @@ class MongoClient:
     def _build_conn_uri(self):
         uri = 'mongodb://'
         if self.username is not None:
-            uri += f'{self.username}'
-        if self.password is not None:
-            uri += f':{self.password}@'
-        if self.replica_set is None:
-            uri += f'{self.host}:{self.port}'
+            uri += f'{self.username}{":"+self.password if self.password else ""}@'
+        if self.seeds is None:
+            uri += f'{self.host}{":"+self.port if self.port else ""}'
         else:
             uri += ",".join(self.seeds)
         uri += f'/{self.database}'
@@ -62,7 +78,7 @@ class MongoClient:
         collection = db[collection]
         find_func = getattr(collection, 'find')  # noqa
         res = find_func(query, fields)
-        if limit > 0:
+        if (type(limit) == int) and (limit > 0):
             res = res.limit(limit)
         return list(res)
 
