@@ -4,7 +4,7 @@ from muttlib.dbconn import OracleClient
 import pytest
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def oracleClient():
     client = OracleClient(
         username="scott",
@@ -62,5 +62,25 @@ def test_insert_from_frame_connects_fix_club_false(oracleClient):
             create_engine.return_value.connect.return_value.__enter__.return_value,
             if_exists='append',
             dtype='test',
+            index=False,
+        )
+
+
+def test_insert_from_frame_connects_fix_club_true(oracleClient):
+
+    with patch("muttlib.dbconn.base.create_engine") as create_engine:
+
+        df = MagicMock(dtypes='object')
+
+        table = "test_table"
+        oracleClient.insert_from_frame(df, table, fix_clobs=True)
+        create_engine.assert_called_once_with(
+            oracleClient.conn_str, connect_args=ANY, echo=ANY
+        )
+        df.to_sql.assert_called_once_with(
+            table,
+            create_engine.return_value.connect.return_value.__enter__.return_value,
+            if_exists='append',
+            dtype=dict(),
             index=False,
         )
