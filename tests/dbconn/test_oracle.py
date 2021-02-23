@@ -46,25 +46,21 @@ def url_connection_with_scheme_error(oracleClient):
     assert engine.url != 'oracle://scott:tiger@127.0.0.1:1521/test'
 
 
-def test_oracle_insert_from_frame_connects(oracleClient):
+def test_insert_from_frame_connects_fix_club_false(oracleClient):
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
-        client = OracleClient(
-            username="scott",
-            host="127.0.0.1",
-            port=1521,
-            dialect="oracle",
-            password="tiger",
-        )
-        df = MagicMock()
+
+        df = MagicMock(dtypes='test')
+
         table = "test_table"
-        client.insert_from_frame(df, table)
+        oracleClient.insert_from_frame(df, table, fix_clobs=False)
         create_engine.assert_called_once_with(
-            client.conn_str, connect_args=ANY, echo=ANY
+            oracleClient.conn_str, connect_args=ANY, echo=ANY
         )
         df.to_sql.assert_called_once_with(
             table,
             create_engine.return_value.connect.return_value.__enter__.return_value,
             if_exists='append',
+            dtype='test',
             index=False,
         )
