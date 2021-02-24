@@ -52,7 +52,7 @@ class MongoClient(BaseClient):
             raise ValueError("Either `host` or `seeds` is required and was not found!")
 
         super().__init__(
-            host=host,
+            host=host if host else ",".join(seeds),
             port=port,
             database=database,
             username=username,
@@ -65,6 +65,15 @@ class MongoClient(BaseClient):
         self.database = database
         self.seeds = seeds
         self.replica_set = replica_set
+
+    _conn_url_delegated = (
+        "username",
+        "database",
+        "dialect",
+        "port",
+        "driver",
+        "password",
+    )
 
     @property
     def conn_str(self):
