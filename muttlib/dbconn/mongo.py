@@ -66,14 +66,7 @@ class MongoClient(BaseClient):
         self.seeds = seeds
         self.replica_set = replica_set
 
-    _conn_url_delegated = (
-        "username",
-        "database",
-        "dialect",
-        "port",
-        "driver",
-        "password",
-    )
+    _conn_url_delegated = ("", "", "", "", "", "", "")
 
     @property
     def conn_str(self):
