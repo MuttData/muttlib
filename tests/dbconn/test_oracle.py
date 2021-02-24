@@ -46,7 +46,7 @@ def url_connection_with_scheme_error(oracle_client):
     assert engine.url != 'oracle://scott:tiger@127.0.0.1:1521/test'
 
 
-def test_insert_from_frame_connects_fix_clob_false(oracle_client):
+def test_insert_from_frame_connects_fix_clobs_false(oracle_client):
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
@@ -66,21 +66,27 @@ def test_insert_from_frame_connects_fix_clob_false(oracle_client):
         )
 
 
-def test_insert_from_frame_connects_fix_clob_true(oracle_client):
+def test_insert_from_frame_connects_fix_clobs_true(oracle_client):
 
-    with patch("muttlib.dbconn.base.create_engine") as create_engine:
+    with patch("muttlib.dbconn.base.create_engine") as create_engine, patch(
+        "muttlib.dbconn.oracle.VARCHAR"
+    ) as varchar:
 
         df = MagicMock(dtypes='object')
+        df.columns.__getitem__.return_value.tolist.return_value = ["col1", "col2"]
+        df.__getitem__.return_value.str.len.return_value.max.return_value = 3
 
         table = "test_table"
         oracle_client.insert_from_frame(df, table, fix_clobs=True)
+
         create_engine.assert_called_once_with(
             oracle_client.conn_str, connect_args=ANY, echo=ANY
         )
+
         df.to_sql.assert_called_once_with(
             table,
             create_engine.return_value.connect.return_value.__enter__.return_value,
             if_exists='append',
-            dtype=dict(),
+            dtype={'col1': varchar(3), 'col2': varchar(3)},
             index=False,
         )
