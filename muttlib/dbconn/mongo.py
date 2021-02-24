@@ -91,6 +91,10 @@ class MongoClient(BaseClient):
         uri += f'?replicaSet={self.replica_set}' if self.replica_set is not None else ''
         return uri
 
+    def execute(self, sql, params=None, connection=None):
+        # Not sure if this method applies for mongodb queries
+        raise NotImplementedError
+
     def _connect(self, custom_uri=None):
         if custom_uri is None:
             conn_uri = self._build_conn_uri()
