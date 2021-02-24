@@ -1,6 +1,7 @@
 import logging
 
 from pandas import json_normalize
+from muttlib.dbconn.base import BaseClient
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ except ModuleNotFoundError:
 MONGO_DB_TYPE = 'mongo'
 
 
-class MongoClient:
+class MongoClient(BaseClient):
     """MongoDb client.
 
      Parameters
@@ -34,6 +35,9 @@ class MongoClient:
         A cluster of MongoDB servers that implements replication and automated failover.
     """
 
+    default_dialect = "mongodb"
+    default_driver = ""
+
     def __init__(
         self,
         username=None,
@@ -46,6 +50,14 @@ class MongoClient:
     ):
         if host is None and seeds is None:
             raise ValueError("Either `host` or `seeds` is required and was not found!")
+
+        super().__init__(
+            host=host,
+            port=port,
+            database=database,
+            username=username,
+            password=password,
+        )
         self.username = username
         self.password = password
         self.host = host
@@ -53,6 +65,10 @@ class MongoClient:
         self.database = database
         self.seeds = seeds
         self.replica_set = replica_set
+
+    @property
+    def conn_str(self):
+        return self._build_conn_uri()
 
     def _build_conn_uri(self):
         uri = 'mongodb://'
