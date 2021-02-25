@@ -39,12 +39,12 @@ def url_connection(oracle_client):
     assert str(engine.url) == 'oracle://scott:tiger@127.0.0.1:1521'
 
 
-def url_connection_with_scheme(oracle_client_with_schema):
+def url_connection_with_schema(oracle_client_with_schema):
     engine = oracle_client_with_schema.get_engine()
     assert str(engine.url) == 'oracle://scott:tiger@127.0.0.1:1521/test'
 
 
-def url_connection_with_scheme_error(oracle_client):
+def url_connection_with_schema_error(oracle_client):
     engine = oracle_client.get_engine()
     assert engine.url != 'oracle://scott:tiger@127.0.0.1:1521/test'
 
