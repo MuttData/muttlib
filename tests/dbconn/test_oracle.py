@@ -51,33 +51,33 @@ def url_connection_with_scheme_error(oracle_client):
 
 def test_insert_from_frame_connects_fix_clobs_false(oracle_client):
 
-    with patch("muttlib.dbconn.base.create_engine") as create_engine:
+    df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
 
-        df = MagicMock(dtypes='test')
+    with patch("muttlib.dbconn.base.create_engine") as create_engine, patch.object(
+        df, 'to_sql'
+    ) as mock_to_sql:
 
         table = "test_table"
         oracle_client.insert_from_frame(df, table, fix_clobs=False)
         create_engine.assert_called_once_with(
             oracle_client.conn_str, connect_args=ANY, echo=ANY
         )
-        df.to_sql.assert_called_once_with(
+        mock_to_sql.assert_called_once_with(
             table,
             create_engine.return_value.connect.return_value.__enter__.return_value,
             if_exists='append',
-            dtype='test',
+            dtype=ANY,
             index=False,
         )
 
 
 def test_insert_from_frame_connects_fix_clobs_true(oracle_client):
 
+    df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
+
     with patch("muttlib.dbconn.base.create_engine") as create_engine, patch(
         "muttlib.dbconn.oracle.VARCHAR"
-    ) as varchar:
-
-        df = MagicMock(dtypes='object')
-        df.columns.__getitem__.return_value.tolist.return_value = ["col1", "col2"]
-        df.__getitem__.return_value.str.len.return_value.max.return_value = 3
+    ) as varchar, patch.object(df, 'to_sql') as mock_to_sql:
 
         table = "test_table"
         oracle_client.insert_from_frame(df, table, fix_clobs=True)
@@ -86,11 +86,11 @@ def test_insert_from_frame_connects_fix_clobs_true(oracle_client):
             oracle_client.conn_str, connect_args=ANY, echo=ANY
         )
 
-        df.to_sql.assert_called_once_with(
+        mock_to_sql.assert_called_once_with(
             table,
             create_engine.return_value.connect.return_value.__enter__.return_value,
             if_exists='append',
-            dtype={'col1': varchar(3), 'col2': varchar(3)},
+            dtype={'col1': varchar(1), 'col2': varchar(3)},
             index=False,
         )
 
