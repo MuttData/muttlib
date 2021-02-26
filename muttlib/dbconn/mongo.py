@@ -16,7 +16,7 @@ MONGO_DB_TYPE = 'mongo'
 class MongoClient:
     """MongoDb client.
 
-     Parameters
+    Parameters
     ----------
     username : str, optional
         user to authenticate
