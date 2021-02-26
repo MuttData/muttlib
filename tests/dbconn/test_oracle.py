@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import patch, ANY
 
 import pandas as pd
 from pandas._testing import assert_frame_equal
@@ -52,23 +52,32 @@ def url_connection_with_schema_error(oracle_client):
 def test_insert_from_frame_connects_fix_clobs_false(oracle_client):
 
     df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
-
+    print(df.dtypes)
     with patch("muttlib.dbconn.base.create_engine") as create_engine, patch.object(
         df, 'to_sql'
     ) as mock_to_sql:
 
         table = "test_table"
-        oracle_client.insert_from_frame(df, table, fix_clobs=False)
+        oracle_client.insert_from_frame(
+            df, table, fix_clobs=False, upper_case_cols=False
+        )
         create_engine.assert_called_once_with(
             oracle_client.conn_str, connect_args=ANY, echo=ANY
         )
-        mock_to_sql.assert_called_once_with(
+        # print(mock_to_sql.call_args_list)
+        mock_to_sql.assert_called_once()
+        args, kwargs = mock_to_sql.call_args_list[0]
+
+        assert args == (
             table,
             create_engine.return_value.connect.return_value.__enter__.return_value,
-            if_exists='append',
-            dtype=ANY,
-            index=False,
         )
+
+        assert set(kwargs.keys()) == {'if_exists', 'index', 'dtype'}
+
+        assert kwargs['if_exists'] == 'append'
+        assert kwargs['index'] == False
+        assert kwargs['dtype'].equals(df.dtypes)
 
 
 def test_insert_from_frame_connects_fix_clobs_true(oracle_client):
