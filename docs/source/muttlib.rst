@@ -8,6 +8,7 @@ muttlib.dbconn module
 ---------------------
 
 .. automodule:: muttlib.dbconn
+   :imported-members:
    :members:
    :undoc-members:
    :show-inheritance:
