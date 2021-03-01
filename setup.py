@@ -87,7 +87,7 @@ setuptools.setup(
     install_requires=[
         'deprecated',
         'jinja2',
-        'pandas',
+        'pandas>=1.0.0',
         'progressbar2',
         'pyyaml',
         'scikit-learn',
