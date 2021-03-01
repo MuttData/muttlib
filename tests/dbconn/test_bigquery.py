@@ -50,21 +50,38 @@ def test_execute(dummy_db_credentials):
         assert bq_query.call_count == 1
 
 
-def test_execute_sql_with_params(dummy_db_credentials):
-    with patch("google.cloud.bigquery.client.Client") as client, patch(
+def test_execute_bigquery_with_incomplete_params_fails(dummy_db_credentials):
+    with patch("google.cloud.bigquery.client.Client") as connection, patch(
         "google.cloud.bigquery.client.Client.query"
     ) as bq_query:
-
         bq_cli = BigQueryClient(**dummy_db_credentials)
         bq_cli.credentials = True
-        bq_cli.client = client
+        bq_cli.connection = connection
+
+        q = """
+        SELECT * FROM {table}
+        WHERE {condition1}
+        """
+        with pytest.raises(KeyError):
+            bq_cli.execute(q, connection=connection, params={"table": "teradactyl"})
+
+
+def test_execute_bigquery_with_params(dummy_db_credentials):
+    with patch("google.cloud.bigquery.client.Client") as connection, patch(
+        "google.cloud.bigquery.client.Client.query"
+    ) as bq_query:
+        bq_cli = BigQueryClient(**dummy_db_credentials)
+        bq_cli.credentials = True
+        bq_cli.connection = connection
 
         q = """
         SELECT * FROM {table}
         WHERE {condition1}
         """
         params = {"table": "teradactyl", "condition1": "id = 1"}
-        bq_cli.execute(q, params=params)
+        bq_cli.execute(q, connection=connection, params=params)
+        connection.query.assert_called_once_with(
+            q.format(**params))
 
 
 def test_to_frame(dummy_db_credentials):
