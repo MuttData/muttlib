@@ -143,7 +143,13 @@ class BigQueryClient(BaseClient):
         return self.execute(sql, params, connection).to_dataframe()
 
     def insert_from_frame(  # pylint: disable=W0221
-        self, df, table=None, create_first=True, create_sql=None, connection=None, **kwargs
+        self,
+        df,
+        table=None,
+        create_first=True,
+        create_sql=None,
+        connection=None,
+        **kwargs,
     ):
         """Insert from a Pandas dataframe.
 
@@ -169,7 +175,6 @@ class BigQueryClient(BaseClient):
             table = self.table_id
 
         logger.info(f"Going to insert data into {table}")
-
 
         if connection is not None:
             if create_first:
