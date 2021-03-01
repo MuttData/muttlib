@@ -6,37 +6,26 @@ import muttlib
 with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
-pyarrow_dep = ['pyarrow==0.13.0']
+pyarrow_dep = ['pyarrow==2.0.0']
 holidays_dep = ['holidays>=0.10.2']
 
 #  define 'extra_dependencies'
 extra_dependencies = {
     'pyarrow': pyarrow_dep,
     'oracle': ['cx_Oracle'],
-    'hive': ['pyhive>=0.6.1'],
+    'hive': ['pyhive>=0.6.1', 'thrift'],
     'postgres': ['psycopg2-binary'],
     'mysql': ['pymysql'],
     'sqlserver': ['pymssql'],
     'mongo': ['pymongo'],
     'bigquery': ['google-cloud-bigquery'],
-    'ibis': ['ibis', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
-    'ipynb-utils': [
-        'IPython',
-        'jinja2',
-        'jinjasql',
-        'matplotlib',
-        'numpy',
-        'pandas',
-        'seaborn',
-        'tabulate',
-        'textwrap3',
-    ],
+    'ibis': ['ibis-framework', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
         'flake8-bugbear',
         'flake8-docstrings',
         'bump2version',
-        'sphinx',
+        'sphinx==3.2.1',
         'sphinx_rtd_theme',
         'm2r2',
         'betamax',
@@ -56,7 +45,7 @@ extra_dependencies = {
         'pytest-xdist',
         'pytest-cov',
         'pytest-html',
-        'hypothesis',
+        'pytest-mpl==0.12',
         'betamax',
         'betamax-serializers',
     ]
@@ -96,6 +85,7 @@ setuptools.setup(
     + holidays_dep,
     test_suite='test',
     install_requires=[
+        'deprecated',
         'jinja2',
         'pandas>=1.0.0',
         'progressbar2',
@@ -103,6 +93,10 @@ setuptools.setup(
         'scikit-learn',
         'scipy',
         'sqlalchemy',
+        'numpy==1.19.5',
+        'jinjasql',
+        'IPython',
+        'matplotlib',
     ],
     extras_require=extra_dependencies,
 )

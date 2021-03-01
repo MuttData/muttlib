@@ -1,6 +1,6 @@
 # muttlib 🐶📚
 
-[![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)
+[![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![pypi version](https://img.shields.io/pypi/v/muttlib?color=blue)](https://pypi.org/project/muttlib/)
 
 ## Description
 
@@ -15,10 +15,8 @@ Current modules:
   utilities for forecasting problems, allowing wider and easier grid search for
   hyperparameters.
 - `utils`: A single version of miscellaneous functions needed every now and then.
-- `ipynb_const` and `ipynb_utils`: Utilities when doing exploratory work (helpful for jupyter notebooks).
 - `gsheetsconn`: Module to make data interactions to/from Google Sheets <> Pandas.
 - `gdrive`: Module that provides a UNIX-ish interface to GDrive.
-- `gcd`: (Greatest Common Divisor, for lack of a better name - Ty @memeplex) Classes, abstract objects and other gimmicks.
 
 ## Table of Contents
 
@@ -28,40 +26,44 @@ Current modules:
 - [Credits](#contributing)
 - [License](#license)
 
-## Installation
+### Installing from PyPi
 
-To install base lib:
+Base lib:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib
+pip install muttlib
 ```
+
+Check below for available extras.
 
 Parquet and Feather support:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[pyarrow]
-```
-
-IPython utils:
-```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ipynb-utils]
+pip install muttlib[pyarrow]
 ```
 
 Forecast:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[forecast]
+pip install muttlib[forecast]
 ```
 
 Misc DB support for dbconn:
 ```bash
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[oracle]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[hive]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[postgres]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[mysql]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[sqlserver]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[moongo]
-pip install git+https://gitlab.com/mutt_data/muttlib.git#egg=muttlib[ibis]
+pip install muttlib[oracle]
+pip install muttlib[hive]
+pip install muttlib[postgres]
+pip install muttlib[mysql]
+pip install muttlib[sqlserver]
+pip install muttlib[mongo]
+pip install muttlib[ibis]
 ```
 
-Install custom branch:
+### Installing custom branches from the repos
+
+From GitHub mirror:
+```bash
+pip install -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
+```
+
+From Gitlab main repo:
 ```bash
 pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```

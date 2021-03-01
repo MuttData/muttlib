@@ -3,40 +3,56 @@ image: python:3.7
 before_script:
   - apt-get update
 
+stages:
+  - validate
+  - test_stage
+  - version_stage
+  - release_stage
+  - deploy_stage
+
 test:
+  stage: test_stage
   script:
   - pip install .
   - python -c 'from muttlib import dbconn, utils'
-  - pip install .[ipynb-utils]
-  - python -c 'from muttlib import ipynb_const, ipynb_utils'
   - pip install .[forecast]
   - python -c 'from muttlib import forecast'
   - pip install .[gsheets]
   - python -c 'from muttlib import gsheetsconn'
-  - pip install .[gcd]
-  - python -c 'from muttlib import gcd'
   - pip install .[gdrive]
   - python -c 'from muttlib import gdrive'
   - pip install nox
   - nox --sessions tests
-
+  only:
+    refs:
+      - merge_requests
+      - master
 
 lint:
+  stage: test_stage
   script:
     - pip install nox
     - nox --sessions cop
-
+  only:
+    refs:
+      - merge_requests
+      - master
 
 bandit:
+  stage: test_stage
   script:
     - pip install nox
     - nox --sessions bandit
-
+  only:
+    refs:
+      - merge_requests
+      - master
 
 pages:
-  stage: deploy
+  stage: deploy_stage
   script:
-  - pip install .[all]
+  - pip install .
+  - pip install .[all] --use-deprecated=legacy-resolver
   - cd docs
   - make html -e SPHINXOPTS=-W
   - cd ..
@@ -45,4 +61,83 @@ pages:
     paths:
     - public
   only:
-  - master
+    refs:
+      - master
+
+# Deploy from master to package registry
+# If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
+# package registry, thus using the required variables to do so
+# The package will be uploaded to PYPI_URL, which can be overrided
+# not to upload to gitlab's PYPI
+deploy:
+  stage: deploy_stage
+  script:
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
+    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
+    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
+    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
+  only:
+    refs:
+      - master
+
+tag_release_version:
+  stage: version_stage
+  script:
+    - echo "TAG=v$(grep __version__ ./muttlib/__init__.py | cut -d "'" -f 2)" >> variables.env
+  artifacts:
+    reports:
+      dotenv: variables.env
+  before_script:
+    - ''
+  only:
+    refs:
+      - master
+
+release:
+  stage: release_stage
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: tag_release_version
+      artifacts: true
+  release:
+    tag_name: '$TAG'
+    description: './CHANGELOG.md'
+  script:
+    - echo 'running release job for $TAG'
+  before_script:
+    - ''
+  only:
+    refs:
+      - master
+
+check_version:
+  stage: validate
+  script:
+    - pip install packaging
+    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- muttlib/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
+    - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+    - exit_status=$?
+    - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
+    - exit $exit_status
+  only:
+    refs:
+      - merge_requests
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+
+check_changelog:
+  stage: validate
+  script:
+    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -- CHANGELOG.md | awk '{print $1}')
+    - if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+  only:
+    refs:
+      - merge_requests
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
