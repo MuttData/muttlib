@@ -123,3 +123,17 @@ def test_insert_from_frame_create_first_true(dummy_db_credentials):
 
         bq_cli.insert_from_frame(df, create_first=True)
         bq_load.assert_called_once_with(df, 'project.192.168.0.1.teradactyl')
+
+
+def test_connect_credentials_none(dummy_db_credentials):
+    with patch("google.cloud.bigquery.client.Client") as connection, patch(
+        "google.cloud.bigquery.client.Client.query"
+    ) as bq_query, patch(
+        "muttlib.dbconn.bigquery.BigQueryClient._read_cred"
+    ) as mock_read_cred:
+        bq_cli = BigQueryClient(**dummy_db_credentials)
+        bq_cli.credentials = None
+        bq_cli.connection = connection
+
+        bq_cli.execute("SELECT *")
+        mock_read_cred.assert_called_once_with(bq_cli.auth, bq_cli.auth_file)
