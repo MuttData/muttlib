@@ -80,8 +80,7 @@ def test_execute_bigquery_with_params(dummy_db_credentials):
         """
         params = {"table": "teradactyl", "condition1": "id = 1"}
         bq_cli.execute(q, connection=connection, params=params)
-        connection.query.assert_called_once_with(
-            q.format(**params))
+        connection.query.assert_called_once_with(q.format(**params))
 
 
 def test_to_frame(dummy_db_credentials):
@@ -109,3 +108,18 @@ def test_insert_from_frame(dummy_db_credentials, df):
         assert bq_load.call_count == 0
         bq_cli.insert_from_frame(df, create_first=False)
         assert bq_load.call_count == 1
+
+
+def test_insert_from_frame_create_first_true(dummy_db_credentials):
+    with patch("google.cloud.bigquery.client.Client") as connection, patch(
+        "google.cloud.bigquery.client.Client.load_table_from_dataframe"
+    ) as bq_load:
+
+        df = pd.DataFrame({'col1': [1], 'col2': [3.0]})
+
+        bq_cli = BigQueryClient(**dummy_db_credentials)
+        bq_cli.credentials = True
+        bq_cli.connection = connection
+
+        bq_cli.insert_from_frame(df, create_first=True)
+        bq_load.assert_called_once_with(df, 'project.192.168.0.1.teradactyl')
