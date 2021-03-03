@@ -122,7 +122,7 @@ def test_insert_from_frame_create_first_true(dummy_db_credentials):
         bq_cli.connection = connection
 
         bq_cli.insert_from_frame(df, create_first=True)
-        bq_load.assert_called_once_with(df, 'project.192.168.0.1.teradactyl')
+        bq_load.assert_called_once_with(df, bq_cli.table_id)
 
 
 def test_connect_credentials_none(dummy_db_credentials):
@@ -137,3 +137,15 @@ def test_connect_credentials_none(dummy_db_credentials):
 
         bq_cli.execute("SELECT *")
         mock_read_cred.assert_called_once_with(bq_cli.auth, bq_cli.auth_file)
+
+
+def test_insert_from_frame_create_first_true_with_connection(dummy_db_credentials, df):
+    with patch("google.cloud.bigquery.client.Client") as connection:
+        bq_cli = BigQueryClient(**dummy_db_credentials)
+        bq_cli.credentials = True
+
+        bq_cli.insert_from_frame(df, create_first=True, connection=connection)
+        connection.load_table_from_dataframe.assert_called_once_with(
+            df, bq_cli.table_id
+        )
+        connection.load_table_from_dataframe.return_value.result.assert_called_once()
