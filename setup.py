@@ -76,7 +76,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',
-        'OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
     ],
     setup_requires=['pytest-runner', 'wheel'],
