@@ -58,45 +58,41 @@ def test_base_execute_connection_and_params_not_none(engine_baseClient):
 
 
 @patch("muttlib.dbconn.base.BaseClient.__abstractmethods__", set())
-def test_base_to_frame_rise_not_implemented_method(engine_baseClient):
+def test_base_to_frame_rise_not_implemented_method():
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        nuevo = BaseClient(dialect="mysql",)
+        base_cli = BaseClient(dialect="mysql",)
 
         q = "SELECT *"
 
         with pytest.raises(NotImplementedError):
-            nuevo.to_frame(q)
+            base_cli.to_frame(q)
 
 
 @patch("muttlib.dbconn.base.BaseClient.__abstractmethods__", set())
-def test_base_insert_from_frame_if_exists_replace_rise_not_implemented_method(
-    engine_baseClient,
-):
+def test_base_insert_from_frame_if_exists_replace_rise_not_implemented_method():
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        nuevo = BaseClient(dialect="mysql",)
+        base_cli = BaseClient(dialect="mysql",)
 
         df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test_table"
 
         with pytest.raises(NotImplementedError):
-            nuevo.insert_from_frame(df, table, if_exists='replace')
+            base_cli.insert_from_frame(df, table, if_exists='replace')
 
 
 @patch("muttlib.dbconn.base.BaseClient.__abstractmethods__", set())
-def test_base_insert_from_frame_index_true_rise_not_implemented_method(
-    engine_baseClient,
-):
+def test_base_insert_from_frame_index_true_rise_not_implemented_method():
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        nuevo = BaseClient(dialect="mysql",)
+        base_cli = BaseClient(dialect="mysql",)
 
         df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test_table"
 
         with pytest.raises(NotImplementedError):
-            nuevo.insert_from_frame(df, table, index=True)
+            base_cli.insert_from_frame(df, table, index=True)
