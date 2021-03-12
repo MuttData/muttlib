@@ -96,3 +96,20 @@ def test_base_insert_from_frame_index_true_rise_not_implemented_method():
 
         with pytest.raises(NotImplementedError):
             base_cli.insert_from_frame(df, table, index=True)
+
+
+@patch("muttlib.dbconn.base.BaseClient.__abstractmethods__", set())
+def test_base_insert_from_frame_chunk():
+
+    with patch("muttlib.dbconn.base.create_engine") as create_engine:
+
+        base_cli = BaseClient(dialect="mysql",)
+
+        base_cli._connect = create_engine.get_engine()
+
+        df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
+        table = "test"
+
+        with patch.object(base_cli, 'execute') as execute_mock:
+            base_cli.insert_from_frame(df, table, connection=None)
+            execute_mock.assert_called_once()
