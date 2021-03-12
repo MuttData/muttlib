@@ -57,6 +57,19 @@ def test_base_execute_connection_and_params_not_none(engine_baseClient):
         engine.execute.assert_called_once_with(q.format(**params))
 
 
+def test_base_to_frame_data_none(engine_baseClient):
+
+    with patch("muttlib.dbconn.base.create_engine") as create_engine:
+        q = "SELECT *"
+
+        create_engine.return_value.connect.return_value.__enter__.return_value.execute.return_value.fetchall.return_value = (
+            None
+        )
+        df = engine_baseClient.to_frame(q)
+
+        assert_frame_equal(df, pd.DataFrame())
+
+
 def test_base_setattr_getattr(engine_baseClient):
 
     engine_baseClient.__setattr__('driver', "pymysql")
