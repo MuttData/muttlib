@@ -1,35 +1,39 @@
 """Project agnostic utility functions."""
+from collections import OrderedDict, deque
 import contextlib
+from copy import deepcopy
 import csv
+from datetime import date, datetime
+from functools import wraps
 import hashlib
 import io
 import logging
 import logging.config
+from numbers import Number
 import os
+from pathlib import Path
 import re
 import sys
-
-from collections import OrderedDict, deque, namedtuple
-from copy import deepcopy
-from datetime import datetime, date
-from functools import wraps
-from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Dict, Tuple
 
 import jinja2
+from jinjasql import JinjaSql
 import numpy as np
 import pandas as pd
-import yaml
 from pandas.tseries import offsets
 from scipy.stats import iqr
+from IPython.display import display
+import matplotlib.pyplot as plt  # NOQA
+
 
 logger = logging.getLogger(f'utils.{__name__}')
 
+DEFAULT_JINJA_ENV_ARGS = dict(
+    autoescape=True, line_statement_prefix="%", trim_blocks=True, lstrip_blocks=True,
+)
 
-def read_yaml(f):
-    """Read a yaml file."""
-    with open(f, 'r') as file:
-        return yaml.safe_load(file.read())
+NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
+    THEN 1 ELSE 0 END ) AS {as_col}"""
 
 
 def make_dirs(dir_path):
@@ -38,37 +42,14 @@ def make_dirs(dir_path):
     return dir_path
 
 
-def non_empty_dirs(path):
-    """List all non-empty directories for a given path."""
-    return list({str(p.parent) for p in path.rglob('*') if p.is_file()})
-
-
-def is_readable_path(str_or_path):
-    """Check if string or Path passed corresponds to a readable file.
-
-    Args:
-        str_or_path (str, Path): A string or a path to be checked.
-    Returns:
-        (bool): A bool indicating whether or not str_or_path corresponds to a
-        readable file.
-    """
-    try:
-        f = open(str_or_path)
-        f.close()
-    except Exception:
-        return False
-
-    return True
-
-
 def path_or_string(str_or_path):
     """Load file contents as string or return input str."""
     file_path = Path(str_or_path)
-    if is_readable_path(file_path):
+    try:
         with file_path.open('r') as f:
             return f.read()
-
-    return str_or_path
+    except (OSError, ValueError):
+        return str_or_path
 
 
 # PythonDecorators/decorator_function_with_arguments.py
@@ -150,8 +131,6 @@ def local_df_cache(
 
             if callable(cache_fn):
                 cache_fn = cache_fn(cache_opts, *args, **kwargs)
-            else:
-                cache_fn = cache_fn
 
             base_fn = f"{cache_fn}.{cache_format}"
             cache_fn = os.path.join(cache_dir, base_fn)
@@ -225,11 +204,6 @@ def convert_to_snake_case(name: str):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
-def dict_to_namedtuple(name, d):
-    """Convert dictionary to namedtuple object."""
-    return namedtuple(name, d.keys())(**d)
-
-
 def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
     """Converts a deque to an ordered dictionary using GEO ordered levels."""
     orde = OrderedDict()  # type: ignore # noqa
@@ -240,11 +214,6 @@ def deque_to_geo_hierarchy_dict(double_linked_list: deque, target_level: str):
         orde[level] = elem
         if target_level == level:
             return orde
-
-
-def wrap_list_values_quotes(lis):
-    """Wraps all values in a list with single quotes."""
-    return [f"'{val}'" for val in lis]
 
 
 def str_to_datetime(datetime_str):
@@ -278,91 +247,12 @@ def range_datetime(datetime_start, datetime_end, timeskip=None):
         datetime_start += timeskip
 
 
-def get_fathers_mothers_kids_day(year: int):
-    """Get three dates for a given year input."""
-    august_first = str_to_datetime(f'{year}-08-01')
-    kids_dow_iteration = 3  # third sunday each August
-    KIDS_DAY = pd.date_range(
-        start=august_first, end=august_first + offsets.Day(21), freq='W-SUN'
-    )[kids_dow_iteration - 1]
-
-    october_first = august_first + offsets.MonthBegin(2)
-    mother_dow_iteration = 3  # third sunday each October
-    MOTHERS_DAY = pd.date_range(
-        start=october_first, end=october_first + offsets.Day(21), freq='W-SUN'
-    )[mother_dow_iteration - 1]
-
-    june_first = august_first - offsets.MonthBegin(2)
-    father_dow_iteration = 3  # third sunday each June
-    FATHERS_DAY = pd.date_range(
-        start=june_first, end=june_first + offsets.Day(21), freq='W-SUN'
-    )[father_dow_iteration - 1]
-
-    return FATHERS_DAY, MOTHERS_DAY, KIDS_DAY
-
-
-def get_friends_day(year: int):
-    """Get arg-style friends date."""
-    return str_to_datetime(f'{year}-07-20')
-
-
-def is_special_day(ds, timestamps_inclause):
-    """
-    Flag a date or date-string-like object as a special day.
-
-    The default list of timestamps will be the `Celebration days` which are
-    those commercially imposed days (not easter, EOY, christmas, etc.) that are
-    not technically `Feriados` per se.
-    """
-    if isinstance(ds, str):
-        ds = str_to_datetime(ds).date()
-    else:
-        ds = ds.date()
-    # breakpoint()
-    dates_inclause = [d.date() for d in timestamps_inclause]
-    if ds in dates_inclause:
-        return 1
-    else:
-        return 0
-
-
-def get_semi_month_pay_days(start_date, end_date):
-    """Get half and end of month friday pay-days for salary workers."""
-    first_monthly_fridays = pd.date_range(
-        start=start_date, end=end_date, freq='BM'
-    ) + offsets.Week(
-        weekday=4
-    )  # move to end of month
-    # Beware fridays that are too faraway from middle/end of month
-    first_semimonth_pay_days = [
-        ts + offsets.Day(14) if ts.day <= 4 else ts + offsets.Day(7)
-        for ts in first_monthly_fridays
-    ]
-    second_semimonth_pay_days = [
-        ts + offsets.Day(14) for ts in first_semimonth_pay_days
-    ]
-    SEMIMONTH_PAY_DAYS = sorted(first_semimonth_pay_days + second_semimonth_pay_days)
-    return SEMIMONTH_PAY_DAYS
-
-
 def get_first_fortnight_last_day(ds):
     """Return the last day of the datestamp's fortnight for its month."""
     first_bday = ds + offsets.MonthBegin(1) - offsets.BMonthBegin(1)
     first_monday_second_fortnight = first_bday + offsets.BDay(10)
     last_sunday_first_fortnight = first_monday_second_fortnight - offsets.Day(1)
     return last_sunday_first_fortnight
-
-
-def get_obj_hash(d, length=10):
-    """Return SHAKE 256 hash from hashable obj.
-
-    Args:
-        d: dict containing all necesssary data
-        length: number of characters to return in the hash
-    """
-    shake = hashlib.shake_256()
-    shake.update(repr(d).encode('utf-8'))
-    return shake.hexdigest(int(length / 2))  # pylint: disable=too-many-function-args
 
 
 def query_yes_no(question, default='no'):
@@ -393,7 +283,7 @@ def query_yes_no(question, default='no'):
 
     while True:
         sys.stdout.write(question + prompt)
-        choice = input().lower()
+        choice = input().lower()  # nosec
         if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
@@ -459,28 +349,9 @@ def robust_standarize_values(values):
     return (values - values.median()) / iqr(values)
 
 
-def none_or_empty_pandas(obj):
-    """Check if object is None or empty pd.Dataframe / pd.Series."""
-    if obj is None:
-        return True
-    elif isinstance(obj, (pd.DataFrame, pd.Series)):
-        return obj.empty
-    else:
-        raise ValueError(
-            "Argument type should be one of: "
-            f"'{(type(None) , pd.Series, pd.DataFrame)}'. Type passed was {type(obj)}"
-        )
-
-
 def hash_str(s, length=8):
     """Hash a string."""
     return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
-
-
-def setup_logging(log_config, logger_name='root', level='INFO'):
-    """Setup logging config."""
-    log_config['loggers'][logger_name]['level'] = level
-    logging.config.dictConfig(log_config)
 
 
 def df_info_to_str(df):
@@ -498,69 +369,74 @@ class BadInClauseException(JinjaTemplateException):
     """Dummy doc."""
 
 
-def in_clause_requirement(obj):
-    """Check object list or tuple iterables."""
-    return isinstance(obj, (list, tuple))
+def _format_value_in_clause(value: Union[Number, str]) -> str:
+    """Format value according to type.
+
+    Args:
+        value (Union[Number, str]): any number or string
+
+    Raises:
+        BadInClauseException: for values other than Number or str
+
+    Returns:
+        str: formatted string
+    """
+    if isinstance(value, str):
+        return f"'{value}'"
+    elif isinstance(value, Number):
+        return f"{value}"
+    else:
+        raise BadInClauseException(
+            f"Value type: {type(value)} is not allowed for in clause formatting"
+        )
 
 
-def format_in_clause(iterable):
+def format_in_clause(
+    iterable: Union[Tuple[Union[Number, str]], List[Union[Number, str]]]
+) -> str:
     """
     Create a Jinja2 filter to format list-like values passed.
 
-    Idea originally from
-    https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
+    Args:
+        iterable (list, tuple): list / tuple of strings and numbers. Can be empty.
+
+    Raises:
+        BadInClauseException: for non iterable inputs.
+
+    Returns:
+        str: The formatted string of the list of elements.
+
+    Notes:
+        Idea originally from
+        https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
+        Passing an empty tuple/list won't raise an exception, in order to
+        simplify the function. Also, regarding failing queries, there's no
+        explicit goal for sql formatting (although that's a common use case).
+
+    Examples:
+        >>> format_in_clause([1.12, 1, 'a'])
+
+        (1.12,1,'a')
     """
-    if not in_clause_requirement(iterable):
+    if not isinstance(iterable, (list, tuple)):
         raise BadInClauseException(
             f"Value passed is not a list or tuple: '{iterable}'. "
             f"Where the query uses the '| inclause'."
         )
-    values = [f"{v}" for v in iterable]
+    values = [_format_value_in_clause(v) for v in iterable]
     clause = ",".join(values)
     clause = "(" + clause + ")"
     return clause
 
 
-def template(path_or_str, **kwargs):
-    """Create jinja specific template.."""
-    environment = jinja2.Environment(
-        autoescape=True,
-        line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
-        trim_blocks=kwargs.pop('trim_blocks', True),
-        lstrip_blocks=kwargs.pop('lstrip_blocks', True),
-        **kwargs,
-    )
-    environment.filters['inclause'] = format_in_clause
+def get_default_jinja_template(path_or_str, filters=None, **kwargs):
+    """Create Jinja specific template.."""
+    if filters is None:
+        filters = {"inclause": format_in_clause}
+    # The following line is labeled with nosec so that bandit doesn't fail. In DEFAULT_JINJA_ENV_ARGS, autoescape is set to True.
+    environment = jinja2.Environment(**{**DEFAULT_JINJA_ENV_ARGS, **kwargs})  # nosec
+    environment.filters = {**environment.filters, **filters}
     return environment.from_string(path_or_string(path_or_str))
-
-
-def render_jinja_template(path_or_str, jparams={}):
-    """
-    Render a query via jinja, from a str or a sql-like file.
-
-    Args:
-        path_or_str (str, Path): A string or a path object from which to load
-            the sql-like file, if one exists.
-        jparams (dict): The mapping of jinja placeholders {{}} to python values to be
-            replaced in the query.
-    Returns:
-        (str): A str where all possible jinja placeholders were replaced.
-
-    Notes:
-        Given that the first argument might both be a query in str form, a
-        path in string form, or a pure path, it must be said that the func will log
-        the path's location, if the arg is an existing file-path.
-        We do not use `pat.exists()` method as it breaks for long enough strings
-        (which might be queries)!
-    """
-    # TODO April 11, 2019: Refactor this func with path_or_string() to have them both
-    #  share a method that checks is_valid_path()
-    # Standarize to pathlib object, supports str objects
-
-    pat = Path(path_or_str).expanduser().resolve().as_posix()
-    if is_readable_path(pat):
-        logger.debug(f'Loading jinja template from {pat}.')
-    return template(path_or_str).render(**jparams)
 
 
 def get_cloudera_sql_stats_aggr(
@@ -657,9 +533,14 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 
 def df_optimize_float_types(
-    df, type_mappings={"float64": "float16", "float32": "float16"}
+    df, type_mappings: Dict[str, str] = None,
 ):
     """Cast dataframe columns to more memory friendly types.
+
+    Parameters
+    ----------
+        df: DataFrame to be modified.
+        type_mappings: Mapping of types. Defaults to {"float64":"float16", "float32":"float16"}
 
     WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
     Eg:
@@ -667,6 +548,12 @@ def df_optimize_float_types(
     >>> np.float64(n), np.float32(n)
     (3.402823669209385e+38, inf)
     """
+    if type_mappings is None:
+        type_mappings = {
+            "float64": "float16",
+            "float32": "float16",
+        }
+
     new_dtypes = {c: type_mappings.get(t.name, t) for c, t in df.dtypes.iteritems()}
     df = df.astype(new_dtypes, copy=False)
     return df
@@ -682,10 +569,12 @@ def df_replace_empty_strs_null(df):
     return df
 
 
-def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
+def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
     """Drop null columns in df, for null share over a certain threshold."""
     # Note: Pandas treats string columns as `object` data types.
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    if protected_cols is None:
+        protected_cols = list()
     logger.debug(
         f'Dropping columns with null ratio greater than {max_null_prop:.2%}...'
     )
@@ -707,9 +596,11 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols=[]):
     return df
 
 
-def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
+def df_drop_std(df, min_std_dev=1.5e-2, protected_cols: List[str] = None):
     """Drop low variance cols."""
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    if protected_cols is None:
+        protected_cols = list()
     std_values = df.std()
     low_variance_cols = std_values < min_std_dev
     low_variance_cols = low_variance_cols.index[low_variance_cols].tolist()
@@ -723,11 +614,21 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols=[]):
 
 
 def df_drop_corr(
-    df, target_col, max_corr=0.3, protected_cols=[], frac=0.2, random_state=None
+    df,
+    target_col,
+    max_corr=0.3,
+    protected_cols: List[str] = None,
+    frac=0.2,
+    random_state=None,
 ):
     """Drop high correlated to-target cols."""
     # Warning this function modifies the passed df. If you dont want this you should use df.copy()
-    assert target_col in df.columns
+
+    if target_col not in df.columns:
+        raise ValueError(f"target col ({target_col}) is not in dataframe columns")
+
+    if protected_cols is None:
+        protected_cols = list()
 
     corr_df = df.sample(frac=frac, random_state=random_state).corr()
     high_corr_cols = abs(corr_df[target_col]) > max_corr
@@ -741,13 +642,16 @@ def df_drop_corr(
     return df
 
 
-def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
+def df_get_typed_cols(df, col_type='cat', protected_cols: List[str] = None):
     """Get typed columns, excluding protected cols if passed."""
     assert col_type in ('cat', 'num', 'date', 'bool', 'timedelta')
+    if protected_cols is None:
+        protected_cols = list()
+
     if col_type == 'cat':  # Work in cases, else dont define include var
         include = ['object', 'category']
     elif col_type == 'num':
-        include = [np.number]
+        include = ['number']
     elif col_type == 'date':
         include = ['datetime']
     elif col_type in ('bool', 'timedelta'):
@@ -759,9 +663,17 @@ def df_get_typed_cols(df, col_type='cat', protected_cols=[]):
 
 
 def df_encode_categorical_dummies(
-    df, cat_cols=[], skip_cols=[], top=25, other_val='OTHER'
+    df,
+    cat_cols: List[str] = None,
+    skip_cols: List[str] = None,
+    top=25,
+    other_val='OTHER',
 ):
     """Encode categorical columns into dummies."""
+    if skip_cols is None:
+        skip_cols = list()
+    if cat_cols is None:
+        cat_cols = list()
     pre_dummy_cols = df.columns.tolist()
     cat_cols = df_get_typed_cols(df, col_type='cat') if cat_cols == [] else cat_cols
     cat_cols = [c for c in cat_cols if c not in skip_cols]
@@ -828,11 +740,6 @@ def dedup_list(li: list):
     return new_list
 
 
-def split_on_letter(s):
-    """Split string on groups of letters"""
-    return tuple(filter(None, re.split(r'([aA-zZ]+)', s)))
-
-
 def create_forecaster_dates(end_date, forecast_train_window, forecast_future_window):
     """Process and correct all respective dates for forecaster.
 
@@ -875,7 +782,7 @@ def get_matching_columns(cols, regex_list):
 def get_include_exclude_columns(cols, include_regexes=None, exclude_regexes=None):
     """Filter list by inclusion and exclusion regexes."""
     if not cols:
-        raise ValueError(f"`cols` argument must be a non-empty list")
+        raise ValueError("`cols` argument must be a non-empty list")
     if include_regexes is None:
         ret = cols
     else:
@@ -1058,3 +965,403 @@ def numpy_temp_seed(seed=42):
         yield
     finally:
         np.random.set_state(state)
+
+
+def ab_split(id_obj: str, salt: str, control_group_size: float):
+    """Split object into test or control group based on the ID and salt.
+
+    Parameters
+    ----------
+    id_obj : str
+        Object id.
+    salt : str
+        Salt value.
+    control_group_size : float
+        Sets how big the control group is desired in percentage.
+        Must be between 0 and 1.
+
+    Returns
+    -------
+        True (for test) or False (for control) : bool
+
+    Examples
+    --------
+        >>> users = pandas.DataFrame({'id': numpy.arange(100**2)})
+        >>> users['test_group'] = users.id.apply(
+        ...     lambda id: ab_split(id, 'E1F53135E559C253', 0.25))
+        >>> users.test_group.value_counts(normalize=True)
+        True     0.7465
+        False    0.2535
+        Name: test_group, dtype: float64
+    """
+    test_id = str(id_obj) + '-' + str(salt)
+    test_id_digest = hashlib.md5(test_id.encode('ascii')).hexdigest()  # nosec
+    test_id_first_digits = test_id_digest[:6]
+    test_id_last_int = int(test_id_first_digits, 16)
+    split = test_id_last_int / 0xFFFFFF
+    return split > control_group_size
+
+
+def col_sample_display(
+    df: pd.DataFrame,
+    col: str,
+    quantile: float = None,
+    top_val: float = None,
+    num_sample: float = 300,
+):
+    """Fast printing/visualization of sample data for given column.
+
+    Also shows 10 unique specific values from the column and has
+    modifiers for either showing a histogram for numeric data, or
+    showing top_value counts for non-numeric columns.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    col: str :
+
+    quantile: float :
+         (Default value = None)
+    top_val: float :
+         (Default value = None)
+    num_sample: float :
+         (Default value = 300)
+
+    Returns
+    -------
+
+    """
+    len_col = df[col].shape[0]
+    unique_vals = df[col].unique()
+    num_unique_vals = len(unique_vals)
+    null_count = df[col].isnull().sum()
+    null_pct = null_count / df.shape[0]
+    print(f'\nCol is {col}\n')
+    print(f'Null count is {null_count}, Null percentage is: {null_pct:.2%}')
+    print(num_unique_vals, unique_vals[0:10])
+    display(df[col].describe())
+    display(df[col].sample(10))
+
+    # Various checks either numerical or not
+    if len_col < num_sample:
+        num_sample = len_col
+    if col in df_get_typed_cols(df, 'date'):
+        # Direct exit with `date`, as they can be miscasted to numeric
+        is_numeric_type = False
+    else:
+        if col in df_get_typed_cols(df, 'num'):
+            is_numeric_type = True
+        else:  # cols that are string which might get converted
+            try:
+                pd.to_numeric(df[col].sample(num_sample))
+                is_numeric_type = True
+            except ValueError:
+                is_numeric_type = False
+
+    if is_numeric_type or num_unique_vals < 15:
+        val_counts = df[col].value_counts().to_frame()
+        val_counts.index.name = col
+        val_counts.rename(columns={col: 'count'}, inplace=True)
+        val_counts['percentage'] = 100 * val_counts['count'] / val_counts['count'].sum()
+        display(val_counts.head(10))
+
+    if is_numeric_type:
+        num_col = df[[col]].copy()  # keep in dataframe form to use the .query method
+        num_col[col] = pd.to_numeric(num_col[col].values, errors='coerce')
+        query_str = f'{col} == {col}'
+        if quantile is not None:
+            top_perc = num_col[col].quantile(q=quantile)
+            # this +100 is a safety net for when top_perc results
+            # are equal to the lower limit of the filter.
+            query_str = f'{col}>=0 and {col}<= {top_perc+100}'
+
+        elif top_val is not None:
+            query_str = f'{col}<= {top_val}'
+
+        num_col.query(query_str)[col].hist(bins=60)
+        plt.title(query_str)
+
+
+def sum_count_aggregation(
+    df: pd.DataFrame,
+    group_cols: List,
+    numerical_cols: List,
+    aggregation_operations=('sum', 'count'),
+):
+    """Aggregate data by a gruop of columns into sum and count.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    group_cols: list :
+
+    numerical_cols: list :
+
+    aggregation_operations: tuple or list :
+        (Default value = ('sum', 'count')) :
+
+    Returns
+    -------
+
+    """
+    # Create aggregating dictionary
+    agg_dict = {col: aggregation_operations for col in numerical_cols}
+
+    # Group and aggregate
+    counts = df.groupby(group_cols).agg(agg_dict)
+
+    # Flatten multi-hierarchy index
+    counts.columns = ['_'.join(col).strip() for col in counts.columns.values]
+
+    for col in numerical_cols:
+        for aggr in aggregation_operations:
+            perc_col = '_'.join([col, aggr, 'perc'])
+            aggr_col = '_'.join([col, aggr])
+            counts[perc_col] = counts[aggr_col] / counts[aggr_col].sum()
+
+    # Chose one column to sort for [first column]
+    sort_col = [col for col in counts.columns if 'count' in col][0]
+    counts.sort_values(by=sort_col, ascending=False)
+    return counts
+
+
+def sum_count_time_series(
+    df: pd.DataFrame,
+    date_col: str,
+    numerical_series: List,
+    resample_frequency: str = 'D',
+    aggregation_operations=('sum', 'count'),
+    filter_query: str = None,  # to select a subset of the whole database only
+):
+    """Get a time series grouping in a a certain time-window.
+
+    Only for a view of the original df.
+
+    Parameters
+    ----------
+    df: pandas.DataFrame :
+
+    date_col: str :
+
+    numerical_series: list :
+
+    resample_frequency: str :
+         (Default value = 'D')
+    aggregation_operations: tuple or list :
+         (Default value = ('sum', 'count') :
+
+    filter_query: str :
+         (Default value = None)
+    # to select a subset of the whole database only :
+
+
+    Returns
+    -------
+
+    """
+    if not filter_query:
+        filter_query = f'{date_col} == {date_col}'
+    # generate aggregating dictionary
+    agg_dict = {col: aggregation_operations for col in numerical_series}
+
+    # Count the amount of events in this time frequency
+    time_series = (
+        df.query(filter_query)
+        .resample(resample_frequency, on=date_col)[numerical_series]
+        .agg(agg_dict)
+    )
+
+    # Flatten multi-hierarchy index
+    time_series.columns = ['_'.join(col).strip() for col in time_series.columns.values]
+    # Reset index and sort by oldest event date first
+    time_series = time_series.reset_index().sort_values(date_col)
+
+    return time_series
+
+
+def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
+    """Reduce a categorical col's levels.
+
+    This outputs a new cat col with reduced levels.
+    It will not modify any null values in original category.
+
+    Parameters
+    ----------
+    df :
+
+    categorical_col :
+
+    n_levels :
+         (Default value = 8)
+    default_level :
+         (Default value = 'Other')
+
+    Returns
+    -------
+
+    """
+    top_levels, _ = get_ordered_factor_levels(df, categorical_col, n_levels - 1)
+
+    def sub_categorize(x, top_levels):
+        """Reduce category series levels.
+
+        Parameters
+        ----------
+        x :
+
+        top_levels :
+
+
+        Returns
+        -------
+
+        """
+        if x in top_levels:
+            return x
+        else:
+            return default_level
+
+    # Modify only non-null values
+    rv = df[categorical_col].apply(
+        lambda x: sub_categorize(x, top_levels) if (pd.notnull(x)) else x
+    )
+
+    return rv
+
+
+def load_sql_query(sql, query_context_params=None):
+    """Read sql file or string and format with a dictionary of params.
+
+    Parameters
+    ----------
+    sql :
+
+    query_context_params :
+         (Default value = None)
+
+    Returns
+    -------
+
+    """
+    pat = Path(sql).expanduser()
+    if pat.exists():
+        with open(pat, 'r') as f:
+            sql = f.read()
+
+    if query_context_params:
+        j = JinjaSql(param_style='pyformat')
+        binded_sql, bind_params = j.prepare_query(sql, query_context_params)
+        missing_placeholders = [
+            k for k, v in bind_params.items() if jinja2.Undefined() == v
+        ]
+
+        assert (
+            len(missing_placeholders) == 0
+        ), f'Missing placeholders are: {missing_placeholders}'
+
+        try:
+            sql = binded_sql % bind_params
+        except KeyError as e:
+            print(e)
+            return
+
+    return sql
+
+
+def get_sql_stats_aggr(
+    input_expression, as_name=None, with_std=False, with_ndv=False, with_count=False
+):
+    """Get Cloudera-valid battery of statistical aggregations clause.
+
+    Parameters
+    ----------
+    input_expression :
+
+    as_name :
+         (Default value = None)
+    with_std :
+         (Default value = False)
+    with_ndv :
+         (Default value = False)
+    with_count :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
+    rv = f"""
+    SUM({input_expression}) as sum_{as_name},
+    AVG({input_expression}) as mean_{as_name},
+    APPX_MEDIAN({input_expression}) as median_{as_name},
+    MIN({input_expression}) as min_{as_name},
+    MAX({input_expression}) as max_{as_name},"""
+
+    if with_std:
+        rv += f'\n STDDEV({input_expression}) as std_{as_name},'
+    if with_ndv:
+        rv += f'\n NDV({input_expression}) as unique_{as_name},'
+    if with_count:
+        rv += f'\n COUNT(1) as count_{as_name},'
+    return rv
+
+
+def get_null_count_aggr(
+    columns_list, as_name='null_count', no_ending_comma=False, empty_string_null=False
+):
+    """Get Cloudera-valid expression counting nulls for columns.
+
+    Parameters
+    ----------
+    columns_list :
+
+    as_name :
+         (Default value = 'null_count')
+    no_ending_comma :
+         (Default value = False)
+    empty_string_null :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
+    rv = ""
+    pre_clause = NULL_COUNT_CLAUSE
+    if empty_string_null:
+
+        pre_clause = pre_clause.replace('IS NULL', "= ''")
+    for col in columns_list:
+
+        rv += pre_clause.format(col=col, as_col=as_name + col) + ',\n'
+    if no_ending_comma:
+
+        rv = rv.rsplit(',', 1)[0]
+
+    return rv
+
+
+def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
+    """Get SQL Server-valid synthax for hashed-sampling an id clause.on
+
+    Takes as imput a given sample_pct in (0, 1).
+
+    Parameters
+    ----------
+    id_clause :
+
+    sample_pct :
+
+
+    Returns
+    -------
+
+    """
+    assert 0 < sample_pct < 1, f'{sample_pct} should be a float  in (0,1)'
+    int_pct = int(sample_pct * 100)
+    rv = f"""
+    AND ABS(CAST(HASHBYTES('SHA1',
+        {id_clause}) AS BIGINT)) % 100 <= {int_pct}"""
+    return rv

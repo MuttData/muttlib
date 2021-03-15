@@ -20,47 +20,50 @@ The most relevant docstrings are on:
 Simple examples can be taken from the tests.
 A complex example doing a grid search can be seen here:
 
-> import pandas as pd
-> from sklearn.model_selection import GridSearchCV, ParameterGrid
-> from muttlib.forecast import SkProphet, StepsSelectorEstimator
->
-> # The grid has to be turned into a list if used in a StepsSelectorEstimator
-> # as it has to be copyable for get / set params
-> prophet_grid = list(ParameterGrid({
->     'sk_date_column': ['date'],
->     'sk_yhat_only': [True],
->     'sk_extra_regressors': [
->         [],
->         [{'name': 'b'}],
->         ],
->     'prophet_kwargs': [
->         dict(daily_seasonality='auto'),
->         dict(daily_seasonality=True),
->         ],
->     }))
->
-> days_selector_grid = {
->     'estimator_class': [SkProphet],
->     'amount_of_steps': [90, 120],
->     'sort_col': ['date'],
->     'estimator_kwargs': prophet_grid,
-> }
->
-> # To instance GridSearchCV, we need to pass an initialized estimator
-> # (for example, a `StepsSelectorEstimator`)
-> initial_estimator = StepsSelectorEstimator(
->     SkProphet,
->     days_selector_grid['amount_of_steps'][0],
->     prophet_grid[0])
-> cv = GridSearchCV(
->     initial_estimator,
->     days_selector_grid,
->     cv=2,
->     scoring='r2')
->
-> X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
-> y = pd.Series([1, 1, 0, 1, 0])
-> cv.fit(X, y)
+.. code-block:: python
+
+    import pandas as pd
+    from sklearn.model_selection import GridSearchCV, ParameterGrid
+    from muttlib.forecast import SkProphet, StepsSelectorEstimator
+
+    # The grid has to be turned into a list if used in a StepsSelectorEstimator
+    # as it has to be copyable for get / set params
+    prophet_grid = list(ParameterGrid({
+        'sk_date_column': ['date'],
+        'sk_yhat_only': [True],
+        'sk_extra_regressors': [
+            [],
+            [{'name': 'b'}],
+            ],
+        'prophet_kwargs': [
+            dict(daily_seasonality='auto'),
+            dict(daily_seasonality=True),
+            ],
+        }))
+
+    days_selector_grid = {
+        'estimator_class': [SkProphet],
+        'amount_of_steps': [90, 120],
+        'sort_col': ['date'],
+        'estimator_kwargs': prophet_grid,
+    }
+
+    # To instance GridSearchCV, we need to pass an initialized estimator
+    # (for example, a `StepsSelectorEstimator`)
+    initial_estimator = StepsSelectorEstimator(
+        SkProphet,
+        days_selector_grid['amount_of_steps'][0],
+        prophet_grid[0])
+    cv = GridSearchCV(
+        initial_estimator,
+        days_selector_grid,
+        cv=2,
+        scoring='r2')
+
+    X = pd.DataFrame({'date': [0, 2, 3, 4, 5], 'b': [1, 4, 5, 0, 9]})
+    y = pd.Series([1, 1, 0, 1, 0])
+    cv.fit(X, y)
+
 
 TODO:
   - At the moment, given FBProphet's current version we have that the model's
@@ -94,8 +97,8 @@ class SkProphet(Prophet):
         self,
         sk_date_column=DS,
         sk_yhat_only=True,
-        sk_extra_regressors=[],
-        prophet_kwargs={},
+        sk_extra_regressors=None,
+        prophet_kwargs=None,
     ):
         """Scikit learn compatible interface for FBProphet.
 
@@ -121,6 +124,11 @@ class SkProphet(Prophet):
         prophet_kwargs: dict
             Keyword arguments to forward to Prophet.
         """
+        if sk_extra_regressors is None:
+            sk_extra_regressors = []
+        if prophet_kwargs is None:
+            prophet_kwargs = {}
+
         super().__init__(**prophet_kwargs)
         self.sk_date_column = sk_date_column
         self.sk_yhat_only = sk_yhat_only
@@ -128,7 +136,9 @@ class SkProphet(Prophet):
         self.prophet_kwargs = prophet_kwargs
         self._set_my_extra_regressors()
 
-    def fit(self, X, y=None, copy=True, **fit_params):
+    def fit(
+        self, X, y=None, copy=True, **fit_params
+    ):  # pylint: disable=arguments-differ
         """Scikit learn's like fit on the Prophet model.
 
         Parameters
@@ -170,7 +180,7 @@ class SkProphet(Prophet):
                 X['y'] = self._as_np_vector(y)
         return super().fit(X, **fit_params)
 
-    def predict(self, X, copy=True):
+    def predict(self, X, copy=True):  # pylint: disable=arguments-differ
         """Scikit learn's predict (returns predicted values).
 
         Parameters
@@ -300,7 +310,7 @@ class SkProphet(Prophet):
 
 class StepsSelectorEstimator(BaseEstimator):
     def __init__(
-        self, estimator_class, amount_of_steps, estimator_kwargs={}, sort_col='date'
+        self, estimator_class, amount_of_steps, estimator_kwargs=None, sort_col='date'
     ):
         """An estimator that only uses a certain amount of rows on fit.
 
@@ -326,6 +336,9 @@ class StepsSelectorEstimator(BaseEstimator):
 
         > StepsSelectorEstimator(RandomForestRegressor(), 100)
         """
+        if estimator_kwargs is None:
+            estimator_kwargs = {}
+
         self.amount_of_steps = amount_of_steps
         self.sort_col = sort_col
         self.estimator_kwargs = estimator_kwargs
@@ -368,7 +381,7 @@ class StepsSelectorEstimator(BaseEstimator):
         }
 
     def set_params(self, **params):
-        """Sets the estimator's params to \*\*params."""
+        """Sets the estimator's params to \*\*params."""  # pylint: disable=anomalous-backslash-in-string
         self.estimator_class = Classer.from_obj(params['estimator_class'])
         self.amount_of_steps = params['amount_of_steps']
         self.sort_col = params['sort_col']
@@ -376,7 +389,7 @@ class StepsSelectorEstimator(BaseEstimator):
         self._estimator = self.estimator_class.new(**self.estimator_kwargs)
         return self
 
-    def __repr__(self):
+    def __repr__(self):  # pylint: disable=signature-differs
         """Text representation of the object to look it nicely in the
         interpreter.
         """

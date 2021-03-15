@@ -318,7 +318,7 @@ class DriveFolder(DriveNode):
                 'get',
                 GDriveURL.FILES.value,
                 'files',
-                params={'q': f"trashed=False and sharedWithMe=True"},
+                params={'q': "trashed=False and sharedWithMe=True"},
             )
 
             other_files.extend(files_shared_with_me)

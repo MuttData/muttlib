@@ -7,6 +7,7 @@ import pandas as pd
 import progressbar
 
 import muttlib.utils as utils
+from muttlib.dbconn.base import BaseClient
 
 logger = logging.getLogger(__name__)
 try:
@@ -18,35 +19,87 @@ except ModuleNotFoundError:
 HIVE_DB_TYPE = 'hive'
 
 
-class HiveClient:
-    """Create Hive DB Client."""
+class HiveClient(BaseClient):
+    """Wrapper around PyHive's hive module.
+
+    Parameters
+    ----------
+    host: str
+        Host url.
+    port: int, Optional
+        Port to connect to the HiveServer. Defaults to 10000.
+    auth: str, Optional
+        Authentication protocol or layer. Defaults to "NOSASL".
+    database: str, Optional
+        Name of database to connect to.
+    username: str, Optional
+        Hive username.
+    password: str, Optional
+        Use with `auth="LDAP"` or `auth="CUSTOM"` only.
+
+    Notes
+    ----------
+    Refer to PyHive's docstrings for better context on parameters' descriptions:
+    https://github.com/dropbox/PyHive/blob/2c2446bf905ea321aac9dcdd3fa033909ff0b0b5/pyhive/hive.py#L105
+
+    """
+
+    default_dialect = "hive"
+    default_driver = ""
 
     def __init__(
-        self, host, port=10_000, auth='NOSASL', database='default', username=None
+        self,
+        host,
+        port=10_000,
+        auth='NOSASL',
+        database='default',
+        username=None,
+        password=None,
     ):
-        self.host = host
-        self.port = port
+        if (auth not in ["LDAP", "CUSTOM"]) and password:
+            raise ValueError(
+                "Password should be set if and only if in LDAP or CUSTOM mode; Remove password or use one of those modes"
+            )
+        super().__init__(
+            host=host,
+            port=port,
+            database=database,
+            username=username,
+            password=password,
+        )
         self.auth = auth
-        self.database = database
-        self.username = username
 
     def _connect(self):
+        """Instance a connection to the database.
+
+        Returns
+        ----------
+        pyhive.hive.Connection
+        """
         return hive.connect(
             host=self.host,
             port=self.port,
             auth=self.auth,
             database=self.database,
             username=self.username,
+            password=self.password,
         )
 
-    def _cursor(self):
-        conn = self._connect()
-        return conn.cursor()
-
     def execute(
-        self, sql, params=None, show_progress=True, dry_run=False, async_=False
+        self,
+        sql,
+        params=None,
+        connection=None,
+        show_progress=True,
+        dry_run=False,
+        async_=False,
     ):
-        """Execute sql statement."""
+        """Execute sql statement.
+
+        Returns
+        ----------
+        pyhive.hive.Cursor or None
+        """
         sql = utils.path_or_string(sql)
         if params is not None:
             try:
@@ -55,17 +108,25 @@ class HiveClient:
                 if e not in params:
                     # If the sql string has an unformatted key then fail
                     raise
-                else:
-                    pass
         if dry_run:
             logger.debug(f"Query dry-run:{sql}")
             return
 
-        cursor = self._cursor()
+        should_close = False
+
+        if connection is None:
+            connection = self._connect()
+            should_close = True
+
+        cursor = connection.cursor()
         cursor.execute(sql, async_=async_)
 
         if show_progress:
             self._show_query_progress(cursor)
+
+        if should_close:
+            connection.close()
+
         return cursor
 
     def _show_query_progress(self, cursor, max_val=100, poll_interval=1):
@@ -97,24 +158,3 @@ class HiveClient:
             progress, total = m.groups()
             progress = int(progress) / int(total)
         return progress
-
-    def to_frame(self, *args, **kwargs):
-        """Execute sql statement and return results as a Pandas dataframe."""
-        with closing(self.execute(*args, **kwargs)) as cursor:
-            if not cursor:
-                return
-            data = cursor.fetchall()  # pylint: disable=no-member
-            # TODO: Add variant that dumps per row rather than the whole thing
-            if data:
-                df = pd.DataFrame(data)
-                df.columns = [
-                    c[0] for c in cursor.description  # pylint: disable=no-member
-                ]
-            else:
-                df = pd.DataFrame()
-            return df
-
-
-# Backward compatiblity alias.
-# TODO: Deprecate this.
-HiveDb = HiveClient
