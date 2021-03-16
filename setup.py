@@ -93,7 +93,7 @@ setuptools.setup(
         'pyyaml',
         'scikit-learn',
         'scipy',
-        'sqlalchemy',
+        'sqlalchemy<1.4',
         'numpy==1.19.5',
         'jinjasql',
         'IPython',
