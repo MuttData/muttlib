@@ -54,10 +54,10 @@ class TeradataClient(BaseClient):
         self.table = table
 
     def __setattr__(self, *args):
-        pass
+        object.__setattr__(self, *args)
 
     def __getattr__(self, *args):
-        pass
+        object.__getattr__(self, *args)
 
     def _connect(self):
         if self.connection is None:

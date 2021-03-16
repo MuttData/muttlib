@@ -38,36 +38,30 @@ def test_teradata_close(dummy_db_credentials):
 
 
 def test_execute(dummy_db_credentials):
-    with patch("teradatasql.TeradataConnection") as connection, patch(
-        "teradatasql.TeradataCursor.execute"
-    ) as td_exec:
+    with patch("teradatasql.TeradataConnection") as connection:
         td_cli = TeradataClient(**dummy_db_credentials)
         td_cli.connection = connection
 
-        assert td_exec.call_count == 0
+        assert connection.cursor.return_value.execute.call_count == 0
         td_cli.execute("SELECT *")
-        assert td_exec.call_count == 1
+        assert connection.cursor.return_value.execute.call_count == 1
 
 
-def _test_to_frame(dummy_db_credentials):
-    with patch("teradatasql.TeradataConnection") as connection, patch(
-        "teradatasql.TeradataCursor.execute"
-    ) as td_exec:
+def test_to_frame(dummy_db_credentials):
+    with patch("teradatasql.TeradataConnection") as connection:
         td_cli = TeradataClient(**dummy_db_credentials)
         td_cli.connection = connection
 
-        assert td_exec.call_count == 0
+        assert connection.cursor.return_value.execute.call_count == 0
         _ = td_cli.to_frame("SELECT *")
-        assert td_exec.call_count == 1
+        assert connection.cursor.return_value.execute.call_count == 1
 
 
-def _test_insert_from_frame(dummy_db_credentials, df):
-    with patch("teradatasql.TeradataConnection") as connection, patch(
-        "teradatasql.TeradataCursor.execute"
-    ) as td_load:
+def test_insert_from_frame(dummy_db_credentials, df):
+    with patch("teradatasql.TeradataConnection") as connection:
         td_cli = TeradataClient(**dummy_db_credentials)
         td_cli.connection = connection
 
-        assert td_load.call_count == 0
+        assert connection.cursor.return_value.execute.call_count == 0
         td_cli.insert_from_frame(df, create_first=False)
-        assert td_load.call_count == 1
+        assert connection.cursor.return_value.execute.call_count == 1
