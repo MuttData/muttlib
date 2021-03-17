@@ -18,6 +18,7 @@ extra_dependencies = {
     'mysql': ['pymysql'],
     'sqlserver': ['pymssql'],
     'mongo': ['pymongo'],
+    'teradata': ['teradatasql==17.0.0.8'],
     'bigquery': ['google-cloud-bigquery'],
     'ibis': ['ibis-framework', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
     'gdrive': ['oauth2client', 'requests'],
@@ -58,7 +59,7 @@ extra_dependencies = {
 # create 'all' extras
 all_extras = []
 for extra_dep in extra_dependencies.values():
-    if not extra_dep in all_extras:
+    if extra_dep not in all_extras:
         all_extras += extra_dep
 extra_dependencies.update({'all': all_extras})
 
@@ -92,7 +93,7 @@ setuptools.setup(
         'pyyaml',
         'scikit-learn',
         'scipy',
-        'sqlalchemy',
+        'sqlalchemy<1.4',
         'numpy==1.19.5',
         'jinjasql',
         'IPython',
