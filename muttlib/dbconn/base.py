@@ -176,21 +176,12 @@ class BaseClient(abc.ABC):
         self, df, table, if_exists='append', index=False, connection=None, **kwargs
     ):
         """Insert from a Pandas dataframe."""
+
         # TODO: Validate types here?
+        connection = self._connect()
+        with connection:
+            df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
 
-        column_names = df.columns.tolist()
-        chunksize = kwargs.get("chunksize", 10_000)
-
-        if if_exists == "fail" or if_exists == "replace":
-            raise NotImplementedError
-
-        if index:
-            raise NotImplementedError
-
-        insert_stmt = """
-            INSERT INTO {table} ({columns})
-            VALUES {values_chunk}
-        """
 
         def _to_sql_tuple(d):
             return f"({', '.join(map(str, d.values()))})"
