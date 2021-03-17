@@ -14,6 +14,7 @@ from muttlib.dbconn.sqlserver import (
     SQLSERVER_DIALECT,
     SqlServerClient,
 )
+from muttlib.dbconn.teradata import TERADATA_DB_TYPE, TeradataClient
 
 connectors = {
     BIGQUERY_DB_TYPE: BigQueryClient,
@@ -25,6 +26,7 @@ connectors = {
     POSTGRES_DB_TYPE: PgClient,
     SQLITE_DB_TYPE: SqliteClient,
     SQLSERVER_DB_TYPE: SqlServerClient,
+    TERADATA_DB_TYPE: TeradataClient,
 }
 
 
