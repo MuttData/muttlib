@@ -8,7 +8,6 @@ from typing import Optional
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
-from contextlib import closing
 
 import muttlib.utils as utils
 
@@ -182,20 +181,6 @@ class BaseClient(abc.ABC):
         with connection:
             df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
 
-
-        def _to_sql_tuple(d):
-            return f"({', '.join(map(str, d.values()))})"
-
-        def df_chunksize_iterator(df, chunksize=10_000):
-            for start in range(0, len(df), chunksize):
-                yield df[start : start + chunksize]
-
-        for chunk in df_chunksize_iterator(df, chunksize):
-            values = map(_to_sql_tuple, chunk.to_dict(orient="records"))
-            chunk_insert_stmt = insert_stmt.format(
-                table=table, columns=column_names, values_chunk=",\n".join(values)
-            )
-            self.execute(chunk_insert_stmt, connection=connection)
 
 
 class EngineBaseClient(BaseClient):
