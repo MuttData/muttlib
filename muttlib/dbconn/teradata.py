@@ -28,6 +28,10 @@ class TeradataClient(BaseClient):
         authentication: str = "LDAP",
     ):
         """Wrapper around Teradata Connection.
+
+
+        Parameters
+        ----------
         host : str
             Host name of Teradata.
         username : str
