@@ -91,6 +91,18 @@ We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.htm
 - Class dosctrings explaining what it is
 - Method/functions to explain what it does and what it's parameters are
 
+As an additional tool, `muttlib` incorporates [interrogate](https://interrogate.readthedocs.io/en/latest/#) to analyze the docstring coverage. `interrogate` is a dependency installed with `[dev]` option. To run the coverage, use the following command:
+```bash
+interrogate muttlib -c pyproject.toml
+```
+
+or for more details use the `-vv` flag:
+```bash
+interrogate muttlib -c pyproject.toml -vv
+```
+
+As a final result, `interrogate` will report if the current docstring coverage has passed or not the `fail-under` parameter configured in the pyproject.toml file.
+
 ## Testing
 `muttlib` uses the [pytest framework](https://docs.pytest.org/en/latest/) to test `muttlib`.
 

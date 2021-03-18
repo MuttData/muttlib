@@ -38,6 +38,16 @@ lint:
       - merge_requests
       - master
 
+docstr-cov:
+  stage: test_stage
+  script:
+    - pip install interrogate
+    - interrogate muttlib -c pyproject.toml -vv
+  only:
+    refs:
+      - merge_requests
+      - master
+
 bandit:
   stage: test_stage
   script:
