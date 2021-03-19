@@ -17,6 +17,26 @@ TERADATA_DB_TYPE = 'teradata'
 
 
 class TeradataClient(BaseClient):
+    """Wrapper around Teradata Connection.
+
+    Parameters
+    ----------
+    host : str
+        Host name of Teradata.
+    username : str
+        LDAP user to authenticate.
+    password : str
+        password to authenticate.
+    database: str
+        Database name where data will be inserted.
+    table: str
+        Table name where data will be inserted.
+    port : int
+        Teradata's port.
+    authentication : str
+        Teradata's authentication type.
+    """
+
     def __init__(
         self,
         host: str,
@@ -27,23 +47,6 @@ class TeradataClient(BaseClient):
         port: int = 1025,
         authentication: str = "LDAP",
     ):
-        """Wrapper around Teradata Connection.
-        host : str
-            Host name of Teradata.
-        username : str
-            LDAP user to authenticate
-        password : str
-            password to authenticate
-        database: str
-            Database name where data will be inserted.
-        table: str
-            Table name where data will be inserted.
-        port : int
-            Teradata's port
-        authentication : str
-            Teradata's authentication type
-        """
-
         self.host = host
         self.port = port
         self.username = username
