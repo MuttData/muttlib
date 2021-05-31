@@ -54,7 +54,7 @@ extra_dependencies = {
     ]
     + pyarrow_dep
     + holidays_dep,
-    'forecast': ['fbprophet'] + holidays_dep,
+    'forecast': ['fbprophet', 'pystan==2.19.1.1'] + holidays_dep,
     'gsheets': ['gspread_pandas'],
 }
 
