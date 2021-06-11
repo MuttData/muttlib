@@ -13,6 +13,14 @@ muttlib.dbconn module
    :undoc-members:
    :show-inheritance:
 
+muttlib.plotting module
+-----------------------
+
+.. automodule:: muttlib.plotting.plot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 muttlib.file\_processing module
 -------------------------------
 
