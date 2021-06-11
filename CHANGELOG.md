@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2021-06-11
+
+### Fixed
+
+  - [[Issue #150](https://gitlab.com/mutt_data/muttlib/-/issues/150)] Fix missing doc section for `plotting` module
+
 ## [1.1.3] - 2021-05-31
 
 ### Fixed
