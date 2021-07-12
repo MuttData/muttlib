@@ -89,19 +89,19 @@ class GSheetsClient:
 
     def __init__(
         self,
-        conf_filepath: Path,
+        conf_filepath: Path = None,
         user: str = None,
         auth_scope: List[str] = None,
         auth_creds: Any = None,
         conf: Any = None,
     ) -> None:
 
-        self.conf_filepath = conf_filepath
+        self.conf_filepath = conf_filepath or Path()
         self.user = user
         self.auth_scope = auth_scope
         self.auth_creds = auth_creds
         if isinstance(conf, str):
-            conf = json.loads(conf)
+            conf = json.loads(conf, strict=False)
         self.conf = conf or gconf.get_config(
             conf_dir=self.conf_filepath.parent, file_name=self.conf_filepath.name
         )
