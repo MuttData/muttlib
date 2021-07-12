@@ -96,7 +96,7 @@ class GSheetsClient:
         conf: Any = None,
     ) -> None:
 
-        self.conf_filepath = conf_filepath
+        self.conf_filepath = conf_filepath or Path()
         self.user = user
         self.auth_scope = auth_scope
         self.auth_creds = auth_creds
