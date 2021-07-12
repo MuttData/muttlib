@@ -63,12 +63,12 @@ This implies that this service email needs to have sufficient permissions to act
 edit these files. In general, giving permissions to the needed sheets will suffice.
 """
 # TODO July 29, 2019: extend docstring with examples
+
 import logging
+from pathlib import Path
 import re
 from string import ascii_letters
-from typing import List
-from typing import Any
-from pathlib import Path
+from typing import Any, Dict, List
 
 logger = logging.getLogger(f'gsheetsconn.{__name__}')  # NOQA
 
@@ -88,19 +88,18 @@ class GSheetsClient:
 
     def __init__(
         self,
-        conf_filepath: Path,
+        conf_filepath: Path = None,
         user: str = None,
         auth_scope: List[str] = None,
         auth_creds: Any = None,
-        conf: Any = None,
+        conf: Dict = None,
     ) -> None:
 
-        self.conf_filepath = conf_filepath
+        self.conf_filepath = conf_filepath or Path()
         self.user = user
         self.auth_scope = auth_scope
         self.auth_creds = auth_creds
-        self.conf = conf
-        self.conf = gconf.get_config(
+        self.conf = conf or gconf.get_config(
             conf_dir=self.conf_filepath.parent, file_name=self.conf_filepath.name
         )
 
