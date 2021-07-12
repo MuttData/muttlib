@@ -64,7 +64,6 @@ edit these files. In general, giving permissions to the needed sheets will suffi
 """
 # TODO July 29, 2019: extend docstring with examples
 
-import json
 import logging
 from pathlib import Path
 import re
