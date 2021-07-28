@@ -115,7 +115,7 @@ class IbisClient:
             and self.hdfs_port is not None
             and self.hdfs_username is not None
         ):
-            self.hdfs_client = ibis.impala.hdfs_connect(
+            self.hdfs_client = ibis.backends.impala.hdfs_connect(
                 host=self.hdfs_host, port=self.hdfs_port, user=self.hdfs_username
             )
 
