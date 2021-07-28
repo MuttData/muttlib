@@ -85,7 +85,7 @@ def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
 
 
 def test_to_frame_via_hdfs_and_no_cache_dir_fails():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="",)
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*dir.*"):
@@ -94,7 +94,7 @@ def test_to_frame_via_hdfs_and_no_cache_dir_fails():
 
 
 def test_to_frame_via_hdfs_and_refresh_cache():
-    with patch("ibis.impala") as impala, patch("shutil.rmtree") as rm, patch(
+    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
         "pyarrow.parquet.read_table"
     ) as pq:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
@@ -107,7 +107,7 @@ def test_to_frame_via_hdfs_and_refresh_cache():
 
 
 def test_to_frame_via_hdfs_creates_tmp_table():
-    with patch("ibis.impala") as impala, patch(
+    with patch("ibis.backends.impala") as impala, patch(
         "muttlib.dbconn.ibis.urlparse"
     ) as parse, patch("muttlib.utils.make_dirs") as make_dirs, patch(
         "muttlib.dbconn.ibis.pq"
@@ -148,7 +148,7 @@ def test_to_frame_via_hdfs_creates_tmp_table():
 
 
 def test_to_frame_via_hdfs_create_tmp_table_fails():
-    with patch("ibis.impala") as impala, patch(
+    with patch("ibis.backends.impala") as impala, patch(
         "muttlib.dbconn.ibis.sleep"
     ) as sleep, patch("muttlib.dbconn.ibis.urlparse") as parse, patch(
         "muttlib.utils.make_dirs"
@@ -165,7 +165,7 @@ def test_to_frame_via_hdfs_create_tmp_table_fails():
 
 
 def test_to_frame_via_hdfs_and_erase_cache_dir():
-    with patch("ibis.impala") as impala, patch("shutil.rmtree") as rm, patch(
+    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
         "pyarrow.parquet.read_table"
     ) as pq:
         local_tmp_table_dir = MagicMock()
