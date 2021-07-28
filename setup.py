@@ -20,7 +20,7 @@ extra_dependencies = {
     'mongo': ['pymongo'],
     'teradata': ['teradatasql==17.0.0.8'],
     'bigquery': ['google-cloud-bigquery'],
-    'ibis': ['ibis-framework', 'ibis-framework[impala]', 'impyla'] + pyarrow_dep,
+    'ibis': ['ibis-framework[impala]==1.4.0'] + pyarrow_dep,
     'gdrive': ['oauth2client', 'requests'],
     'dev': [
         'flake8-bugbear',
