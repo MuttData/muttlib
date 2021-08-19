@@ -48,7 +48,7 @@ def test_temp_hdfs_path_changes_config():
 
 
 def test_execute_with_no_client():
-    with patch("ibis.backends.impala.client.ImpalaConnection") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
         ibis_cli.execute(q, return_cursor=False)
@@ -94,9 +94,9 @@ def test_to_frame_via_hdfs_and_no_cache_dir_fails():
 
 
 def test_to_frame_via_hdfs_and_refresh_cache():
-    with patch("ibis.backends.impala") as impala, patch(
-        "shutil.rmtree"
-    ) as rm, patch("pyarrow.parquet.read_table") as pq:
+    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
+        "pyarrow.parquet.read_table"
+    ) as pq:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
         q = "SELECT *"
         call_to_frame_with_cache_dir(
@@ -165,9 +165,9 @@ def test_to_frame_via_hdfs_create_tmp_table_fails():
 
 
 def test_to_frame_via_hdfs_and_erase_cache_dir():
-    with patch("ibis.backends.impala") as impala, patch(
-        "shutil.rmtree"
-    ) as rm, patch("pyarrow.parquet.read_table") as pq:
+    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
+        "pyarrow.parquet.read_table"
+    ) as pq:
         local_tmp_table_dir = MagicMock()
         local_tmp_table_dir.exists.return_value = True
         q = "SELECT *"
@@ -179,7 +179,7 @@ def test_to_frame_via_hdfs_and_erase_cache_dir():
 
 
 def test_to_frame_no_hdfs_returns_empty_df():
-    with patch("ibis.backends.impala.client.ImpalaConnection") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
         impala.connect.return_value.raw_sql.return_value.fetchall.return_value = None
