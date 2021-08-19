@@ -1,8 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+import urllib.parse
 
 import pandas as pd
 import pytest
-import urllib.parse
 
 from muttlib.dbconn import IbisClient
 
@@ -48,7 +48,7 @@ def test_temp_hdfs_path_changes_config():
 
 
 def test_execute_with_no_client():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
         ibis_cli.execute(q, return_cursor=False)
@@ -57,7 +57,7 @@ def test_execute_with_no_client():
 
 
 def test_execute_with_client():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
@@ -67,7 +67,7 @@ def test_execute_with_client():
 
 
 def test_execute_returns_cursor():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
@@ -76,7 +76,7 @@ def test_execute_returns_cursor():
 
 
 def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*hdfs\Wclient.*"):
@@ -85,7 +85,7 @@ def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
 
 
 def test_to_frame_via_hdfs_and_no_cache_dir_fails():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="",)
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*dir.*"):
@@ -94,7 +94,7 @@ def test_to_frame_via_hdfs_and_no_cache_dir_fails():
 
 
 def test_to_frame_via_hdfs_and_refresh_cache():
-    with patch("ibis.impala") as impala, patch("shutil.rmtree") as rm, patch(
+    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
         "pyarrow.parquet.read_table"
     ) as pq:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
@@ -107,7 +107,7 @@ def test_to_frame_via_hdfs_and_refresh_cache():
 
 
 def test_to_frame_via_hdfs_creates_tmp_table():
-    with patch("ibis.impala") as impala, patch(
+    with patch("ibis.backends.impala") as impala, patch(
         "muttlib.dbconn.ibis.urlparse"
     ) as parse, patch("muttlib.utils.make_dirs") as make_dirs, patch(
         "muttlib.dbconn.ibis.pq"
@@ -148,7 +148,7 @@ def test_to_frame_via_hdfs_creates_tmp_table():
 
 
 def test_to_frame_via_hdfs_create_tmp_table_fails():
-    with patch("ibis.impala") as impala, patch(
+    with patch("ibis.backends.impala") as impala, patch(
         "muttlib.dbconn.ibis.sleep"
     ) as sleep, patch("muttlib.dbconn.ibis.urlparse") as parse, patch(
         "muttlib.utils.make_dirs"
@@ -165,7 +165,7 @@ def test_to_frame_via_hdfs_create_tmp_table_fails():
 
 
 def test_to_frame_via_hdfs_and_erase_cache_dir():
-    with patch("ibis.impala") as impala, patch("shutil.rmtree") as rm, patch(
+    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
         "pyarrow.parquet.read_table"
     ) as pq:
         local_tmp_table_dir = MagicMock()
@@ -179,7 +179,7 @@ def test_to_frame_via_hdfs_and_erase_cache_dir():
 
 
 def test_to_frame_no_hdfs_returns_empty_df():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
         impala.connect.return_value.raw_sql.return_value.fetchall.return_value = None
@@ -192,7 +192,7 @@ def test_to_frame_no_hdfs_returns_empty_df():
 
 
 def test_to_frame_no_hdfs_returns_non_empty_df():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
         values = [[1, 2], [3, 4]]
@@ -209,7 +209,7 @@ def test_to_frame_no_hdfs_returns_non_empty_df():
 
 
 def test_to_frame_no_hdfs_fails_and_closes_connection():
-    with patch("ibis.impala") as impala:
+    with patch("ibis.backends.impala") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
         impala.connect.return_value.raw_sql.side_effect = ValueError("test error")
