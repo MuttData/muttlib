@@ -69,12 +69,15 @@ class BaseClient(abc.ABC):
         port=None,
         driver=None,
         password=None,
+        connect_args=None,
     ):
         if dialect is None:
             dialect = self.default_dialect
 
         if driver is None and self.default_driver is not None:
             driver = self.default_driver
+
+        self.connect_args = connect_args
 
         self.conn_url = URL(
             drivername=format_drivername(dialect, driver),
@@ -218,8 +221,7 @@ class EngineBaseClient(BaseClient):
     def get_engine(self, custom_uri=None, connect_args=None, echo=False):
         """Create engine or return existing one."""
         if not self._engine:
-            if connect_args is None:
-                connect_args = {}
+            connect_args = connect_args or self.connect_args or {}
             db_uri = custom_uri or self.conn_str
             self._engine = create_engine(db_uri, connect_args=connect_args, echo=echo)
         return self._engine

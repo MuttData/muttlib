@@ -56,10 +56,7 @@ def parse_connection_string(connstr):
         POSTGRES_DIALECT: POSTGRES_DB_TYPE,
         SQLSERVER_DIALECT: SQLSERVER_DB_TYPE,
     }.get(dialect, dialect)
-    rv = {
-        "db_type": db_type,
-        "dialect": dialect,
-    }
+    rv = {"db_type": db_type, "dialect": dialect}
     if r.database:
         rv["database"] = r.database
 
