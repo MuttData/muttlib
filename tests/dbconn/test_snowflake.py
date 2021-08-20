@@ -22,6 +22,7 @@ def db_creds():
         "database": "dummy-databse",
         "schema": "dummy-schema",
         "password": "dummy-password",
+        "role": "dummy-role",
     }
 
 
@@ -32,6 +33,7 @@ def test_conn_str_property(db_creds):
     database = db_creds["database"]
     schema = db_creds["schema"]
     warehouse = db_creds["warehouse"]
+    role = db_creds["role"]
     sf_client = SnowflakeClient(
         username=username,
         password=password,
@@ -39,8 +41,9 @@ def test_conn_str_property(db_creds):
         database=database,
         schema=schema,
         warehouse=warehouse,
+        role=role,
     )
-    db_uri = f"snowflake://{username}:{password}@{account}/{database}/{schema}?warehouse={warehouse}"
+    db_uri = f"snowflake://{username}:{password}@{account}/{database}/{schema}?role={role}&warehouse={warehouse}"
     assert sf_client.conn_str == db_uri
 
 
