@@ -95,8 +95,8 @@ class SnowflakeClient(EngineBaseClient):
         account: str = None,
         warehouse: str = None,
         schema: str = None,
-        role: str = None,
-        password: str = None,
+        role: str = "",
+        password: str = "",
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -104,8 +104,7 @@ class SnowflakeClient(EngineBaseClient):
         self.warehouse = warehouse
         self.schema = schema
         self.role = role
-        # FIXME: handle empty/None password
-        self.password = '' if password is None else password
+        self.password = password
 
     @property
     def conn_str(self):
@@ -117,7 +116,6 @@ class SnowflakeClient(EngineBaseClient):
                 password=self.password,
                 schema=self.schema,
                 warehouse=self.warehouse,
-                # FIXME: handle default/empty role
-                # role=self.role
+                role=self.role,
             )
         )
