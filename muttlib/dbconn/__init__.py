@@ -15,6 +15,7 @@ from muttlib.dbconn.sqlserver import (
     SqlServerClient,
 )
 from muttlib.dbconn.teradata import TERADATA_DB_TYPE, TeradataClient
+from muttlib.dbconn.trino import TRINO_DB_TYPE, TrinoClient
 
 connectors = {
     BIGQUERY_DB_TYPE: BigQueryClient,
@@ -27,6 +28,7 @@ connectors = {
     SQLITE_DB_TYPE: SqliteClient,
     SQLSERVER_DB_TYPE: SqlServerClient,
     TERADATA_DB_TYPE: TeradataClient,
+    TRINO_DB_TYPE: TrinoClient,
 }
 
 

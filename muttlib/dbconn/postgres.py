@@ -8,7 +8,7 @@ POSTGRES_DB_TYPE = 'postgres'
 POSTGRES_DIALECT = "postgresql"
 
 try:
-    import psycopg2  # noqa: F401 # pylint:disable=unused-import
+    import trino  # noqa: F401 # pylint:disable=unused-import
 except ModuleNotFoundError:
     logger.debug("No Postgresql support.")
 
