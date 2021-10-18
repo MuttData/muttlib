@@ -15,7 +15,7 @@ from muttlib.dbconn.sqlserver import (
     SqlServerClient,
 )
 from muttlib.dbconn.teradata import TERADATA_DB_TYPE, TeradataClient
-from muttlib.dbconn.trino import TRINO_DB_TYPE, TrinoClient
+from muttlib.dbconn.trino import TRINO_DB_TYPE, TRINO_DIALECT, TrinoClient
 
 connectors = {
     BIGQUERY_DB_TYPE: BigQueryClient,
@@ -57,6 +57,7 @@ def parse_connection_string(connstr):
     db_type = {
         POSTGRES_DIALECT: POSTGRES_DB_TYPE,
         SQLSERVER_DIALECT: SQLSERVER_DB_TYPE,
+        TRINO_DIALECT: TRINO_DB_TYPE,
     }.get(dialect, dialect)
     rv = {"db_type": db_type, "dialect": dialect}
     if r.database:
