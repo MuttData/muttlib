@@ -51,6 +51,12 @@ If you find a security related bug or any kind of security rellated issue, **ple
 
 ## Development Setup
 
+### Prerequisites
+
+In order to build `muttlib` you will need to have installed the following system packages:
+
+* `libkrb5-dev`
+
 ### Installation
 Start by cloning the repo
 ```bash
