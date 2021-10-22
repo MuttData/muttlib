@@ -6,7 +6,7 @@ def test_RedshiftClient():
         database="database",
         host="host",
         password="password",
-        port=443,
+        port=5439,
         username="username",
     )
     engine = client.get_engine()
