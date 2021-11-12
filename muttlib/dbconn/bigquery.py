@@ -9,7 +9,8 @@ import muttlib.utils as utils
 
 logger = logging.getLogger(__name__)
 try:
-    from google.cloud import bigquery, exceptions
+    import google.cloud.bigquery as bigquery
+    import google.cloud.exceptions as exceptions
     from google.oauth2 import service_account
 except ModuleNotFoundError:
     logger.debug("No BigQuery support.")
