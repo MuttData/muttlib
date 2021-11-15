@@ -33,6 +33,7 @@ extra_dependencies = {
         'flake8-bugbear',
         'flake8-docstrings',
         'bump2version',
+        'docutils==0.17.1',
         'sphinx==3.2.1',
         'sphinx_rtd_theme',
         'm2r2',
