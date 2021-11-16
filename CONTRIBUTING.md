@@ -34,7 +34,7 @@ We expect everyone contributing to `muttlib` to follow this principle. Be kind, 
 
 ## Issues
 
-Before submitting an issue, first check on the [issues tracker](https://gitlab.com/mutt_data/muttlib/issues) if there is already one trying to cover that topic, to avoid duplicates. Otherwise we invite you to create it. And if you feel that your issue can be categorized you can use this labels:
+Before submitting an issue, first check on the [issues tracker](https://gitlab.com/mutt_data/muttlib/issues) if there is already one trying to cover that topic, to avoid duplicates. Otherwise we invite you to create it. And if you feel that your issue can be categorized you can use these labels:
 
 ### Labels
 
@@ -50,6 +50,12 @@ If you find a security related bug or any kind of security rellated issue, **ple
 
 
 ## Development Setup
+
+### Prerequisites
+
+In order to build `muttlib` you will need to have installed the following system packages:
+
+* `libkrb5-dev`
 
 ### Installation
 Start by cloning the repo
@@ -70,7 +76,7 @@ We use [pre-commit](https://pre-commit.com) to run several code scans and hooks 
 To install pre-commit hooks run
 ```bash
 pre-commit install
-pre-commit install -t push
+pre-commit install -t pre-push
 ```
 
 ## Style guide

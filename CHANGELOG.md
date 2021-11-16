@@ -5,10 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.2] - 2021-09-27
+## [1.4.5] - 2021-11-15
 
-### Changed
-  - `numpy` version
+### Fix
+  - Fix CI/CD issues.
+
+## [1.4.4] - 2021-11-13
+
+### Fix
+  - Typos on README
+
+## [1.4.3] - 2021-11-12
+
+### Added
+  -  Added Black badge to `README.md`
+
+## [1.4.2] - 2021-11-11
+
+### Fix
+  -  Fix CI linter issues.
+
+## [1.4.1] - 2021-11-11
+
+### Fix
+  -  Fix CI issues.
+
+## [1.4.0] - 2021-10-22
+
+### Added
+  -  dbconn Redshift client
+
+## [1.3.0] - 2021-10-19
+
+### Added
+  -  dbconn Trino client
 
 ## [1.2.1] - 2021-08-20
 
