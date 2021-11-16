@@ -6,7 +6,7 @@ import muttlib
 with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
-pyarrow_dep = ['pyarrow==2.0.0']
+pyarrow_dep = ['pyarrow==6.0.0']
 holidays_dep = ['holidays>=0.10.2']
 
 #  define 'extra_dependencies'
