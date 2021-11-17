@@ -6,7 +6,7 @@ import muttlib
 with open('README.md', 'r', encoding='utf8') as fh:
     long_description = fh.read()
 
-pyarrow_dep = ['pyarrow==2.0.0']
+pyarrow_dep = ['pyarrow==6.0.0']
 holidays_dep = ['holidays>=0.10.2']
 
 #  define 'extra_dependencies'
@@ -104,7 +104,7 @@ setuptools.setup(
         'scikit-learn',
         'scipy',
         "sqlalchemy<1.4.0,>=1.3.0",
-        'numpy==1.19.5',
+        'numpy>=1.20.0,<2.0',
         'jinjasql',
         'IPython',
         'matplotlib',
