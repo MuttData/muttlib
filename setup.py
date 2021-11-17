@@ -104,7 +104,7 @@ setuptools.setup(
         'scikit-learn',
         'scipy',
         "sqlalchemy<1.4.0,>=1.3.0",
-        'numpy>=1.19.5,<2.0',
+        'numpy>=1.20.0,<2.0',
         'jinjasql',
         'IPython',
         'matplotlib',
