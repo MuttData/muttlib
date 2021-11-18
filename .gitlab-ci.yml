@@ -47,6 +47,7 @@ docstr-cov:
   artifacts:
     paths:
       - docs_coverage.svg
+    expire_in: 365 days
   only:
     refs:
       - merge_requests
