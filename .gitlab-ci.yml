@@ -43,6 +43,10 @@ docstr-cov:
   script:
     - pip install interrogate
     - interrogate muttlib -c pyproject.toml -vv
+    - interrogate muttlib --generate-badge docs_coverage.svg --badge-style flat
+  artifacts:
+    paths:
+      - docs_coverage.svg
   only:
     refs:
       - merge_requests
