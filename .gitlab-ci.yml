@@ -13,15 +13,15 @@ stages:
 test:
   stage: test_stage
   script:
-  - pip install .
-  - python -c 'from muttlib import dbconn, utils'
-  - pip install .[forecast]
-  - python -c 'from muttlib import forecast'
-  - pip install .[gsheets]
-  - python -c 'from muttlib import gsheetsconn'
-  - pip install .[gdrive]
-  - python -c 'from muttlib import gdrive'
-  - pip install nox
+  - pip install poetry
+  - poetry install
+  - poetry run python -c 'from muttlib import dbconn, utils'
+  - poetry install -E forecast
+  - poetry run python -c 'from muttlib import forecast'
+  - poetry install -E gsheets
+  - poetry run python -c 'from muttlib import gsheetsconn'
+  - poetry install -E gdrive
+  - poetry run python -c 'from muttlib import gdrive'
   - nox --sessions tests
   only:
     refs:
@@ -31,8 +31,8 @@ test:
 lint:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --sessions cop
+    - poetry install
+    - poetry run nox --sessions cop
   only:
     refs:
       - merge_requests
@@ -41,8 +41,8 @@ lint:
 docstr-cov:
   stage: test_stage
   script:
-    - pip install interrogate
-    - interrogate muttlib -c pyproject.toml -vv
+    - poetry install
+    - poetry run interrogate muttlib -c pyproject.toml -vv
   only:
     refs:
       - merge_requests
@@ -51,8 +51,8 @@ docstr-cov:
 bandit:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --sessions bandit
+    - poetry install
+    - poetry run nox --sessions bandit
   only:
     refs:
       - merge_requests
@@ -61,8 +61,7 @@ bandit:
 pages:
   stage: deploy_stage
   script:
-  - pip install .
-  - pip install .[all] --use-deprecated=legacy-resolver
+  - poetry install -E all
   - cd docs
   - make html -e SPHINXOPTS=-W
   - cd ..
@@ -82,12 +81,10 @@ pages:
 deploy:
   stage: deploy_stage
   script:
-    - pip install twine
-    - python setup.py sdist bdist_wheel
-    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
-    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
+    - export PYPI_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
+    - export PYPI_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
     - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
+    - poetry publish --build -r ${PYPI_REPO} -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}
   only:
     refs:
       - master
