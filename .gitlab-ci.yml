@@ -42,8 +42,7 @@ docstr-cov:
   stage: test_stage
   script:
     - pip install interrogate
-    - interrogate muttlib -c pyproject.toml -vv
-    - interrogate muttlib --generate-badge docs_coverage.svg --badge-style flat
+    - interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
   artifacts:
     paths:
       - docs_coverage.svg
