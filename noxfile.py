@@ -26,5 +26,5 @@ def cop(session):
 def bandit(session):
     """Run all pre-commit hooks."""
     session.install("pip==20.3.1")
-    session.install("bandit", "--use-deprecated=legacy-resolver")
+    session.install("bandit==1.7.1", "--use-deprecated=legacy-resolver")
     session.run("bandit", "-r", "muttlib/", "-ll", "-c", "bandit.yaml")
