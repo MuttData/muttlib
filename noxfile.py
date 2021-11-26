@@ -28,3 +28,11 @@ def bandit(session):
     session.install("pip==20.3.1")
     session.install("bandit", "--use-deprecated=legacy-resolver")
     session.run("bandit", "-r", "muttlib/", "-ll", "-c", "bandit.yaml")
+
+
+@nox.session(reuse_venv=True, python=["3.7", "3.8"])
+def isort(session):
+    """Run all pre-commit hooks."""
+    session.install("pip==20.3.1")
+    session.install("bandit", "--use-deprecated=legacy-resolver")
+    session.run("isort", "-y", "muttlib/")
