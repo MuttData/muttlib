@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
   - Added isort to ci/cd pipeline and pre-commit hooks
+  - Pin gspread version to 4.0.1 due to API changes in a new version of gspread (gspread_pandas dependency)
 
 ## [1.4.8] - 2021-11-25
 
