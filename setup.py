@@ -41,11 +41,11 @@ extra_dependencies = {
         'betamax-serializers',
         'pre-commit==2.2.0',
         'interrogate',
-        'isort==4.3.21',
+        'isort>=5.10.1',
         'black==19.10b0',
         'mypy==0.770',
         'flake8==3.7.8',
-        'pylint==2.4.4',
+        'pylint==2.12.1',
         'nox',
     ],
     'test': [
@@ -63,7 +63,7 @@ extra_dependencies = {
     + pyarrow_dep
     + holidays_dep,
     'forecast': ['fbprophet', 'pystan==2.19.1.1'] + holidays_dep,
-    'gsheets': ['gspread_pandas'],
+    'gsheets': ['gspread_pandas', 'gspread==4.0.1'],
 }
 
 # create 'all' extras

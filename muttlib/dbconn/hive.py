@@ -1,18 +1,18 @@
-from contextlib import closing
-import logging
 import re
+import logging
 from time import sleep
+from contextlib import closing
 
-import pandas as pd
 import progressbar
+import pandas as pd
 
 import muttlib.utils as utils
 from muttlib.dbconn.base import BaseClient
 
 logger = logging.getLogger(__name__)
 try:
-    from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
     from pyhive import hive
+    from TCLIService.ttypes import TOperationState  # noqa: F401 # pylint: disable=W0611
 except ModuleNotFoundError:
     logger.debug("No Hive support.")
 

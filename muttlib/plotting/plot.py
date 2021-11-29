@@ -1,34 +1,36 @@
 """Auxiliary functions for plotting"""
-from typing import Dict, Optional, Tuple
-from datetime import timedelta
 from copy import deepcopy
-import pandas as pd
+from datetime import timedelta
+from typing import Dict, Tuple, Optional
+
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter
+
 from muttlib.plotting.constants import (
-    ANOMALY_WIN,
-    ANOMALY_WIN_FILL,
+    Y_COL,
     COLORS,
-    DAILY_TIME_GRANULARITY,
-    DATE_FORMAT,
     DS_COL,
+    LABELS,
+    HISTORY,
     FIG_SIZE,
     FORECAST,
-    HISTORY,
+    YHAT_COL,
+    ANOMALY_WIN,
+    DATE_FORMAT,
+    PLOT_CONFIG,
     HISTORY_FILL,
-    HOURLY_TIME_GRANULARITY,
-    LABELS,
+    YHAT_LOWER_COL,
+    YHAT_UPPER_COL,
+    ANOMALY_WIN_FILL,
     OUTLIER_SIGN_COL,
     OUTLIERS_HISTORY,
     OUTLIERS_NEGATIVE,
     OUTLIERS_POSITIVE,
-    PLOT_CONFIG,
-    Y_COL,
-    YHAT_COL,
-    YHAT_LOWER_COL,
-    YHAT_UPPER_COL,
+    DAILY_TIME_GRANULARITY,
+    HOURLY_TIME_GRANULARITY,
 )
 
 

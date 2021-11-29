@@ -1,10 +1,10 @@
-from unittest.mock import patch, ANY
+from unittest.mock import ANY, patch
 
+import pytest
 import pandas as pd
 from pandas._testing import assert_frame_equal
 
 from muttlib.dbconn import OracleClient
-import pytest
 
 
 @pytest.fixture()
