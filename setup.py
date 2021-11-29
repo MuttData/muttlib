@@ -45,7 +45,7 @@ extra_dependencies = {
         'black==19.10b0',
         'mypy==0.770',
         'flake8==3.7.8',
-        'pylint==2.4.4',
+        'pylint==2.12.1',
         'nox',
     ],
     'test': [
