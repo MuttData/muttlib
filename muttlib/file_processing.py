@@ -3,14 +3,14 @@
 This module provides convenient functions and classes for renaming files after
 successful operations and paralellized processing of new files.
 """
-from concurrent.futures import Future, ProcessPoolExecutor, wait as wait_futures
-import functools
+import os
 import glob
+import time
 import inspect
 import logging
-import os
+import functools
 from pathlib import Path
-import time
+from concurrent.futures import Future, ProcessPoolExecutor, wait as wait_futures
 
 READY_PREFIX = "ready"
 DONE_PREFIX = "done"

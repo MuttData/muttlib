@@ -1,17 +1,17 @@
-from contextlib import closing
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Union
+from contextlib import closing
+from typing import Union, Optional
 
-from muttlib.dbconn.base import BaseClient
 import muttlib.utils as utils
+from muttlib.dbconn.base import BaseClient
 
 logger = logging.getLogger(__name__)
 try:
     import google.cloud.bigquery as bigquery
-    import google.cloud.exceptions as exceptions
     from google.oauth2 import service_account
+    import google.cloud.exceptions as exceptions
 except ModuleNotFoundError:
     logger.debug("No BigQuery support.")
 

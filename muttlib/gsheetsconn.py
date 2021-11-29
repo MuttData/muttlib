@@ -64,9 +64,9 @@ edit these files. In general, giving permissions to the needed sheets will suffi
 """
 # TODO July 29, 2019: extend docstring with examples
 
+import re
 import logging
 from pathlib import Path
-import re
 from string import ascii_letters
 from typing import Any, Dict, List
 

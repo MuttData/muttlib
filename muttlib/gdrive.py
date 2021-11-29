@@ -10,14 +10,14 @@ TODO:
 - return DriveNode objects
 """
 
+import os
 import enum
 import logging
-import os
 import pathlib
 
 import httplib2
-from oauth2client.service_account import ServiceAccountCredentials
 import requests
+from oauth2client.service_account import ServiceAccountCredentials
 
 logger = logging.getLogger(f'gdrive.{__name__}')
 

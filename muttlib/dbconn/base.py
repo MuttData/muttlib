@@ -1,14 +1,13 @@
 """Module to get and use multiple Big Data DB connections."""
 import abc
-from contextlib import closing
-from functools import wraps
 import logging
+from functools import wraps
 from typing import Optional
+from contextlib import closing
 
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
-from contextlib import closing
 
 import muttlib.utils as utils
 
