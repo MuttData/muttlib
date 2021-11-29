@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.10] - 2021-11-29
 
 ### Changed
-  - Changed nox session of precommit-hooks to be more descriptive 
+  - Changed nox session of precommit-hooks to be more descriptive
 
 ## [1.4.9.post1] - 2021-11-29
 
