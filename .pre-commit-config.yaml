@@ -31,6 +31,14 @@ repos:
       exclude: (docs/|muttlib/dbconn/|tests/)
 -   repo: local
     hooks:
+    - id: isort
+      name: isort
+      entry: isort
+      language: system
+      types: [python]
+      exclude: (docs/)
+-   repo: local
+    hooks:
     - id: pytest
       name: pytest
       language: system
@@ -52,4 +60,3 @@ repos:
       types: [python]
       stages: [push]
       pass_filenames: false
-
