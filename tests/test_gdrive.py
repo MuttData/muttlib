@@ -3,9 +3,9 @@ import os
 import unittest
 
 import betamax
+import requests
 from betamax import Betamax
 from betamax_serializers import pretty_json
-import requests
 
 from muttlib.gdrive import GDrive, GDriveMimeType
 

@@ -1,8 +1,8 @@
-from unittest.mock import patch, ANY, MagicMock, call
+from itertools import chain, repeat
+from unittest.mock import ANY, MagicMock, call, patch
 
-import pandas as pd
 import pytest
-from itertools import repeat, chain
+import pandas as pd
 
 from muttlib.dbconn import HiveClient
 

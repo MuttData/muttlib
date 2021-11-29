@@ -29,18 +29,18 @@ More info about `pytest-mpl` library: https://github.com/matplotlib/pytest-mpl#u
 """
 from copy import deepcopy
 
+import pytest
 import numpy as np
 import pandas as pd
-import pytest
 
 from muttlib.plotting import plot
 from muttlib.plotting.constants import (
+    Y_COL,
+    DS_COL,
+    YHAT_COL,
+    PLOT_CONFIG,
     DAILY_TIME_GRANULARITY,
     HOURLY_TIME_GRANULARITY,
-    PLOT_CONFIG,
-    DS_COL,
-    Y_COL,
-    YHAT_COL,
 )
 
 

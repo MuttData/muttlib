@@ -1,15 +1,15 @@
 import logging
 
 from snowflake.sqlalchemy import URL
-from cryptography.hazmat.primitives.serialization import (
-    load_pem_private_key,
-    Encoding,
-    PrivateFormat,
-    PublicFormat,
-    NoEncryption,
-    BestAvailableEncryption,
-)
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    NoEncryption,
+    PublicFormat,
+    PrivateFormat,
+    BestAvailableEncryption,
+    load_pem_private_key,
+)
 
 from muttlib.dbconn.base import EngineBaseClient
 

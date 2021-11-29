@@ -1,30 +1,29 @@
 """Project agnostic utility functions."""
-from collections import OrderedDict, deque
-import contextlib
-from copy import deepcopy
-import csv
-from datetime import date, datetime
-from functools import wraps
-import hashlib
 import io
-import logging
-import logging.config
-from numbers import Number
 import os
-from pathlib import Path
 import re
+import csv
 import sys
-from typing import List, Union, Dict, Tuple
+import hashlib
+import logging
+import contextlib
+import logging.config
+from pathlib import Path
+from copy import deepcopy
+from numbers import Number
+from functools import wraps
+from datetime import date, datetime
+from collections import OrderedDict, deque
+from typing import Dict, List, Tuple, Union
 
 import jinja2
-from jinjasql import JinjaSql
 import numpy as np
 import pandas as pd
-from pandas.tseries import offsets
 from scipy.stats import iqr
+from jinjasql import JinjaSql
+from pandas.tseries import offsets
 from IPython.display import display
 import matplotlib.pyplot as plt  # NOQA
-
 
 logger = logging.getLogger(f'utils.{__name__}')
 

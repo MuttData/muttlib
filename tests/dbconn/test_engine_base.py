@@ -1,10 +1,10 @@
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import ANY, MagicMock, patch
 
+import pytest
 import pandas as pd
 from pandas._testing import assert_frame_equal
 
-from muttlib.dbconn.base import EngineBaseClient, BaseClient
-import pytest
+from muttlib.dbconn.base import BaseClient, EngineBaseClient
 
 
 @pytest.fixture

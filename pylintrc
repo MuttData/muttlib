@@ -12,6 +12,7 @@ disable =
     fixme,
     logging-format-interpolation,
     logging-fstring-interpolation,
+	unspecified-encoding
 
 [FORMAT]
 

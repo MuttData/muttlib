@@ -84,7 +84,6 @@ from inspect import isclass, signature
 
 import numpy as np
 import pandas as pd
-
 from fbprophet import Prophet
 from sklearn.base import BaseEstimator
 

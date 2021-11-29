@@ -1,10 +1,10 @@
-from contextlib import closing
 import logging
+from contextlib import closing
 
 import pandas as pd
 
-from muttlib.dbconn.base import BaseClient
 import muttlib.utils as utils
+from muttlib.dbconn.base import BaseClient
 
 logger = logging.getLogger(__name__)
 try:
