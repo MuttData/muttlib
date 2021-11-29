@@ -1,17 +1,17 @@
 # pylint:disable=W0611, E1101
 
-from collections import OrderedDict, deque, namedtuple  # noqa: F401
+import io
 import datetime
 from pathlib import Path
+from unittest import mock
 from textwrap import dedent
-import io
+from collections import OrderedDict, deque, namedtuple  # noqa: F401
 
+import pytest
 import numpy as np
 import pandas as pd
-from pandas._testing import assert_frame_equal
 from pandas.tseries import offsets
-import pytest
-from unittest import mock
+from pandas._testing import assert_frame_equal
 
 from muttlib import utils
 

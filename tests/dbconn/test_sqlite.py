@@ -1,7 +1,8 @@
 from unittest.mock import patch
 
-from muttlib.dbconn import SqliteClient
 import pytest
+
+from muttlib.dbconn import SqliteClient
 
 
 @pytest.fixture()

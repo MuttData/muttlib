@@ -1,14 +1,13 @@
 # TODO: migrate to pytest
-from datetime import datetime, timedelta
 from unittest import TestCase, main
 from unittest.mock import MagicMock
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
-
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
-from muttlib.forecast import SkProphet, Classer, StepsSelectorEstimator
+from muttlib.forecast import Classer, SkProphet, StepsSelectorEstimator
 
 
 class TestSkProphet(TestCase):

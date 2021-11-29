@@ -1,8 +1,8 @@
-from unittest.mock import MagicMock, patch
 import urllib.parse
+from unittest.mock import MagicMock, patch
 
-import pandas as pd
 import pytest
+import pandas as pd
 
 from muttlib.dbconn import IbisClient
 

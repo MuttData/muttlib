@@ -1,8 +1,7 @@
-from unittest.mock import patch
-from unittest.mock import create_autospec
+from unittest.mock import patch, create_autospec
 
-import pandas as pd
 import pytest
+import pandas as pd
 
 from muttlib.dbconn import BigQueryClient
 
