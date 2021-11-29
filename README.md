@@ -1,7 +1,6 @@
 # muttlib 🐶📚
 
-[![pypi version](https://img.shields.io/pypi/v/muttlib?color=blue)](https://pypi.org/project/muttlib/)[![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![docstring report](https://gitlab.com/mutt_data/muttlib/-/jobs/artifacts/master/raw/docs_coverage.svg?job=docstr-cov)](https://interrogate.readthedocs.io/en/latest/)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
-
+[![pypi version](https://img.shields.io/pypi/v/muttlib?color=blue)](https://pypi.org/project/muttlib/)[![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![docstring report](https://gitlab.com/mutt_data/muttlib/-/jobs/artifacts/master/raw/docs_coverage.svg?job=docstr-cov)](https://interrogate.readthedocs.io/en/latest/)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 ## Description
