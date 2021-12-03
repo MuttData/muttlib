@@ -49,7 +49,7 @@ repos:
     - id: linter
       name: linter
       language: system
-      entry: nox --session cop
+      entry: nox --session precommit_hooks
       types: [python]
       stages: [push]
       pass_filenames: false

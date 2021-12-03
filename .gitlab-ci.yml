@@ -32,7 +32,7 @@ lint:
   stage: test_stage
   script:
     - pip install nox
-    - nox --sessions cop
+    - nox --sessions precommit_hooks
   only:
     refs:
       - merge_requests
