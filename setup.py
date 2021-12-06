@@ -24,7 +24,7 @@ extra_dependencies = {
         'snowflake-sqlalchemy==1.2.4',
     ],
     'teradata': ['teradatasql==17.0.0.8'],
-    'trino': ['sqlalchemy-trino==0.4.0'],
+    'trino': ['sqlalchemy-trino==0.4.1'],
     'redshift': ['sqlalchemy-redshift==0.8.6', 'psycopg2-binary', 'pyparsing<3'],
     'bigquery': ['google-cloud-bigquery==2.24.0'],
     'ibis': ['ibis-framework[impala]==1.4.0'] + pyarrow_dep,
