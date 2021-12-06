@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.11] - 2021-12-06
 
 ### Changed
-  - Update copyright year in docs.
+  - Update trino version to 0.4.1
+  - Update copyright year in docs
 
 ## [1.4.10] - 2021-11-29
 
