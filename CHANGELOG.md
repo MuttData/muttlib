@@ -5,10 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.11] - 2021-12-06
+## [1.4.12] - 2021-12-09
 
 ### Added
   - Added DataFrame changes warning to docstrings
+## [1.4.11] - 2021-12-07
+
+### Changed
+  - Update copyright year in docs
+  - Fix CI issue
+
+## [1.4.10.post1] - 2021-12-06
+
+### Fixed
+   - Pin trino version to 0.4.1
+
 ## [1.4.10] - 2021-11-29
 
 ### Changed
