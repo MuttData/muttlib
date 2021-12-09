@@ -36,6 +36,7 @@ extra_dependencies = {
         'docutils==0.17.1',
         'sphinx==3.2.1',
         'sphinx_rtd_theme',
+        'mistune==0.8.4',
         'm2r2',
         'betamax',
         'betamax-serializers',
