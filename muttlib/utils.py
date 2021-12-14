@@ -101,8 +101,7 @@ def local_df_cache(
 
     Warnings
     --------
-    - If the decorated function returns a tuple, only the first
-    dataframe contained in the tuple will be cached.
+    - If the decorated function returns a tuple, only the first dataframe contained in the tuple will be cached.
     """
     # Scope jumping scheisse.
     orig_cache_opts = locals()
@@ -319,8 +318,7 @@ def apply_time_bounds(df, sd, ed, ds_col):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     if ds_col:
         rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
@@ -334,8 +332,7 @@ def normalize_ds_index(df, ds_col):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     if ds_col in df.columns:
         return df
@@ -518,8 +515,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
 
     if isinstance(data, pd.DataFrame):
@@ -567,8 +563,7 @@ def df_optimize_float_types(
         >>> n = 2**128
         >>> np.float64(n), np.float32(n)
         (3.402823669209385e+38, inf)
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     if type_mappings is None:
         type_mappings = {
@@ -586,8 +581,7 @@ def df_replace_empty_strs_null(df):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
@@ -602,8 +596,7 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     # Note: Pandas treats string columns as `object` data types.
     if protected_cols is None:
@@ -634,8 +627,7 @@ def df_drop_std(df, min_std_dev=1.5e-2, protected_cols: List[str] = None):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     if protected_cols is None:
         protected_cols = list()
@@ -663,8 +655,7 @@ def df_drop_corr(
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
 
     if target_col not in df.columns:
@@ -716,8 +707,7 @@ def df_encode_categorical_dummies(
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     if skip_cols is None:
         skip_cols = list()
@@ -745,8 +735,7 @@ def df_drop_single_factor_level(df):
 
     Warnings
     --------
-    - Be aware this function potentially modify the given Dataframe df,
-    so please send a copy of the original if you want it to remain unmodified.
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     cat_cols = df_get_typed_cols(df, col_type='cat')
     cols_to_drop = []
