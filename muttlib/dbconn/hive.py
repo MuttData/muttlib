@@ -7,7 +7,7 @@ import progressbar
 import pandas as pd
 
 import muttlib.utils as utils
-from muttlib.dbconn.base import BaseClient
+from muttlib.dbconn.base import InsertFromFrameClient
 
 logger = logging.getLogger(__name__)
 try:
@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 HIVE_DB_TYPE = 'hive'
 
 
-class HiveClient(BaseClient):
+class HiveClient(InsertFromFrameClient):
     """Wrapper around PyHive's hive module.
 
     Parameters

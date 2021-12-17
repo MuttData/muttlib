@@ -4,32 +4,27 @@ import os
 import re
 import csv
 import sys
+import math
 import hashlib
 import logging
 import contextlib
 import logging.config
 from pathlib import Path
 from copy import deepcopy
-from numbers import Number
 from functools import wraps
 from datetime import date, datetime
+from typing import Dict, List, Union
 from collections import OrderedDict, deque
-from typing import Dict, List, Tuple, Union
 
-import jinja2
 import numpy as np
 import pandas as pd
 from scipy.stats import iqr
-from jinjasql import JinjaSql
 from pandas.tseries import offsets
 from IPython.display import display
 import matplotlib.pyplot as plt  # NOQA
 
 logger = logging.getLogger(f'utils.{__name__}')
 
-DEFAULT_JINJA_ENV_ARGS = dict(
-    autoescape=True, line_statement_prefix="%", trim_blocks=True, lstrip_blocks=True,
-)
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
     THEN 1 ELSE 0 END ) AS {as_col}"""
@@ -41,14 +36,25 @@ def make_dirs(dir_path):
     return dir_path
 
 
-def path_or_string(str_or_path):
+def path_or_string(str_or_path: Union[Path, str]) -> str:
     """Load file contents as string or return input str."""
-    file_path = Path(str_or_path)
     try:
-        with file_path.open('r') as f:
-            return f.read()
-    except (OSError, ValueError):
-        return str_or_path
+        file_path = Path(str_or_path).expanduser()
+        if file_path.exists():
+            with file_path.open('r') as f:
+                return f.read()
+        elif isinstance(str_or_path, str):
+            return str_or_path
+        else:
+            raise ValueError("Path does not exist")
+    except OSError as exc:
+        if exc.errno == 36:
+            # File name is too long
+            if isinstance(str_or_path, Path):
+                raise
+            return str_or_path
+        else:
+            raise
 
 
 # PythonDecorators/decorator_function_with_arguments.py
@@ -369,115 +375,6 @@ def df_info_to_str(df):
     buffer = io.StringIO()
     df.info(buf=buffer)
     return buffer.getvalue()
-
-
-class JinjaTemplateException(Exception):
-    """Dummy doc."""
-
-
-class BadInClauseException(JinjaTemplateException):
-    """Dummy doc."""
-
-
-def _format_value_in_clause(value: Union[Number, str]) -> str:
-    """Format value according to type.
-
-    Args:
-        value (Union[Number, str]): any number or string
-
-    Raises:
-        BadInClauseException: for values other than Number or str
-
-    Returns:
-        str: formatted string
-    """
-    if isinstance(value, str):
-        return f"'{value}'"
-    elif isinstance(value, Number):
-        return f"{value}"
-    else:
-        raise BadInClauseException(
-            f"Value type: {type(value)} is not allowed for in clause formatting"
-        )
-
-
-def format_in_clause(
-    iterable: Union[Tuple[Union[Number, str]], List[Union[Number, str]]]
-) -> str:
-    """
-    Create a Jinja2 filter to format list-like values passed.
-
-    Args:
-        iterable (list, tuple): list / tuple of strings and numbers. Can be empty.
-
-    Raises:
-        BadInClauseException: for non iterable inputs.
-
-    Returns:
-        str: The formatted string of the list of elements.
-
-    Notes:
-        Idea originally from
-        https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
-        Passing an empty tuple/list won't raise an exception, in order to
-        simplify the function. Also, regarding failing queries, there's no
-        explicit goal for sql formatting (although that's a common use case).
-
-    Examples:
-        >>> format_in_clause([1.12, 1, 'a'])
-
-        (1.12,1,'a')
-    """
-    if not isinstance(iterable, (list, tuple)):
-        raise BadInClauseException(
-            f"Value passed is not a list or tuple: '{iterable}'. "
-            f"Where the query uses the '| inclause'."
-        )
-    values = [_format_value_in_clause(v) for v in iterable]
-    clause = ",".join(values)
-    clause = "(" + clause + ")"
-    return clause
-
-
-def get_default_jinja_template(path_or_str, filters=None, **kwargs):
-    """Create Jinja specific template.."""
-    if filters is None:
-        filters = {"inclause": format_in_clause}
-    # The following line is labeled with nosec so that bandit doesn't fail. In DEFAULT_JINJA_ENV_ARGS, autoescape is set to True.
-    environment = jinja2.Environment(**{**DEFAULT_JINJA_ENV_ARGS, **kwargs})  # nosec
-    environment.filters = {**environment.filters, **filters}
-    return environment.from_string(path_or_string(path_or_str))
-
-
-def get_cloudera_sql_stats_aggr(
-    input_expression,
-    as_name=None,
-    with_minmax=False,
-    with_std=False,
-    with_ndv=False,
-    with_count=False,
-    ends_comma=True,
-):
-    """Get Cloudera-valid battery of statistical aggregations clause."""
-    rv_l = [
-        f'SUM({input_expression}) AS sum',
-        f'AVG({input_expression}) AS mean',
-        f'APPX_MEDIAN({input_expression}) AS median',
-    ]
-
-    if with_minmax:
-        rv_l.append(f'MIN({input_expression}) AS min')
-        rv_l.append(f'MAX({input_expression}) AS max')
-    if with_std:
-        rv_l.append(f'STDDEV({input_expression}) AS std')
-    if with_ndv:
-        rv_l.append(f'NDV({input_expression}) AS unique')
-    if with_count:
-        rv_l.append(f'COUNT({input_expression}) AS count_rows')
-    rv = ',\n'.join([f'{i}_{as_name}' for i in rv_l]) + ','
-    if not ends_comma:
-        rv = rv[:-1]
-    return rv
 
 
 def get_cloudera_sample_cut(sample_lines_ratio=None):
@@ -1274,45 +1171,6 @@ def category_reductor(df, categorical_col, n_levels=8, default_level='Other'):
     return rv
 
 
-def load_sql_query(sql, query_context_params=None):
-    """Read sql file or string and format with a dictionary of params.
-
-    Parameters
-    ----------
-    sql :
-
-    query_context_params :
-         (Default value = None)
-
-    Returns
-    -------
-
-    """
-    pat = Path(sql).expanduser()
-    if pat.exists():
-        with open(pat, 'r') as f:
-            sql = f.read()
-
-    if query_context_params:
-        j = JinjaSql(param_style='pyformat')
-        binded_sql, bind_params = j.prepare_query(sql, query_context_params)
-        missing_placeholders = [
-            k for k, v in bind_params.items() if jinja2.Undefined() == v
-        ]
-
-        assert (
-            len(missing_placeholders) == 0
-        ), f'Missing placeholders are: {missing_placeholders}'
-
-        try:
-            sql = binded_sql % bind_params
-        except KeyError as e:
-            print(e)
-            return
-
-    return sql
-
-
 def get_sql_stats_aggr(
     input_expression, as_name=None, with_std=False, with_ndv=False, with_count=False
 ):
@@ -1408,3 +1266,26 @@ def get_sqlserver_hashed_sample_clause(id_clause, sample_pct):
     AND ABS(CAST(HASHBYTES('SHA1',
         {id_clause}) AS BIGINT)) % 100 <= {int_pct}"""
     return rv
+
+
+def humansize(nbytes: int) -> str:
+    """Convert bytes to human readable format.
+
+    Source: https://stackoverflow.com/a/14996816/4864169
+
+    Parameters
+    ----------
+    nbytes : int
+        Number of bytes.
+
+    Returns
+    -------
+    str
+        Message that indicates number of bytes in a human readable format.
+
+    """
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    i: int = math.floor(math.log(nbytes, 1024))
+    units: float = nbytes / math.pow(1024, i)
+    bytes_str = f"{units:.2f}".rstrip('0').rstrip('.')
+    return f"{bytes_str} {suffixes[i]}"

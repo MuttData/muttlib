@@ -1,13 +1,17 @@
 import json
 import logging
 from pathlib import Path
-from contextlib import closing
-from typing import Union, Optional
+from typing import Any, Dict, Union, Optional
+
+import pandas as pd
+from google.cloud import bigquery
 
 import muttlib.utils as utils
 from muttlib.dbconn.base import BaseClient
+from muttlib.jinja.templating import load_sql_query
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 try:
     import google.cloud.bigquery as bigquery
     from google.oauth2 import service_account
@@ -24,9 +28,9 @@ class BigQueryClient(BaseClient):
 
     def __init__(
         self,
-        db: str,
-        table: str,
-        project: str,
+        db: Optional[str] = None,
+        project: Optional[str] = None,
+        table: Optional[str] = None,
         auth: Optional[str] = None,
         auth_file: Optional[Union[str, Path]] = None,
     ):
@@ -54,8 +58,11 @@ class BigQueryClient(BaseClient):
         self.table = table
 
     @property
-    def table_id(self):
-        return f"{self.project}.{self.db}.{self.table}"
+    def table_id(self) -> Optional[str]:
+        """Get table id."""
+        if self.table is not None:
+            return f"{self.project}.{self.db}.{self.table}"
+        return None
 
     def _read_cred(
         self, auth: Optional[str], auth_file: Optional[Union[str, Path]],
@@ -78,7 +85,11 @@ class BigQueryClient(BaseClient):
         else:
             return service_account.Credentials.from_service_account_info(auth)
 
-    def _connect(self):
+    def __del__(self):
+        if self.connection is not None:
+            self.connection.close()
+
+    def _connect(self) -> bigquery.client.Client:
         """Create a BigQuery Client.
 
         Returns
@@ -98,34 +109,42 @@ class BigQueryClient(BaseClient):
         if self.connection is not None:
             self.connection.close()
 
-    def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
-        """Execute sql statement.
+    def execute(
+        self,
+        sql: str,
+        params: Optional[Dict[str, Any]] = None,
+        connection: Optional[bigquery.client.Client] = None,
+        mode='python',
+        *,
+        dry_run: bool = True,
+    ):
+        if dry_run:
+            self._connect()
+            conn: bigquery.client.Client = connection or self._connect()
 
-        Parameters
-        ----------
-        sql : str or path
-            SQL query string or path to file with Select statements.
-        params : dict, optional
-            parameters to add into the SQL query to execute.
-        connection : google.cloud.bigquery.client, optional
-            client to the database, if it's already created.
+            job_config = bigquery.QueryJobConfig()
+            job_config.dry_run = True
 
-        Returns
-        -------
-        google.cloud.bigquery.job.QueryJob
-        """
-        sql = utils.path_or_string(sql)
-        if params is not None:
-            sql = sql.format(**params)
-        logger.info(f"Executing query:\n{sql}")
+            query_job = conn.query(sql, job_config)
 
-        if connection is not None:
-            return connection.query(sql)
+            # This will only work for native tables
+            logger.info(
+                f"Total data processed: {utils.humansize(query_job.total_bytes_processed)}"
+            )
 
-        with closing(self._connect()) as connection:
-            return connection.query(sql)
+            return sql
 
-    def to_frame(self, sql, params=None, connection=None):  # pylint: disable=W0221
+        return super().execute(sql, params, connection, mode, dry_run=dry_run)
+
+    def to_frame(
+        self,
+        sql: str,
+        params: Optional[Dict[str, Any]] = None,
+        connection: Optional[bigquery.client.Client] = None,
+        mode='python',
+        *,
+        dry_run: bool = False,
+    ) -> pd.DataFrame:  # pylint: disable=W0221
         """Return sql execution as Pandas dataframe.
 
         Parameters
@@ -141,15 +160,30 @@ class BigQueryClient(BaseClient):
         -------
         pandas.DataFrame
         """
-        return self.execute(sql, params, connection).to_dataframe()
+        query_result = self.execute(sql, params, connection, mode, dry_run=dry_run)
+
+        if dry_run:
+            return query_result
+
+        df = query_result.to_dataframe()
+
+        logger.info(
+            f"Total data processed: {utils.humansize(query_result.total_bytes_processed)}"
+        )
+        logger.info(
+            f"Total data billed: {utils.humansize(query_result.total_bytes_billed)}"
+        )
+        logger.info(f"{len(df)} rows retrieved")
+
+        return df
 
     def insert_from_frame(  # pylint: disable=W0221
         self,
-        df,
-        table=None,
-        create_first=True,
-        create_sql=None,
-        connection=None,
+        df: pd.DataFrame,
+        table: str = None,
+        create_first: bool = True,
+        create_sql: Optional[Union[str, Path]] = None,
+        connection: Optional[bigquery.client.Client] = None,
         **kwargs,
     ):
         """Insert from a Pandas dataframe.
@@ -172,29 +206,33 @@ class BigQueryClient(BaseClient):
         connection: google.cloud.bigquery.client, optional
             client to the database, if it's already created.
         """
+
         if table is None:
+            if self.table_id is None:
+                raise ValueError(
+                    "This connector has no table set, so you need to pass a table to insert into"
+                )
             table = self.table_id
 
         logger.info(f"Going to insert data into {table}")
 
-        if connection is not None:
-            if create_first:
-                self._create_table(table, create_sql, connection)
+        conn = connection or self._connect()
+        if create_first:
+            if create_sql is None:
+                raise ValueError("Need to pass sql to create table")
+            self._create_table(table, create_sql, conn)
 
-            job = connection.load_table_from_dataframe(df, table)
+            job = conn.load_table_from_dataframe(df, table)
             job.result()  # Wait for the job to complete.
-
-        else:
-            with closing(self._connect()) as connection:
-                if create_first:
-                    self._create_table(table, create_sql, connection)
-
-                job = connection.load_table_from_dataframe(df, table)
-                job.result()  # Wait for the job to complete.
 
         logger.info(f"Inserted {len(df)} records into {table}")
 
-    def _create_table(self, table, sql, connection=None):
+    def _create_table(
+        self,
+        table: str,
+        sql: Union[str, Path],
+        connection: Optional[bigquery.client.Client] = None,
+    ):
         """Create table if it doesn't exist.
 
         Parameters
@@ -209,8 +247,10 @@ class BigQueryClient(BaseClient):
         if connection is None:
             connection = self._connect()
 
+        sql_str: str = utils.path_or_string(sql)
+
         try:
             connection.get_table(table)  # Make an API request.
         except exceptions.NotFound:
-            self.execute(sql, params={'table_id': table}, connection=connection)
+            self.execute(sql_str, params={'table_id': table}, connection=connection)
             logger.info(f"Created {table}")

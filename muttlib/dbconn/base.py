@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 
 import muttlib.utils as utils
+from muttlib.jinja.templating import load_sql_query
 
 logger = logging.getLogger(__name__)
 
@@ -149,10 +150,23 @@ class BaseClient(abc.ABC):
             return [c[0] for c in cursor.description]
 
     @parse_sql_statement_decorator
-    def execute(self, sql, params=None, connection=None):  # pylint: disable=W0613
+    def execute(
+        self, sql, params=None, connection=None, mode='python', *, dry_run: bool = False
+    ):  # pylint: disable=W0613
         """Execute sql statement."""
+        if mode not in ('python', 'jinja'):
+            raise ValueError("Mode should be either 'jinja' or 'python'")
+
+        sql = utils.path_or_string(sql)
+
         if params is not None:
-            sql = sql.format(**params)
+            if mode == 'python':
+                sql = sql.format(**params)
+            else:
+                sql = load_sql_query(sql, params)
+
+        if dry_run:
+            return sql
 
         if connection is not None:
             # It's not our job to close the passed connection
@@ -162,9 +176,14 @@ class BaseClient(abc.ABC):
             # Create and destroy a connection, as to avoid dangling connections
             return connection.execute(sql)
 
-    def to_frame(self, sql, params=None, connection=None):
+    def to_frame(
+        self, sql, params=None, connection=None, mode='python', *, dry_run: bool = True
+    ):
         """Execute SQL statement and return as Pandas dataframe."""
-        with closing(self.execute(sql, params, connection)) as cursor:
+        if dry_run:
+            return self.execute(sql, params, connection, mode, dry_run=True)
+
+        with closing(self.execute(sql, params, connection, mode)) as cursor:
             if not cursor:
                 return
             data = cursor.fetchall()
@@ -174,8 +193,16 @@ class BaseClient(abc.ABC):
                 df = pd.DataFrame()
             return df
 
+
+class InsertFromFrameClient(BaseClient, abc.ABC):
     def insert_from_frame(
-        self, df, table, if_exists='append', index=False, connection=None, **kwargs
+        self,
+        df: pd.DataFrame,
+        table: str,
+        if_exists: str = 'append',
+        index: bool = False,
+        connection=None,
+        **kwargs,
     ):
         """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
