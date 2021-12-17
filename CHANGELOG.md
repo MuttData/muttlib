@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2021-12-17
+
+### Changed
+  - Jinja utils moved to their own module
+  - BigQuery connector interface changed
+  - DBConn base client `insert_from_frame` moved to new base class due to
+    inconsistencies on different connectors
+
+### Added
+  - BigQuery connector logs billed bytes and processed bytes
+  - Added `dry_run` mode to BigQuery connector
+
 ## [1.4.12post1] - 2021-12-09
 
 ### Fixed
