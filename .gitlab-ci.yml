@@ -2,6 +2,7 @@ image: python:3.7
 
 before_script:
   - apt-get update
+  - pip install poetry
 
 stages:
   - validate
@@ -13,7 +14,6 @@ stages:
 test:
   stage: test_stage
   script:
-  - pip install poetry
   - poetry install
   - poetry run python -c 'from muttlib import dbconn, utils'
   - poetry install -E forecast
