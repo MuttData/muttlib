@@ -5,10 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.6] - 2021-11-18
+## [1.4.13] - 2022-01-18
 
 ### Changed
   - Migrated to poetry
+
+## [1.4.12post1] - 2021-12-09
+
+### Fixed
+  - Fixed identation bug on docstrings generation
+
+## [1.4.12] - 2021-12-09
+
+### Added
+  - Added DataFrame changes warning to docstrings
+## [1.4.11] - 2021-12-07
+
+### Changed
+  - Update copyright year in docs
+  - Fix CI issue
+
+## [1.4.10.post1] - 2021-12-06
+
+### Fixed
+   - Pin trino version to 0.4.1
+
+## [1.4.10] - 2021-11-29
+
+### Changed
+  - Changed nox session of precommit-hooks to be more descriptive
+
+## [1.4.9.post1] - 2021-11-29
+
+### Added
+  - Added isort 5 to pre-commit hooks
+
+### Fixed
+  - Pin gspread version to 4.0.1 due to API changes in a new version of gspread (gspread_pandas dependency)
+
+## [1.4.8] - 2021-11-25
+
+### Changed
+
+  - Pinned bandit version.
+
+## [1.4.7] - 2021-11-19
+
+### Added
+  - Added docstring coverage badge to `README.md`
+>>>>>>> 1f4b7ace47059cb38b3b70161a1f40c857a47393
 
 ## [1.4.6] - 2021-11-16
 

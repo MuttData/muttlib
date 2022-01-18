@@ -1,0 +1,19 @@
+[MASTER]
+
+jobs = 0
+
+[MESSAGES CONTROL]
+
+disable =
+    # Disable conventions and refactors warnings
+    C,
+    R,
+    # Warnings:
+    fixme,
+    logging-format-interpolation,
+    logging-fstring-interpolation,
+	unspecified-encoding
+
+[FORMAT]
+
+max-line-length = 88  # as in black

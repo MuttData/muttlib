@@ -1,9 +1,9 @@
-from concurrent.futures import ThreadPoolExecutor, wait
-import contextlib
 import os
-from pathlib import Path
 import signal
+import contextlib
+from pathlib import Path
 from tempfile import TemporaryDirectory
+from concurrent.futures import ThreadPoolExecutor, wait
 
 import pytest
 
@@ -11,8 +11,8 @@ from muttlib.file_processing import (  # merge_result_dfs,; split_res,
     DONE_PREFIX,
     FAIL_PREFIX,
     READY_PREFIX,
-    DummyPoolExecutor,
     RenameByResult,
+    DummyPoolExecutor,
     process_new_files,
     process_new_files_parallel,
 )

@@ -32,7 +32,7 @@ lint:
   stage: test_stage
   script:
     - poetry install
-    - poetry run nox --sessions cop
+    - poetry run nox --sessions precommit_hooks
   only:
     refs:
       - merge_requests
@@ -42,7 +42,11 @@ docstr-cov:
   stage: test_stage
   script:
     - poetry install
-    - poetry run interrogate muttlib -c pyproject.toml -vv
+    - poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
+  artifacts:
+    paths:
+      - docs_coverage.svg
+    expire_in: 365 days
   only:
     refs:
       - merge_requests

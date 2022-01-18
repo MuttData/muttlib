@@ -1,12 +1,12 @@
-import logging
 import shutil
+import logging
 from time import sleep
 from urllib.parse import urlparse
 
 import pandas as pd
 
-from muttlib.dbconn.base import parse_sql_statement_decorator
 import muttlib.utils as utils
+from muttlib.dbconn.base import parse_sql_statement_decorator
 
 logger = logging.getLogger(__name__)
 

@@ -1,30 +1,29 @@
 """Project agnostic utility functions."""
-from collections import OrderedDict, deque
-import contextlib
-from copy import deepcopy
-import csv
-from datetime import date, datetime
-from functools import wraps
-import hashlib
 import io
-import logging
-import logging.config
-from numbers import Number
 import os
-from pathlib import Path
 import re
+import csv
 import sys
-from typing import List, Union, Dict, Tuple
+import hashlib
+import logging
+import contextlib
+import logging.config
+from pathlib import Path
+from copy import deepcopy
+from numbers import Number
+from functools import wraps
+from datetime import date, datetime
+from collections import OrderedDict, deque
+from typing import Dict, List, Tuple, Union
 
 import jinja2
-from jinjasql import JinjaSql
 import numpy as np
 import pandas as pd
-from pandas.tseries import offsets
 from scipy.stats import iqr
+from jinjasql import JinjaSql
+from pandas.tseries import offsets
 from IPython.display import display
 import matplotlib.pyplot as plt  # NOQA
-
 
 logger = logging.getLogger(f'utils.{__name__}')
 
@@ -100,8 +99,9 @@ def local_df_cache(
     Take care to select a cache name that reflects this changes. Such as
     including the hash of the query used to generate the data stored.
 
-    WARNING: If the decorated function returns a tuple, only the first
-    dataframe contained in the tuple will be cached.
+    Warnings
+    --------
+    - If the decorated function returns a tuple, only the first dataframe contained in the tuple will be cached.
     """
     # Scope jumping scheisse.
     orig_cache_opts = locals()
@@ -314,7 +314,12 @@ def normalize_arr(arr):
 
 
 def apply_time_bounds(df, sd, ed, ds_col):
-    """Filter time dates in a datetime-type column or index."""
+    """Filter time dates in a datetime-type column or index.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     if ds_col:
         rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
     else:
@@ -323,7 +328,12 @@ def apply_time_bounds(df, sd, ed, ds_col):
 
 
 def normalize_ds_index(df, ds_col):
-    """Normalize usage of ds_col as column in df."""
+    """Normalize usage of ds_col as column in df.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     if ds_col in df.columns:
         return df
     elif ds_col == df.index.name:
@@ -502,6 +512,10 @@ def str_normalize_pandas(data, str_replace_kws=None):
     data (pd.DataFrame, pd.Series): containing the data. Might or not have string
         columns
     str_replace_kws (dict): contains pandas str.replace method kwargs
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
 
     if isinstance(data, pd.DataFrame):
@@ -542,11 +556,14 @@ def df_optimize_float_types(
         df: DataFrame to be modified.
         type_mappings: Mapping of types. Defaults to {"float64":"float16", "float32":"float16"}
 
-    WARNING: Type conversion leads to a loss in accuracy and possible overflow of the target type.
-    Eg:
-    >>> n = 2**128
-    >>> np.float64(n), np.float32(n)
-    (3.402823669209385e+38, inf)
+    Warnings
+    --------
+    - Type conversion leads to a loss in accuracy and possible overflow of the target type.
+        Eg:
+        >>> n = 2**128
+        >>> np.float64(n), np.float32(n)
+        (3.402823669209385e+38, inf)
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
     """
     if type_mappings is None:
         type_mappings = {
@@ -560,7 +577,12 @@ def df_optimize_float_types(
 
 
 def df_replace_empty_strs_null(df):
-    """Replace whitespace or empty strs with nan values."""
+    """Replace whitespace or empty strs with nan values.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     str_cols = df.select_dtypes(include='object').columns.tolist()
     if str_cols:
         logger.debug(f'Replacing whitespace in these object cols: {str_cols}...')
@@ -570,9 +592,13 @@ def df_replace_empty_strs_null(df):
 
 
 def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
-    """Drop null columns in df, for null share over a certain threshold."""
+    """Drop null columns in df, for null share over a certain threshold.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     # Note: Pandas treats string columns as `object` data types.
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
     if protected_cols is None:
         protected_cols = list()
     logger.debug(
@@ -597,8 +623,12 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
 
 
 def df_drop_std(df, min_std_dev=1.5e-2, protected_cols: List[str] = None):
-    """Drop low variance cols."""
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    """Drop low variance cols.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     if protected_cols is None:
         protected_cols = list()
     std_values = df.std()
@@ -621,8 +651,12 @@ def df_drop_corr(
     frac=0.2,
     random_state=None,
 ):
-    """Drop high correlated to-target cols."""
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    """Drop high correlated to-target cols.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
 
     if target_col not in df.columns:
         raise ValueError(f"target col ({target_col}) is not in dataframe columns")
@@ -669,7 +703,12 @@ def df_encode_categorical_dummies(
     top=25,
     other_val='OTHER',
 ):
-    """Encode categorical columns into dummies."""
+    """Encode categorical columns into dummies.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     if skip_cols is None:
         skip_cols = list()
     if cat_cols is None:
@@ -692,8 +731,12 @@ def df_encode_categorical_dummies(
 
 
 def df_drop_single_factor_level(df):
-    """Drop categorical columns with null or 1 level."""
-    # Warning this function modifies the passed df. If you dont want this you should use df.copy()
+    """Drop categorical columns with null or 1 level.
+
+    Warnings
+    --------
+    - Be aware this function potentially modify the given Dataframe df, so please send a copy of the original if you want it to remain unmodified.
+    """
     cat_cols = df_get_typed_cols(df, col_type='cat')
     cols_to_drop = []
     for c in cat_cols:

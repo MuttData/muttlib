@@ -31,6 +31,14 @@ repos:
       exclude: (docs/|muttlib/dbconn/|tests/)
 -   repo: local
     hooks:
+    - id: isort
+      name: isort
+      entry: isort
+      language: system
+      types: [python]
+      exclude: (docs/)
+-   repo: local
+    hooks:
     - id: pytest
       name: pytest
       language: system
@@ -41,7 +49,7 @@ repos:
     - id: linter
       name: linter
       language: system
-      entry: poetry run nox --session cop
+      entry: poetry run nox --session precommit_hooks
       types: [python]
       stages: [push]
       pass_filenames: false
