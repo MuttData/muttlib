@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "muttlib"
-version = "1.4.6"
+version = "1.4.13"
 description = "Collection of helper modules by Mutt Data."
 readme = "README.md"
 authors = ["Mutt Data <info@muttdata.ai>"]
