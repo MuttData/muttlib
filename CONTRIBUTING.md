@@ -66,7 +66,7 @@ git clone git@gitlab.com:mutt_data/muttlib.git
 Then install all minimal dependencies for development use:
 ```bash
 cd muttlib
-pip install -e .[dev]
+poetry install
 ```
 
 ### Pre-Commit for Version Control Integration
@@ -119,7 +119,7 @@ pytest
 
 Note that some tests may depend on external dependencies not installed with `[dev]` if you want to run the full set of tests use `[all]` instead, running this:
 ```bash
-pip install -e .[all]
+poetry install -E all
 ```
 
 Run coverage:
@@ -140,7 +140,7 @@ nox --session tests
 `muttlib` uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's [docs](https://mutt_data.gitlab.io/muttlib/) that are automatically built from [docstrings](#docstrings) and pushed by the [CI jobs](#cicd-jobs). Check the [style guide](#style-guide) section for notes on docstrings. Pushing all the docs is too cumbersome. You can generate them locally like so:
 
 ```bash
-pip install .[all]
+poetry install -E all
 cd docs
 make html
 ```
