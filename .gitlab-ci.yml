@@ -125,7 +125,7 @@ check_version:
     - pip install packaging
     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- muttlib/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
+    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- pyproject.toml | grep "^version" | cut -d = -f 2 | cut -d \" -f 2 | xargs)
     - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
     - exit_status=$?
     - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
