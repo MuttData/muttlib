@@ -32,4 +32,5 @@ def bandit(session):
     session.env.update({"POETRY_VIRTUALENVS_CREATE": "false"})
     session.install("poetry")
     session.run("poetry", "install")
+    session.run("poetry", "run", "pip", "install", "bandit==1.7.1")
     session.run("poetry", "run", "bandit", "-r", "muttlib/", "-ll", "-c", "bandit.yaml")
