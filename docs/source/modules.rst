@@ -1,7 +1,9 @@
-muttlib
-=======
+API reference
+=============
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :toctree: _autosummary
+   :template: autosummary/modules.rst
+   :recursive:
 
    muttlib
