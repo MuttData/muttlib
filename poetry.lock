@@ -2194,6 +2194,14 @@ python-versions = "*"
 types-urllib3 = "<1.27"
 
 [[package]]
+name = "types-toml"
+version = "0.10.3"
+description = "Typing stubs for toml"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-urllib3"
 version = "1.26.8"
 description = "Typing stubs for urllib3"
@@ -2270,7 +2278,7 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
-all = ["pyarrow", "cx-Oracle", "PyHive", "thrift", "psycopg2-binary", "PyMySQL", "pymssql", "pymongo", "snowflake-connector-python", "cryptography", "snowflake-sqlalchemy", "teradatasql", "sqlalchemy-trino", "sqlalchemy-redshift", "psycopg2-binary", "pyparsing", "google-cloud-bigquery", "pyarrow", "oauth2client", "requests", "freezegun", "interrogate", "nox", "pytest", "pytest-xdist", "pytest-cov", "pytest-html", "pytest-mpl", "betamax", "betamax-serializers", "pyarrow", "holidays", "fbprophet", "pystan", "holidays", "gspread-pandas"]
+all = ["betamax", "betamax-serializers", "cryptography", "cx-Oracle", "fbprophet", "freezegun", "google-cloud-bigquery", "gspread-pandas", "holidays", "holidays", "interrogate", "nox", "oauth2client", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "PyHive", "pymongo", "pymssql", "PyMySQL", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift"]
 bigquery = ["google-cloud-bigquery"]
 forecast = ["fbprophet", "pystan", "holidays"]
 gdrive = ["oauth2client", "requests"]
@@ -2292,7 +2300,7 @@ trino = ["sqlalchemy-trino"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "cbdf21ea14279894f76cccfe440460a825ee0a5c4323684b29ed8a50dbb29668"
+content-hash = "228ddba30b9271b8772935332872fc902ea3524fc2dc86ebe149ed5d8a1ffd4f"
 
 [metadata.files]
 alabaster = [
@@ -4105,6 +4113,10 @@ types-pymysql = [
 types-requests = [
     {file = "types-requests-2.27.8.tar.gz", hash = "sha256:c2f4e4754d07ca0a88fd8a89bbc6c8a9f90fb441f9c9b572fd5c484f04817486"},
     {file = "types_requests-2.27.8-py3-none-any.whl", hash = "sha256:8ec9f5f84adc6f579f53943312c28a84e87dc70201b54f7c4fbc7d22ecfa8a3e"},
+]
+types-toml = [
+    {file = "types-toml-0.10.3.tar.gz", hash = "sha256:215a7a79198651ec5bdfd66193c1e71eb681a42f3ef7226c9af3123ced62564a"},
+    {file = "types_toml-0.10.3-py3-none-any.whl", hash = "sha256:988457744d9774d194e3539388772e3a685d8057b7c4a89407afeb0a6cbd1b14"},
 ]
 types-urllib3 = [
     {file = "types-urllib3-1.26.8.tar.gz", hash = "sha256:aa0de26893f138523d5552bbb023826c0cc7ea5749d80c1693c57aab7b55f469"},
