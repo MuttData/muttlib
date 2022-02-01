@@ -2,6 +2,7 @@ image: python:3.7
 
 before_script:
   - apt-get update
+  - pip install poetry
 
 stages:
   - validate
@@ -13,15 +14,14 @@ stages:
 test:
   stage: test_stage
   script:
-  - pip install .
-  - python -c 'from muttlib import dbconn, utils'
-  - pip install .[forecast]
-  - python -c 'from muttlib import forecast'
-  - pip install .[gsheets]
-  - python -c 'from muttlib import gsheetsconn'
-  - pip install .[gdrive]
-  - python -c 'from muttlib import gdrive'
-  - pip install nox
+  - poetry install
+  - poetry run python -c 'from muttlib import dbconn, utils'
+  - poetry install -E forecast
+  - poetry run python -c 'from muttlib import forecast'
+  - poetry install -E gsheets
+  - poetry run python -c 'from muttlib import gsheetsconn'
+  - poetry install -E gdrive
+  - poetry run python -c 'from muttlib import gdrive'
   - nox --sessions tests
   only:
     refs:
@@ -31,8 +31,8 @@ test:
 lint:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --sessions precommit_hooks
+    - poetry install
+    - poetry run nox --sessions precommit_hooks
   only:
     refs:
       - merge_requests
@@ -41,8 +41,8 @@ lint:
 docstr-cov:
   stage: test_stage
   script:
-    - pip install interrogate
-    - interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
+    - poetry install
+    - poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
   artifacts:
     paths:
       - docs_coverage.svg
@@ -55,8 +55,8 @@ docstr-cov:
 bandit:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --sessions bandit
+    - poetry install
+    - poetry run nox --sessions bandit
   only:
     refs:
       - merge_requests
@@ -65,8 +65,7 @@ bandit:
 pages:
   stage: deploy_stage
   script:
-  - pip install .
-  - pip install .[all] --use-deprecated=legacy-resolver
+  - poetry install -E all
   - cd docs
   - make html -e SPHINXOPTS=-W
   - cd ..
@@ -86,12 +85,10 @@ pages:
 deploy:
   stage: deploy_stage
   script:
-    - pip install twine
-    - python setup.py sdist bdist_wheel
-    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
-    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
+    - export PYPI_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
+    - export PYPI_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
     - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
+    - poetry publish --build -r ${PYPI_REPO} -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}
   only:
     refs:
       - master
@@ -132,7 +129,7 @@ check_version:
     - pip install packaging
     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- muttlib/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
+    - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
     - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
     - exit_status=$?
     - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;

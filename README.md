@@ -31,42 +31,42 @@ Current modules:
 
 Base lib:
 ```bash
-pip install muttlib
+poetry add muttlib
 ```
 
 Check below for available extras.
 
 Parquet and Feather support:
 ```bash
-pip install muttlib[pyarrow]
+poetry add muttlib -E pyarrow
 ```
 
 Forecast:
 ```bash
-pip install muttlib[forecast]
+poetry add muttlib -E forecast
 ```
 
 Misc DB support for dbconn:
 ```bash
-pip install muttlib[oracle]
-pip install muttlib[hive]
-pip install muttlib[postgres]
-pip install muttlib[mysql]
-pip install muttlib[sqlserver]
-pip install muttlib[mongo]
-pip install muttlib[ibis]
+poetry add muttlib -E oracle
+poetry add muttlib -E hive
+poetry add muttlib -E postgres
+poetry add muttlib -E mysql
+poetry add muttlib -E sqlserver
+poetry add muttlib -E mongo
+poetry add muttlib -E ibis
 ```
 
 ### Installing custom branches from the repos
 
 From GitHub mirror:
 ```bash
-pip install -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
+poetry add -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 From Gitlab main repo:
 ```bash
-pip install -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
+poetry add -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 ## Usage

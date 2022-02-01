@@ -3,7 +3,7 @@ repos:
     hooks:
     - id: black
       name: black
-      entry: black
+      entry: poetry run black
       language: system
       types: [python]
       args: [--skip-string-normalization]
@@ -12,12 +12,14 @@ repos:
     rev: v2.5.0
     hooks:
     - id: trailing-whitespace
-    - id: requirements-txt-fixer
+    - id: check-merge-conflict
+    - id: check-toml
+    - id: debug-statements
 -   repo: local
     hooks:
     - id: mypy
       name: mypy
-      entry: mypy
+      entry: poetry run mypy
       language: system
       types: [python]
       exclude: docs/*
@@ -25,7 +27,7 @@ repos:
     hooks:
     - id: pylint
       name: pylint
-      entry: pylint
+      entry: poetry run pylint
       language: system
       types: [python]
       exclude: (docs/|muttlib/dbconn/|tests/)
@@ -33,7 +35,7 @@ repos:
     hooks:
     - id: isort
       name: isort
-      entry: isort
+      entry: poetry run isort
       language: system
       types: [python]
       exclude: (docs/)
@@ -42,21 +44,21 @@ repos:
     - id: pytest
       name: pytest
       language: system
-      entry: nox --session tests
+      entry: poetry run nox --session tests
       types: [python]
       stages: [push]
       pass_filenames: false
     - id: linter
       name: linter
       language: system
-      entry: nox --session precommit_hooks
+      entry: poetry run nox --session precommit_hooks
       types: [python]
       stages: [push]
       pass_filenames: false
     - id: bandit
       name: bandit
       language: system
-      entry: nox --session bandit
+      entry: poetry run nox --session bandit
       types: [python]
       stages: [push]
       pass_filenames: false
