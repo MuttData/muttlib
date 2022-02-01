@@ -1,7 +1,15 @@
 image: python:3.7
 
+variables:
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
+
+cache:
+  paths:
+    - .cache/poetry
+
 before_script:
   - apt-get update
+  - apt-get install libkrb5-dev
   - pip install poetry
 
 stages:

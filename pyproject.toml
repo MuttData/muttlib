@@ -97,6 +97,7 @@ gspread-pandas = { version = "^2.3.0", optional = true }
 wrapt = "1.11.2"
 types-requests = "^2.27.7"
 types-PyMySQL = "^1.0.11"
+bandit = { version = "^1.7.2", optional = true }
 
 [tool.poetry.extras]
 pyarrow = [ "pyarrow",]
@@ -111,12 +112,12 @@ teradata = [ "teradatasql",]
 trino = [ "sqlalchemy-trino",]
 redshift = [ "sqlalchemy-redshift", "psycopg2-binary", "pyparsing",]
 bigquery = [ "google-cloud-bigquery",]
-ibis = [ "ibis-framework[impala]", "pyarrow",]
+ibis = [ "ibis-framework", "pyarrow",]
 gdrive = [ "oauth2client", "requests",]
-test = [ "freezegun", "interrogate", "nox", "pytest", "pytest-xdist", "pytest-cov", "pytest-html", "pytest-mpl", "betamax", "betamax-serializers", "pyarrow", "holidays",]
+test = [ "bandit", "freezegun", "interrogate", "nox", "pytest", "pytest-xdist", "pytest-cov", "pytest-html", "pytest-mpl", "betamax", "betamax-serializers", "pyarrow", "holidays",]
 forecast = [ "fbprophet", "pystan", "holidays",]
 gsheets = [ "gspread_pandas",]
-all = [ "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "fbprophet", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework[impala]", "interrogate", "nox", "oauth2client", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
+all = [ "bandit", "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "fbprophet", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
 
 [tool.poetry.dev-dependencies]
 bump2version = "^1.0.1"
@@ -136,6 +137,7 @@ mypy-extensions = "^0.4.3"
 typing-extensions = "^4.0.1"
 isort = "^5.10.0"
 types-toml = "^0.10.3"
+nox-poetry = "^0.9.0"
 
 [tool.pytest.ini_options]
 minversion = "4.0.2"
