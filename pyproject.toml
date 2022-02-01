@@ -84,8 +84,6 @@ gsheets = ['gspread_pandas']
 all = ['pyarrow', 'cx_Oracle', 'pyhive', 'thrift', 'psycopg2-binary', 'pymysql', 'pymssql', 'pymongo', 'snowflake-connector-python', 'cryptography', 'snowflake-sqlalchemy', 'teradatasql', 'sqlalchemy-trino', 'sqlalchemy-redshift', 'psycopg2-binary', 'pyparsing', 'google-cloud-bigquery', 'ibis-framework[impala]', 'pyarrow', 'oauth2client', 'requests', 'freezegun', 'interrogate', 'nox', 'pytest', 'pytest-xdist', 'pytest-cov', 'pytest-html', 'pytest-mpl', 'betamax', 'betamax-serializers', 'pyarrow', 'holidays', 'fbprophet', 'pystan', 'holidays', 'gspread_pandas']
 
 [tool.poetry.dev-dependencies]
-flake8-bugbear = "^21.9.2"
-flake8-docstrings = "^1.6.0"
 bump2version = "^1.0.1"
 docutils = "0.17.1"
 Sphinx = "3.2.1"
@@ -96,7 +94,6 @@ betamax-serializers = "^0.2.1"
 pre-commit = "2.2.0"
 interrogate = "^1.5.0"
 black = "19.10b0"
-flake8 = "3.7.8"
 pylint = "^2.6.0"
 nox = "^2021.10.1"
 mypy = ">=0.810"

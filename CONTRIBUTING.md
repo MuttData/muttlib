@@ -85,7 +85,6 @@ muttlib follows [PEP8](https://www.python.org/dev/peps/pep-0008/).
 If you installed the [pre-commit hooks](#pre-commit) you shouldn't worry too much about style, since they will fix it for you or warn you about styling errors. We use the following hooks:
 
 - [black](https://github.com/psf/black): An opinionated code formatting tool that ensures consistency across all projects using it
-- [flake8](https://github.com/PyCQA/flake8): a tool to enforce style guide
 - [mypy](https://github.com/python/mypy): a static type checker for Python
 - [pylint](https://github.com/PyCQA/pylint): a source code, bug and quality checker
 
