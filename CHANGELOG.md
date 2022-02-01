@@ -53,7 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
   - Added docstring coverage badge to `README.md`
->>>>>>> 1f4b7ace47059cb38b3b70161a1f40c857a47393
 
 ## [1.4.6] - 2021-11-16
 

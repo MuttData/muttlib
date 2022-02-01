@@ -75,8 +75,8 @@ We use [pre-commit](https://pre-commit.com) to run several code scans and hooks 
 
 To install pre-commit hooks run
 ```bash
-pre-commit install
-pre-commit install -t pre-push
+poetry run pre-commit install
+poetry run pre-commit install -t pre-push
 ```
 
 ## Style guide
@@ -99,12 +99,12 @@ We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.htm
 
 As an additional tool, `muttlib` incorporates [interrogate](https://interrogate.readthedocs.io/en/latest/#) to analyze the docstring coverage. `interrogate` is a dependency installed with `[dev]` option. To run the coverage, use the following command:
 ```bash
-interrogate muttlib -c pyproject.toml
+poetry run interrogate muttlib -c pyproject.toml
 ```
 
 or for more details use the `-vv` flag:
 ```bash
-interrogate muttlib -c pyproject.toml -vv
+poetry run interrogate muttlib -c pyproject.toml -vv
 ```
 
 As a final result, `interrogate` will report if the current docstring coverage has passed or not the `fail-under` parameter configured in the pyproject.toml file.
@@ -114,7 +114,7 @@ As a final result, `interrogate` will report if the current docstring coverage h
 
 To run the default test suite run this:
 ```bash
-pytest
+poetry run pytest
 ```
 
 Note that some tests may depend on external dependencies not installed with `[dev]` if you want to run the full set of tests use `[all]` instead, running this:
@@ -124,13 +124,13 @@ poetry install -E all
 
 Run coverage:
 ```bash
-pytest --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. tests/
+poetry run pytest --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. tests/
 ```
 That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
 
 To run the tests with [nox](https://nox.thea.codes/en/stable/):
 ```bash
-nox --session tests
+poetry run nox --session tests
 ```
 
 ### Regression testing
