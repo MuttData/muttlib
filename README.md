@@ -59,6 +59,8 @@ poetry add muttlib -E mongo
 poetry add muttlib -E ibis
 ```
 
+_Note:_ the `ibis` extra requires installing binary packages. Check [`CONTRIBUTING.md`](./CONTRIBUTING.md#Prerequisites) for the full list.
+
 ### Installing custom branches from the repos
 
 From GitHub mirror:
