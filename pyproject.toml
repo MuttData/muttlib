@@ -14,6 +14,9 @@ homepage = "https://gitlab.com/mutt_data/muttlib/"
 
 [tool.black]
 line-length = 88
+skip-string-normalization = false
+multi_line_output = 3
+workers = 1
 
 [tool.interrogate]
 ignore-init-method = true
@@ -148,7 +151,7 @@ filterwarnings = [ "error:Sparse:FutureWarning", "error:The SparseArray:FutureWa
 addopts = "--cov=muttlib"
 
 [tool.pylint.MASTER]
-jobs = 0
+jobs = 1
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [ "C", "R", "fixme", "logging-format-interpolation", "logging-fstring-interpolation",]
