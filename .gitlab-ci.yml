@@ -25,7 +25,7 @@ stages:
 test:
   stage: test_stage
   script:
-  - poetry install
+  - poetry install -E all
   - poetry run python -c 'from muttlib import dbconn, utils'
   - poetry install -E forecast
   - poetry run python -c 'from muttlib import forecast'
