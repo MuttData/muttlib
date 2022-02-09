@@ -14,7 +14,6 @@ before_script:
   - apt-get update
   - apt-get install -y libkrb5-dev libsasl2-dev
   - pip install poetry
-  - poetry install -E all
 
 stages:
   - validate
@@ -26,6 +25,7 @@ stages:
 test:
   stage: test_stage
   script:
+  - poetry install -E all
   - poetry run python -c 'from muttlib import dbconn, utils'
   - poetry install -E forecast
   - poetry run python -c 'from muttlib import forecast'
@@ -42,6 +42,7 @@ test:
 lint:
   stage: test_stage
   script:
+    - poetry install
     - poetry run nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
   only:
     refs:
@@ -51,6 +52,7 @@ lint:
 docstr-cov:
   stage: test_stage
   script:
+    - poetry install
     - poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
   artifacts:
     paths:
@@ -64,6 +66,7 @@ docstr-cov:
 bandit:
   stage: test_stage
   script:
+    - poetry install
     - poetry run nox --envdir $NOX_ENV_DIR --sessions bandit
   only:
     refs:
@@ -73,6 +76,7 @@ bandit:
 pages:
   stage: deploy_stage
   script:
+  - poetry install -E all
   - cd docs
   - make html -e SPHINXOPTS=-W
   - cd ..
