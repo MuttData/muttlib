@@ -22,6 +22,11 @@ stages:
   - release_stage
   - deploy_stage
 
+echo:
+  stage: validate
+  script:
+    - echo $POETRY_CACHE_DIR
+
 test:
   stage: test_stage
   script:
