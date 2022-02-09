@@ -20,6 +20,7 @@ before_script:
   - apt-get update
   - apt-get install -y libkrb5-dev libsasl2-dev
   - pip install poetry
+  - yes | poetry cache clear pypi --all
 
 stages:
   - validate
@@ -31,13 +32,13 @@ stages:
 test:
   stage: test_stage
   script:
-  - poetry install -E all
+  - poetry install -vvv
   - poetry run python -c 'from muttlib import dbconn, utils'
-  - poetry install -E forecast
+  - poetry install -E forecast -vvv
   - poetry run python -c 'from muttlib import forecast'
-  - poetry install -E gsheets
+  - poetry install -E gsheets -vvv
   - poetry run python -c 'from muttlib import gsheetsconn'
-  - poetry install -E gdrive
+  - poetry install -E gdrive -vvv
   - poetry run python -c 'from muttlib import gdrive'
   - nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
   only:
@@ -48,7 +49,7 @@ test:
 lint:
   stage: test_stage
   script:
-    - poetry install
+    - poetry install -vvv
     - poetry run nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
   only:
     refs:
