@@ -39,7 +39,7 @@ test:
   - poetry run python -c 'from muttlib import gsheetsconn'
   - poetry install -E gdrive -vvv
   - poetry run python -c 'from muttlib import gdrive'
-  - nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
+  - poetry run nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
   only:
     refs:
       - merge_requests
