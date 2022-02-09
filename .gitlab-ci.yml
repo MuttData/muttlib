@@ -3,12 +3,18 @@ image: python:3.7
 variables:
   POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
   NOX_ENV_DIR: "$CI_PROJECT_DIR/.nox"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 cache:
   paths:
-    - "$POETRY_CACHE_DIR"
-    - "$NOX_ENV_DIR"
-  key: "$CI_PROJECT_ID"
+    - .cache/poetry
+    - .nox
+    - .cache/pip
+  key:
+    files:
+      - poetry.lock
+      - .gitlab-ci.yml
+    prefix: ${CI_PROJECT_ID}
 
 before_script:
   - apt-get update
@@ -21,11 +27,6 @@ stages:
   - version_stage
   - release_stage
   - deploy_stage
-
-make_echo:
-  stage: validate
-  script:
-  - echo $POETRY_CACHE_DIR
 
 test:
   stage: test_stage
