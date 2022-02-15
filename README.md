@@ -29,7 +29,7 @@ Current modules:
 
 ### Installing from PyPi
 
-_Note:_ `muttlib` is packaged and developed using [poetry](https://python-poetry.org).
+_Note:_ since version `1.4.13`, `muttlib` is packaged and developed using [poetry](https://python-poetry.org).
 
 Base lib:
 ```bash
