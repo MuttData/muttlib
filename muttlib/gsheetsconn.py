@@ -70,14 +70,14 @@ from pathlib import Path
 from string import ascii_letters
 from typing import Any, Dict, List
 
+from gspread_pandas import Spread, conf as gconf
+
 logger = logging.getLogger(f'gsheetsconn.{__name__}')  # NOQA
 
 try:
     import gspread_pandas  # noqa: F401 # pylint: disable=unused-import
 except ModuleNotFoundError:
     logger.warning("No GSpread support.")
-
-from gspread_pandas import Spread, conf as gconf
 
 
 class GSheetsClient:

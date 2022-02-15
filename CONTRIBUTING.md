@@ -55,7 +55,16 @@ If you find a security related bug or any kind of security rellated issue, **ple
 
 In order to build `muttlib` you will need to have installed the following system packages:
 
+On Ubuntu:
 * `libkrb5-dev`
+* `libsasl2-dev`
+
+On Fedora/CentOS:
+* `krb5-devel`
+* `cyrus-sasl-devel`
+
+#### Poetry
+`muttlib` is packaged and developed using [poetry](https://python-poetry.org). Follow [these steps](https://python-poetry.org/docs/#installation) to install it and get familiar with the [quickstart](https://python-poetry.org/docs/basic-usage/).
 
 ### Installation
 Start by cloning the repo
@@ -66,7 +75,7 @@ git clone git@gitlab.com:mutt_data/muttlib.git
 Then install all minimal dependencies for development use:
 ```bash
 cd muttlib
-pip install -e .[dev]
+poetry install
 ```
 
 ### Pre-Commit for Version Control Integration
@@ -75,8 +84,8 @@ We use [pre-commit](https://pre-commit.com) to run several code scans and hooks 
 
 To install pre-commit hooks run
 ```bash
-pre-commit install
-pre-commit install -t pre-push
+poetry run pre-commit install
+poetry run pre-commit install -t pre-push
 ```
 
 ## Style guide
@@ -85,7 +94,6 @@ muttlib follows [PEP8](https://www.python.org/dev/peps/pep-0008/).
 If you installed the [pre-commit hooks](#pre-commit) you shouldn't worry too much about style, since they will fix it for you or warn you about styling errors. We use the following hooks:
 
 - [black](https://github.com/psf/black): An opinionated code formatting tool that ensures consistency across all projects using it
-- [flake8](https://github.com/PyCQA/flake8): a tool to enforce style guide
 - [mypy](https://github.com/python/mypy): a static type checker for Python
 - [pylint](https://github.com/PyCQA/pylint): a source code, bug and quality checker
 
@@ -99,12 +107,12 @@ We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.htm
 
 As an additional tool, `muttlib` incorporates [interrogate](https://interrogate.readthedocs.io/en/latest/#) to analyze the docstring coverage. `interrogate` is a dependency installed with `[dev]` option. To run the coverage, use the following command:
 ```bash
-interrogate muttlib -c pyproject.toml
+poetry run interrogate muttlib -c pyproject.toml
 ```
 
 or for more details use the `-vv` flag:
 ```bash
-interrogate muttlib -c pyproject.toml -vv
+poetry run interrogate muttlib -c pyproject.toml -vv
 ```
 
 As a final result, `interrogate` will report if the current docstring coverage has passed or not the `fail-under` parameter configured in the pyproject.toml file.
@@ -114,23 +122,23 @@ As a final result, `interrogate` will report if the current docstring coverage h
 
 To run the default test suite run this:
 ```bash
-pytest
+poetry run pytest
 ```
 
 Note that some tests may depend on external dependencies not installed with `[dev]` if you want to run the full set of tests use `[all]` instead, running this:
 ```bash
-pip install -e .[all]
+poetry install -E all
 ```
 
 Run coverage:
 ```bash
-pytest --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. tests/
+poetry run pytest --cov-report html:cov_html --tb=short -q --cov-report term-missing --cov=. tests/
 ```
 That should output a short summary and generate a dir `cov_html/` with a detailed HTML report that can be viewed by opening `index.html` in your browser.
 
 To run the tests with [nox](https://nox.thea.codes/en/stable/):
 ```bash
-nox --session tests
+poetry run nox --session tests
 ```
 
 ### Regression testing
@@ -140,7 +148,7 @@ nox --session tests
 `muttlib` uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's [docs](https://mutt_data.gitlab.io/muttlib/) that are automatically built from [docstrings](#docstrings) and pushed by the [CI jobs](#cicd-jobs). Check the [style guide](#style-guide) section for notes on docstrings. Pushing all the docs is too cumbersome. You can generate them locally like so:
 
 ```bash
-pip install .[all]
+poetry install -E all
 cd docs
 make html
 ```
