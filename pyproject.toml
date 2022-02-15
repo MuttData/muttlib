@@ -1,6 +1,22 @@
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "muttlib"
+version = "1.4.13"
+description = "Collection of helper modules by Mutt Data."
+readme = "README.md"
+authors = [ "Mutt Data <info@muttdata.ai>",]
+keywords = [ "data",]
+classifiers = [ "Programming Language :: Python :: 3", "License :: OSI Approved :: Apache Software License", "Operating System :: OS Independent",]
+homepage = "https://gitlab.com/mutt_data/muttlib/"
+
 [tool.black]
 line-length = 88
-skip-string-normalization = true
+skip-string-normalization = false
+multi_line_output = 3
+workers = 1
 
 [tool.interrogate]
 ignore-init-method = true
@@ -11,13 +27,140 @@ ignore-private = false
 ignore-property-decorators = false
 ignore-module = false
 fail-under = 70
-exclude = ["setup.py", "docs","muttlib/lib"]
-ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
+exclude = [ "setup.py", "docs", "muttlib/lib",]
+ignore-regex = [ "^get$", "^mock_.*", ".*BaseClass.*",]
 verbose = 0
 quiet = false
 whitelist-regex = []
 color = true
 
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+[tool.isort]
+combine_as_imports = true
+force_grid_wrap = 0
+force_sort_within_sections = true
+include_trailing_comma = true
+indent = "    "
+known_third_party = [ "Cython", "numpy", "dateutil", "matplotlib", "python-dateutil", "pytz", "pyarrow", "pytest", "pandas",]
+length_sort = true
+line_length = 88
+multi_line_output = 3
+use_parentheses = true
+
+[tool.mypy]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.10"
+Deprecated = "^1.2.13"
+Jinja2 = "^3.0.3"
+pandas = ">=1.0.0"
+progressbar2 = "^3.55.0"
+PyYAML = "^6.0"
+scikit-learn = "^1.0.1"
+scipy = "^1.7.2"
+SQLAlchemy = "<1.4.0,>=1.3.0"
+numpy = ">=1.20.0,<2.0"
+jinjasql = "^0.1.8"
+ipython = "^7.29.0"
+matplotlib = "^3.5.0"
+pyarrow = { version = "6.0.0", optional = true }
+cx-Oracle = { version = "^8.3.0", optional = true }
+PyHive = { version = ">=0.6.1", optional = true }
+thrift = { version = "^0.15.0", optional = true }
+psycopg2-binary = { version = "^2.9.2", optional = true }
+PyMySQL = { version = "^1.0.2", optional = true }
+pymssql = { version = "^2.2.2", optional = true }
+pymongo = { version = "^3.12.1", optional = true }
+snowflake-connector-python = { version = "^2.7.1", optional = true }
+cryptography = { version = "3.4.7", optional = true }
+snowflake-sqlalchemy = { version = "1.2.4", optional = true }
+teradatasql = { version = "17.0.0.8", optional = true }
+sqlalchemy-trino = { version = "0.4.0", optional = true }
+sqlalchemy-redshift = { version = "0.8.6", optional = true }
+pyparsing = { version = "<3", optional = true }
+google-cloud-bigquery = { version = "2.24.0", optional = true }
+ibis-framework = { version = "1.4.0", extras = [ "impala",], optional = true }
+oauth2client = { version = "^4.1.3", optional = true }
+requests = { version = "^2.26.0", optional = true }
+freezegun = { version = "^1.1.0", optional = true }
+interrogate = { version = "^1.5.0", optional = true }
+nox = { version = "^2021.10.1", optional = true }
+pytest = { version = "^6.2.5", optional = true }
+pytest-xdist = { version = "^2.4.0", optional = true }
+pytest-cov = { version = "^3.0.0", optional = true }
+pytest-html = { version = "^3.1.1", optional = true }
+pytest-mpl = { version = "0.12", optional = true }
+betamax = { version = "^0.8.1", optional = true }
+betamax-serializers = { version = "^0.2.1", optional = true }
+holidays = { version = ">=0.10.2", optional = true }
+fbprophet = { version = "^0.7.1", optional = true }
+pystan = { version = "2.19.1.1", optional = true }
+gspread-pandas = { version = "^2.3.0", optional = true }
+wrapt = "1.11.2"
+types-requests = "^2.27.7"
+types-PyMySQL = "^1.0.11"
+bandit = { version = "^1.7.2", optional = true }
+
+[tool.poetry.extras]
+pyarrow = [ "pyarrow",]
+oracle = [ "cx_Oracle",]
+hive = [ "pyhive", "thrift",]
+postgres = [ "psycopg2-binary",]
+mysql = [ "pymysql",]
+sqlserver = [ "pymssql",]
+mongo = [ "pymongo",]
+snowflake = [ "snowflake-connector-python", "cryptography", "snowflake-sqlalchemy",]
+teradata = [ "teradatasql",]
+trino = [ "sqlalchemy-trino",]
+redshift = [ "sqlalchemy-redshift", "psycopg2-binary", "pyparsing",]
+bigquery = [ "google-cloud-bigquery",]
+ibis = [ "ibis-framework", "pyarrow",]
+gdrive = [ "oauth2client", "requests",]
+test = [ "bandit", "freezegun", "interrogate", "nox", "pytest", "pytest-xdist", "pytest-cov", "pytest-html", "pytest-mpl", "betamax", "betamax-serializers", "pyarrow", "holidays",]
+forecast = [ "fbprophet", "pystan", "holidays",]
+gsheets = [ "gspread_pandas",]
+all = [ "bandit", "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "fbprophet", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
+
+[tool.poetry.dev-dependencies]
+bump2version = "^1.0.1"
+docutils = "0.17.1"
+Sphinx = "3.2.1"
+sphinx-rtd-theme = "^1.0.0"
+m2r2 = "^0.3.1"
+betamax = "^0.8.1"
+betamax-serializers = "^0.2.1"
+pre-commit = "2.2.0"
+interrogate = "^1.5.0"
+black = "19.10b0"
+pylint = "^2.6.0"
+nox = "^2021.10.1"
+mypy = ">=0.810"
+mypy-extensions = "^0.4.3"
+typing-extensions = "^4.0.1"
+isort = "^5.10.0"
+types-toml = "^0.10.3"
+nox-poetry = "^0.9.0"
+
+[tool.pytest.ini_options]
+minversion = "4.0.2"
+testpaths = "tests"
+doctest_optionflags = [ "NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL",]
+xfail_strict = true
+filterwarnings = [ "error:Sparse:FutureWarning", "error:The SparseArray:FutureWarning",]
+addopts = "--cov=muttlib"
+
+[tool.pylint.MASTER]
+jobs = 1
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [ "C", "R", "fixme", "logging-format-interpolation", "logging-fstring-interpolation",]
+
+[tool.pylint.FORMAT]
+max-line-length = 88
+
+[tool.coverage.run]
+omit = [ "tests/*",]
+
+[tool.coverage.report]
+fail_under = 80

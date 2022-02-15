@@ -1,13 +1,12 @@
 """Entrypoint for nox."""
-import nox
+import nox_poetry as nox
 
 
 @nox.session(reuse_venv=True, python=["3.7", "3.8"])
 def tests(session):
     """Run all tests."""
-    session.install("pip==20.3.1")
-    session.install(".[all]", "--use-deprecated=legacy-resolver")
-    cmd = ["pytest", "-n", "auto", "--mpl"]
+    session.run_always("poetry", "install", "-E", "all", "-vv", external=True)
+    cmd = ["poetry", "run", "pytest", "-n", "auto", "--mpl"]
     if session.posargs:
         cmd.extend(session.posargs)
     session.run(*cmd)
@@ -16,8 +15,7 @@ def tests(session):
 @nox.session(reuse_venv=True, python=["3.7", "3.8"])
 def precommit_hooks(session):
     """Run all pre-commit hooks."""
-    session.install("pip==20.3.1")
-    session.install(".[all]", "--use-deprecated=legacy-resolver")
+    session.run_always("poetry", "install", "-E", "all", "-vv", external=True)
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
 
@@ -25,6 +23,5 @@ def precommit_hooks(session):
 @nox.session(reuse_venv=True, python=["3.7", "3.8"])
 def bandit(session):
     """Run all pre-commit hooks."""
-    session.install("pip==20.3.1")
-    session.install("bandit==1.7.1", "--use-deprecated=legacy-resolver")
+    session.run_always("poetry", "install", "-E", "all", "-vv", external=True)
     session.run("bandit", "-r", "muttlib/", "-ll", "-c", "bandit.yaml")
