@@ -104,8 +104,8 @@ deploy:
   script:
     - export PYPI_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
     - export PYPI_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
-    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - poetry publish --build -r ${PYPI_REPO} -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}
+    - poetry config repositories.deploy-repo ${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
+    - poetry publish --build -r deploy-repo -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}
   only:
     refs:
       - master
