@@ -113,7 +113,7 @@ deploy:
 tag_release_version:
   stage: version_stage
   script:
-    - echo "TAG=v$(grep __version__ ./muttlib/__init__.py | cut -d "'" -f 2)" >> variables.env
+    - echo "TAG=v$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env
