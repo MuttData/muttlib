@@ -55,7 +55,16 @@ If you find a security related bug or any kind of security rellated issue, **ple
 
 In order to build `muttlib` you will need to have installed the following system packages:
 
+On Ubuntu:
 * `libkrb5-dev`
+* `libsasl2-dev`
+
+On Fedora/CentOS:
+* `krb5-devel`
+* `cyrus-sasl-devel`
+
+#### Poetry
+`muttlib` is packaged and developed using [poetry](https://python-poetry.org). Follow [these steps](https://python-poetry.org/docs/#installation) to install it and get familiar with the [quickstart](https://python-poetry.org/docs/basic-usage/).
 
 ### Installation
 Start by cloning the repo

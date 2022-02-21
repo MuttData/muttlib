@@ -1,7 +1,24 @@
 image: python:3.7
 
+variables:
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
+  NOX_ENV_DIR: "$CI_PROJECT_DIR/.nox"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/poetry
+    - .nox
+    - .cache/pip
+  key:
+    files:
+      - poetry.lock
+      - .gitlab-ci.yml
+    prefix: ${CI_PROJECT_ID}
+
 before_script:
   - apt-get update
+  - apt-get install -y libkrb5-dev libsasl2-dev
   - pip install poetry
 
 stages:
@@ -14,15 +31,15 @@ stages:
 test:
   stage: test_stage
   script:
-  - poetry install
+  - poetry install -vvv
   - poetry run python -c 'from muttlib import dbconn, utils'
-  - poetry install -E forecast
+  - poetry install -E forecast -vvv
   - poetry run python -c 'from muttlib import forecast'
-  - poetry install -E gsheets
+  - poetry install -E gsheets -vvv
   - poetry run python -c 'from muttlib import gsheetsconn'
-  - poetry install -E gdrive
+  - poetry install -E gdrive -vvv
   - poetry run python -c 'from muttlib import gdrive'
-  - nox --sessions tests
+  - poetry run nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
   only:
     refs:
       - merge_requests
@@ -31,8 +48,8 @@ test:
 lint:
   stage: test_stage
   script:
-    - poetry install
-    - poetry run nox --sessions precommit_hooks
+    - poetry install -vvv
+    - poetry run nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
   only:
     refs:
       - merge_requests
@@ -56,7 +73,7 @@ bandit:
   stage: test_stage
   script:
     - poetry install
-    - poetry run nox --sessions bandit
+    - poetry run nox --envdir $NOX_ENV_DIR --sessions bandit
   only:
     refs:
       - merge_requests
@@ -87,8 +104,8 @@ deploy:
   script:
     - export PYPI_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
     - export PYPI_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
-    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - poetry publish --build -r ${PYPI_REPO} -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}
+    - poetry config repositories.deploy-repo ${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
+    - poetry publish --build -r deploy-repo -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}
   only:
     refs:
       - master
@@ -96,7 +113,7 @@ deploy:
 tag_release_version:
   stage: version_stage
   script:
-    - echo "TAG=v$(grep __version__ ./muttlib/__init__.py | cut -d "'" -f 2)" >> variables.env
+    - echo "TAG=v$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env

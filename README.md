@@ -29,6 +29,8 @@ Current modules:
 
 ### Installing from PyPi
 
+_Note:_ since version `1.4.13`, `muttlib` is packaged and developed using [poetry](https://python-poetry.org).
+
 Base lib:
 ```bash
 poetry add muttlib
@@ -57,6 +59,8 @@ poetry add muttlib -E mongo
 poetry add muttlib -E ibis
 ```
 
+_Note:_ the `ibis` extra requires installing binary packages. Check [`CONTRIBUTING.md`](./CONTRIBUTING.md#Prerequisites) for the full list.
+
 ### Installing custom branches from the repos
 
 From GitHub mirror:
@@ -76,24 +80,6 @@ See the [documentation](https://mutt_data.gitlab.io/muttlib/) to get started wit
 ## Contributing
 
 We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](CONTRIBUTING.md).
-
-## Credits
-
-- Aldo Escobar
-- Alejandro Rusi
-- Cristián Antuña
-- Eric Rishmuller
-- Fabian Wolfmann
-- Gabriel Miretti
-- Javier Mermet
-- Jose Castagnino
-- Juan Pampliega
-- Luis Alberto Hernandez
-- Mateo de Monasterio
-- Matías Battocchia
-- Pablo Lorenzatto
-- Pedro Ferrari
-- Santiago Hernandez
 
 ## License
 `muttlib` is licensed under the [Apache License 2.0](LICENCE).
