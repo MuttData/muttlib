@@ -201,11 +201,14 @@ class DriveClient:
 class DriveNode:
     """Generic Drive __fs__ node.
 
-    Parameters:
+    Parameters
     -----------
-        gid (str): id given by google drive to the resource
-        name (str): humanly readable name for the resource
-        parent (DriveNode): parent node in the hierarchy
+        gid: str
+            id given by google drive to the resource
+        name: str
+            humanly readable name for the resource
+        parent: DriveNode
+            parent node in the hierarchy
     """
 
     def __init__(self, gid, name, parent):
@@ -396,10 +399,12 @@ class DriveFolder(DriveNode):
     def touch(self, filename, mimetype):
         """Create a file of the specified mimetype on this folder.
 
-        Parameters:
+        Parameters
         -----------
-            filename (str): the filename of the new file
-            mimetype (str or GDriveMimeType): a valid mimetype
+        filename: str
+            the filename of the new file
+        mimetype: str or GDriveMimeType
+            a valid mimetype
         """
         if isinstance(mimetype, GDriveMimeType):
             mimetype = mimetype.value

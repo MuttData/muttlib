@@ -84,7 +84,7 @@ pages:
   script:
   - poetry install -E all
   - cd docs
-  - make html -e SPHINXOPTS=-W
+  - poetry run make html -e SPHINXOPTS=-W
   - cd ..
   - mv docs/build/html/ public/
   artifacts:
