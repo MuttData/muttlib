@@ -34,9 +34,10 @@ release = __muttlib_version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.napoleon', 'sphinx.ext.autodoc', 'm2r2']
+extensions = ['sphinx.ext.napoleon', 'sphinx.ext.autodoc', 'm2r2', 'sphinx.ext.autosummary', ]
 
 napoleon_google_docstring = False
+autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
