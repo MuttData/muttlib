@@ -126,6 +126,8 @@ class BaseClient(abc.ABC):
                 elif attr == 'driver':
                     value = format_drivername(self.dialect, value)
                 attr = 'drivername'
+            self.conn_url = self.conn_url.set(**{attr: value})
+            return None
         else:
             _cls = object
             target = self

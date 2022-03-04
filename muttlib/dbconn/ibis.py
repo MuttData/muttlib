@@ -119,7 +119,7 @@ class IbisClient:
                 host=self.hdfs_host, port=self.hdfs_port, user=self.hdfs_username
             )
 
-        client = ibis.backends.impala.connect(
+        client = ibis.backends.impala.Backend.do_connect(
             host=self.host,
             port=self.port,
             database=self.database,

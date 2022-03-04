@@ -48,26 +48,26 @@ def test_temp_hdfs_path_changes_config():
 
 
 def test_execute_with_no_client():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
         ibis_cli.execute(q, return_cursor=False)
-        impala.connect.assert_called_once()
-        impala.connect.return_value.raw_sql.assert_called_once_with(q, results=False)
+        impala.do_connect.assert_called_once()
+        impala.do_connect.return_value.raw_sql.assert_called_once_with(q, results=False)
 
 
 def test_execute_with_client():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
         ibis_cli.execute(q, client=client, return_cursor=False)
-        impala.connect.assert_not_called()
+        impala.do_connect.assert_not_called()
         client.raw_sql.assert_called_once_with(q, results=False)
 
 
 def test_execute_returns_cursor():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         client = MagicMock()
         q = "SELECT *"
@@ -76,38 +76,38 @@ def test_execute_returns_cursor():
 
 
 def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*hdfs\Wclient.*"):
             ibis_cli.to_frame(q, via_hdfs=True)
-        impala.connect.assert_called_once()
+        impala.do_connect.assert_called_once()
 
 
 def test_to_frame_via_hdfs_and_no_cache_dir_fails():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="",)
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*dir.*"):
             ibis_cli.to_frame(q, via_hdfs=True)
-        impala.connect.assert_called_once()
+        impala.do_connect.assert_called_once()
 
 
 def test_to_frame_via_hdfs_and_refresh_cache():
-    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
-        "pyarrow.parquet.read_table"
-    ) as pq:
+    with patch("ibis.backends.impala.Backend") as impala, patch(
+        "shutil.rmtree"
+    ) as rm, patch("pyarrow.parquet.read_table") as pq:
         ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="")
         q = "SELECT *"
         call_to_frame_with_cache_dir(
             q, local_tmp_table_dir=MagicMock(), to_frame_kwargs={"refresh_cache": True}
         )
-        impala.connect.assert_called_once()
+        impala.do_connect.assert_called_once()
         rm.assert_called_once()
 
 
 def test_to_frame_via_hdfs_creates_tmp_table():
-    with patch("ibis.backends.impala") as impala, patch(
+    with patch("ibis.backends.impala.Backend") as impala, patch(
         "muttlib.dbconn.ibis.urlparse"
     ) as parse, patch("muttlib.utils.make_dirs") as make_dirs, patch(
         "muttlib.dbconn.ibis.pq"
@@ -124,8 +124,10 @@ def test_to_frame_via_hdfs_creates_tmp_table():
             hash_str_return_value=hashed_sql,
             client_kwargs={"hdfs_database": test_db},
         )
-        impala.connect.assert_called_once()
-        queries = [x[0][0] for x in impala.connect.return_value.raw_sql.call_args_list]
+        impala.do_connect.assert_called_once()
+        queries = [
+            x[0][0] for x in impala.do_connect.return_value.raw_sql.call_args_list
+        ]
         # assert all queries were made to ibis_tmp
         assert all(f"ibis_tmp_{hashed_sql}" in x for x in queries)
         # assert query order
@@ -148,7 +150,7 @@ def test_to_frame_via_hdfs_creates_tmp_table():
 
 
 def test_to_frame_via_hdfs_create_tmp_table_fails():
-    with patch("ibis.backends.impala") as impala, patch(
+    with patch("ibis.backends.impala.Backend") as impala, patch(
         "muttlib.dbconn.ibis.sleep"
     ) as sleep, patch("muttlib.dbconn.ibis.urlparse") as parse, patch(
         "muttlib.utils.make_dirs"
@@ -160,62 +162,66 @@ def test_to_frame_via_hdfs_create_tmp_table_fails():
         with pytest.raises(ValueError, match=r".*HDFS.*") as e:
             call_to_frame_with_cache_dir(q, local_tmp_table_dir)
         # assert retries
-        impala.connect.assert_called_once()
-        assert impala.connect.return_value.hdfs.get.call_count > 1
+        impala.do_connect.assert_called_once()
+        assert impala.do_connect.return_value.hdfs.get.call_count > 1
 
 
 def test_to_frame_via_hdfs_and_erase_cache_dir():
-    with patch("ibis.backends.impala") as impala, patch("shutil.rmtree") as rm, patch(
-        "pyarrow.parquet.read_table"
-    ) as pq:
+    with patch("ibis.backends.impala.Backend") as impala, patch(
+        "shutil.rmtree"
+    ) as rm, patch("pyarrow.parquet.read_table") as pq:
         local_tmp_table_dir = MagicMock()
         local_tmp_table_dir.exists.return_value = True
         q = "SELECT *"
         call_to_frame_with_cache_dir(
             q, local_tmp_table_dir, to_frame_kwargs={"erase_cache_dir": True}
         )
-        impala.connect.assert_called_once()
+        impala.do_connect.assert_called_once()
         rm.assert_called_once_with(local_tmp_table_dir, ignore_errors=True)
 
 
 def test_to_frame_no_hdfs_returns_empty_df():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
         impala.connect.return_value.raw_sql.return_value.fetchall.return_value = None
         df = ibis_cli.to_frame(q)
         assert df.empty
-        impala.connect.return_value.raw_sql.assert_called_once_with(q, results=True)
-        impala.connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
-        impala.connect.return_value.raw_sql.return_value.release.assert_called_once()
-        impala.connect.return_value.close.assert_called_once()
+        impala.do_connect.return_value.raw_sql.assert_called_once_with(q, results=True)
+        impala.do_connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
+        impala.do_connect.return_value.raw_sql.return_value.release.assert_called_once()
+        impala.do_connect.return_value.close.assert_called_once()
 
 
 def test_to_frame_no_hdfs_returns_non_empty_df():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
         values = [[1, 2], [3, 4]]
         columns = [["column1"], ["column2"]]
         test_df = pd.DataFrame(values, columns=[c[0] for c in columns])
-        impala.connect.return_value.raw_sql.return_value.description = columns
-        impala.connect.return_value.raw_sql.return_value.fetchall.return_value = values
+        impala.do_connect.return_value.raw_sql.return_value.description = columns
+        impala.do_connect.return_value.raw_sql.return_value.fetchall.return_value = (
+            values
+        )
         df = ibis_cli.to_frame(q)
         assert df.equals(test_df)
-        impala.connect.return_value.raw_sql.assert_called_once_with(q, results=True)
-        impala.connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
-        impala.connect.return_value.raw_sql.return_value.release.assert_called_once()
-        impala.connect.return_value.close.assert_called_once()
+        impala.do_connect.return_value.raw_sql.assert_called_once_with(q, results=True)
+        impala.do_connect.return_value.raw_sql.return_value.fetchall.assert_called_once()
+        impala.do_connect.return_value.raw_sql.return_value.release.assert_called_once()
+        impala.do_connect.return_value.close.assert_called_once()
 
 
 def test_to_frame_no_hdfs_fails_and_closes_connection():
-    with patch("ibis.backends.impala") as impala:
+    with patch("ibis.backends.impala.Backend") as impala:
         ibis_cli = IbisClient("host")
         q = "example query"
-        impala.connect.return_value.raw_sql.side_effect = ValueError("test error")
+        impala.do_connect.return_value.raw_sql.side_effect = ValueError("test error")
         with pytest.raises(ValueError, match=r"test error"):
             df = ibis_cli.to_frame(q)
-            impala.connect.return_value.raw_sql.assert_called_once_with(q, results=True)
-            impala.connect.return_value.raw_sql.return_value.fetchall.assert_not_called()
-            impala.connect.return_value.raw_sql.return_value.release.assert_not_called()
-            impala.connect.return_value.close.assert_called_once()
+            impala.do_connect.return_value.raw_sql.assert_called_once_with(
+                q, results=True
+            )
+            impala.do_connect.return_value.raw_sql.return_value.fetchall.assert_not_called()
+            impala.do_connect.return_value.raw_sql.return_value.release.assert_not_called()
+            impala.do_connect.return_value.close.assert_called_once()
