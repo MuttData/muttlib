@@ -4,12 +4,10 @@ from time import sleep
 from urllib.parse import urlparse
 
 import pandas as pd
-
-import fsspec
+from ibis.backends import impala
 
 import muttlib.utils as utils
 from muttlib.dbconn.base import parse_sql_statement_decorator
-from ibis.backends import impala
 
 logger = logging.getLogger(__name__)
 
