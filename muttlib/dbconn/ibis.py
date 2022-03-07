@@ -5,8 +5,11 @@ from urllib.parse import urlparse
 
 import pandas as pd
 
+import fsspec
+
 import muttlib.utils as utils
 from muttlib.dbconn.base import parse_sql_statement_decorator
+from ibis.backends import impala
 
 logger = logging.getLogger(__name__)
 
@@ -115,11 +118,11 @@ class IbisClient:
             and self.hdfs_port is not None
             and self.hdfs_username is not None
         ):
-            self.hdfs_client = ibis.backends.impala.hdfs_connect(
+            self.hdfs_client = ibis.impala.hdfs_connect(
                 host=self.hdfs_host, port=self.hdfs_port, user=self.hdfs_username
             )
 
-        client = ibis.backends.impala.Backend.do_connect(
+        client = ibis.impala.connect(
             host=self.host,
             port=self.port,
             database=self.database,
