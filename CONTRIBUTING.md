@@ -1,4 +1,4 @@
-# Contributing to muttlib
+# Contributing
 Thanks for your interest in contributing to `muttlib` 🎉. These are the guidelines for contributions. Reading them will help you get started on how to make useful contributions.
 
 ## Foreword
@@ -22,8 +22,8 @@ This guide is not final. It will evolve over time, as we learn and add new voice
   - [Decorator](#decorator)
   - [Release](#release)
 - [PRs](#prs)
-  - [WIP](#wip)
-  - [RFC](#rfc)
+  - [Work in Progress](#wip)
+  - [Ready for Comments](#rfc)
   - [CI/CD jobs](#cicd-jobs)
 - [Rules of Thumb](#rules-of-thumb)
 
@@ -38,12 +38,12 @@ Before submitting an issue, first check on the [issues tracker](https://gitlab.c
 
 ### Labels
 
-| name | description | shortcuts |
-| ---------- | ----------- | ------ |
-| `bug` | Report a bug | [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=bug) for `bug` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Bug) one
-|`feature-request`|Request for a new feature|[Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=feature-request) for `feature-request` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Feature) one
-|`enhancement`|Propose an enhancement|[Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=enhancement) for `enhancement` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Enhancement) one
-|`discussion`|Start a new discussion|[Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=discussion) for `discussion` or [create](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Discussion) one
+| name | description |
+| ---------- | ----------- |
+| `bug` | Report a [new bug](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Bug) or [Look](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=bug) for existing `bug` issues
+|`feature-request`|Request for a [new feature](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Feature) or [find](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=feature-request) existing`feature-request`s
+|`enhancement`|[Propose an enhancement](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Enhancement) or [Find existing proposals](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=enhancement) for `enhancement`
+|`discussion`|Start a [new discussion](https://gitlab.com/mutt_data/muttlib/-/issues/new?issuable_template=Discussion) or [Search](https://gitlab.com/mutt_data/muttlib/issues?scope=all&utf8=✓&state=opened&label_name[]=discussion) for existing `discussion` issues.
 
 ### Security issues
 If you find a security related bug or any kind of security rellated issue, **please DO NOT file a public issue**. Sensitive security-related issues should be reported to privately to the repo owner along with a PoC if possible. You can [send us an email](mailto:security@muttdata.ai) and we'll go from there.
@@ -142,7 +142,7 @@ poetry run nox --session tests
 ```
 
 ### Regression testing
-[Regression testing](https://en.wikipedia.org/wiki/Regression_testing) to ensure new changes have not broken previously working features.
+[Regression test](https://en.wikipedia.org/wiki/Regression_testing) ensures new changes have not broken previously working features.
 
 ## Documentation
 `muttlib` uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's [docs](https://mutt_data.gitlab.io/muttlib/) that are automatically built from [docstrings](#docstrings) and pushed by the [CI jobs](#cicd-jobs). Check the [style guide](#style-guide) section for notes on docstrings. Pushing all the docs is too cumbersome. You can generate them locally like so:
@@ -249,7 +249,7 @@ RFC stands for **R**equest **f**or **C**omments. It means you consider the issue
 
 ### CI/CD jobs
 
-All commits pushed to branches in pull requests will trigger CI jobs that install `muttlib` in a gitlab-provided docker-env and all the extras, run all tests and check for linting. Look at [.gitlab-ci.yml](.gitlab-ci.yml) for more details on this and as well as the official [docs](https://docs.gitlab.com/ce/ci/README.html). Note that only PRs that pass the CI will be allowed to merge.
+All commits pushed to branches in pull requests will trigger CI jobs that install `muttlib` in a gitlab-provided docker-env and all the extras, run all tests and check for linting. Look at [.gitlab-ci.yml](https://gitlab.com/mutt_data/muttlib/-/blob/master/.gitlab-ci.yml) for more details on this and as well as the official [Gitlab's docs](https://docs.gitlab.com/ce/ci/README.html). Note that only PRs that pass the CI will be allowed to merge.
 
 `NOTE:` If your commit message contains [ci skip] or [skip ci], without capitalization, the job will be skipped i.e. no CI job will be spawned for that push.
 
@@ -260,6 +260,6 @@ Alternatively, one can pass the ci.skip Git push option if using Git 2.10 or new
 **Important note on coverage:** A regex that captures the output from `pytest-cov` has been set from Settings -> CI/CD -> General Pipelines -> Test coverage parsing
 
 ## Rules of Thumb
-- Important changes should be mentioned in the [README.md](README.md)
+- Important changes should be mentioned in the [README.md](https://gitlab.com/mutt_data/muttlib/-/blob/master/README.md)
 - Documentation must be updated.
-- Every change should be present in the [CHANGELOG.md](CHANGELOG.md)
+- Every change should be present in the [CHANGELOG.md](https://gitlab.com/mutt_data/muttlib/-/blob/master/CHANGELOG.md)

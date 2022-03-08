@@ -59,7 +59,7 @@ poetry add muttlib -E mongo
 poetry add muttlib -E ibis
 ```
 
-_Note:_ the `ibis` extra requires installing binary packages. Check [`CONTRIBUTING.md`](./CONTRIBUTING.md#Prerequisites) for the full list.
+_Note:_ the `ibis` extra requires installing binary packages. Check [CONTRIBUTING.md](https://gitlab.com/mutt_data/muttlib/-/blob/master/CONTRIBUTING.md#prerequisites) for the full list.
 
 ### Installing custom branches from the repos
 
@@ -79,7 +79,7 @@ See the [documentation](https://mutt_data.gitlab.io/muttlib/) to get started wit
 
 ## Contributing
 
-We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](CONTRIBUTING.md).
+We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](https://mutt_data.gitlab.io/muttlib/contributing.html).
 
 ## License
-`muttlib` is licensed under the [Apache License 2.0](LICENCE).
+`muttlib` is licensed under the [Apache License 2.0](https://gitlab.com/mutt_data/muttlib/-/blob/master/LICENCE).
