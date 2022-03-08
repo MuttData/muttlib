@@ -158,7 +158,7 @@ And open `docs/build/html/index.html` on your browser of choice.
 Alternatively you can see the docs for the `master` branch [here.](https://mutt_data.gitlab.io/muttlib/index.html)
 
 ## Versioning
-`muttlib` uses [SemVer](https://semver.org). To keep things easy, we've included [bump2version](https://github.com/c4urself/bump2version/) as a dev dependency. You can use `bump2version minor` to increase the minor number.
+`muttlib` uses [SemVer](https://semver.org). To keep things easy, we've included [bump2version](https://github.com/c4urself/bump2version/) as a dev dependency. You can use `poetry run bump2version minor` to increase the minor number.
 
 Please remember to bump the version when submitting your PR!
 
