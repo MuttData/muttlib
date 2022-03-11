@@ -22,7 +22,7 @@ from muttlib import __version__ as __muttlib_version__
 # -- Project information -----------------------------------------------------
 
 project = 'muttlib'
-copyright = '2021, Mutt Data'
+copyright = '2022, Mutt Data'
 author = 'Mutt Data'
 
 # The full version, including alpha/beta/rc tags

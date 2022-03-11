@@ -5,3 +5,4 @@
    :hidden:
 
    modules
+   contributing
