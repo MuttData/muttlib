@@ -141,6 +141,7 @@ typing-extensions = "^4.0.1"
 isort = "^5.10.0"
 types-toml = "^0.10.3"
 nox-poetry = "^0.9.0"
+lxml = "^4.8.0"
 
 [tool.pytest.ini_options]
 minversion = "4.0.2"
