@@ -17,7 +17,7 @@ except ModuleNotFoundError:
     logger.debug("No Ibis support.")
 
 
-IBIS_DB_TYPE = 'ibis'
+IBIS_DB_TYPE = "ibis"
 
 
 class IbisClient:
@@ -83,7 +83,7 @@ class IbisClient:
         temp_db=None,
         temp_hdfs_path=None,
         timeout=None,
-        options={'SYNC_DDL': True},
+        options={"SYNC_DDL": True},
     ):
         self.host = host
         self.port = port
@@ -103,11 +103,11 @@ class IbisClient:
         # user that cannot write to `/tmp/ibis`)
         # See https://stackoverflow.com/a/47543691/2149400
         if temp_db is not None or temp_hdfs_path is not None:
-            with ibis.config.config_prefix('impala'):
+            with ibis.config.config_prefix("impala"):
                 if temp_db is not None:
-                    ibis.config.set_option('temp_db', temp_db)
+                    ibis.config.set_option("temp_db", temp_db)
                 if temp_hdfs_path is not None:
-                    ibis.config.set_option('temp_hdfs_path', temp_hdfs_path)
+                    ibis.config.set_option("temp_hdfs_path", temp_hdfs_path)
 
     def _connect(self):
         if (
@@ -158,7 +158,7 @@ class IbisClient:
             if cache_dir is None:
                 raise ValueError("No local dir to save hdfs files was specified!")
 
-            tmp_table = f'{table_prefix}_tmp_{utils.hash_str(sql)}'
+            tmp_table = f"{table_prefix}_tmp_{utils.hash_str(sql)}"
             local_tmp_table_dir = cache_dir / tmp_table
             if refresh_cache:
                 shutil.rmtree(local_tmp_table_dir, ignore_errors=True)
@@ -215,9 +215,9 @@ class IbisClient:
                 """
                 create_stmt = utils.get_default_jinja_template(create_sql).render(
                     **{
-                        'hdfs_database': self.hdfs_database,
-                        'tmp_table': tmp_table,
-                        'sql': sql,
+                        "hdfs_database": self.hdfs_database,
+                        "tmp_table": tmp_table,
+                        "sql": sql,
                     }
                 )
 
@@ -230,9 +230,9 @@ class IbisClient:
                 """
                 insert_stmt = utils.get_default_jinja_template(insert_sql).render(
                     **{
-                        'hdfs_database': self.hdfs_database,
-                        'tmp_table': tmp_table,
-                        'sql': sql,
+                        "hdfs_database": self.hdfs_database,
+                        "tmp_table": tmp_table,
+                        "sql": sql,
                     }
                 )
                 self.execute(insert_stmt, client)
@@ -241,7 +241,7 @@ class IbisClient:
             except Exception as e:
                 logger.error(e)
                 if i < self._max_retries:
-                    backoff_time = min(self._max_backoff, 2 ** i)
+                    backoff_time = min(self._max_backoff, 2**i)
                     logger.debug(
                         f"SQL create/insert has failed {i} times. Retrying in "
                         f"{backoff_time} seconds."
@@ -257,9 +257,9 @@ class IbisClient:
         thoroughly downloaded.
         """
         hdfs_files = (
-            client.table(f'{self.hdfs_database}.{tmp_table}').files()['Path'].tolist()
+            client.table(f"{self.hdfs_database}.{tmp_table}").files()["Path"].tolist()
         )
-        hdfs_dir = urlparse(hdfs_files[0]).path.rsplit('/', 1)[0]
+        hdfs_dir = urlparse(hdfs_files[0]).path.rsplit("/", 1)[0]
         logger.debug(f"Downloading data from {hdfs_dir}...")
         if not local_tmp_dir.exists():
             utils.make_dirs(local_tmp_dir)
@@ -273,13 +273,13 @@ class IbisClient:
             except Exception as e:
                 logger.error(e)
 
-            all_globs = local_tmp_dir.glob('*')  # We only check depth = 0
+            all_globs = local_tmp_dir.glob("*")  # We only check depth = 0
             parquet_files = [f for f in all_globs if f.is_file()]
             if len(parquet_files) > 0:
                 # Check if parquets were downloaded to the local tmp table dir
                 break
             elif i < self._max_retries:
-                backoff_time = min(self._max_backoff, 2 ** i)
+                backoff_time = min(self._max_backoff, 2**i)
                 logger.debug(
                     f"HDFS parquet-get has failed {i} times. Retrying in "
                     f"{backoff_time} seconds."

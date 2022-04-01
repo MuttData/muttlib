@@ -4,7 +4,7 @@ from muttlib.dbconn.base import EngineBaseClient
 
 logger = logging.getLogger(__name__)
 
-MYSQL_DB_TYPE = 'mysql'
+MYSQL_DB_TYPE = "mysql"
 
 
 try:
@@ -16,5 +16,5 @@ except ModuleNotFoundError:
 class MySqlClient(EngineBaseClient):
     """Create MySql DB client."""
 
-    default_driver = 'pymysql'
-    default_dialect = 'mysql'
+    default_driver = "pymysql"
+    default_dialect = "mysql"

@@ -32,7 +32,13 @@ from muttlib.dbconn import parse_connection_string
                 "username": "username",
             },
         ),
-        ("postgresql:///", {"db_type": "postgres", "dialect": "postgresql",}),
+        (
+            "postgresql:///",
+            {
+                "db_type": "postgres",
+                "dialect": "postgresql",
+            },
+        ),
         ("postgresql://", {"db_type": "postgres", "dialect": "postgresql"}),
         (
             "postgresql://localhost",

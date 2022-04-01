@@ -10,9 +10,9 @@ def test_RedshiftClient():
         username="username",
     )
     engine = client.get_engine()
-    assert str(engine.url) == 'redshift://username:password@host:5439/database'
+    assert str(engine.url) == "redshift://username:password@host:5439/database"
 
-    client.database = 'test_db'
+    client.database = "test_db"
     client._engine = None
     engine = client.get_engine()
-    assert str(engine.url) == 'redshift://username:password@host:5439/test_db'
+    assert str(engine.url) == "redshift://username:password@host:5439/test_db"

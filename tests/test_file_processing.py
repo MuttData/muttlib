@@ -114,7 +114,7 @@ def test_rbr_as_decorator_inside_processpool(
     func, base_fn, expected_fn, expected_exc, ok_unless_exception
 ):
     """Test decorator usage inside process pool to ensure there won't be pickling or other
-       issues.
+    issues.
     """
     with run_rbr_helper_contextmanager(
         base_fn, expected_fn, expected_exc=expected_exc
@@ -193,7 +193,9 @@ def test_DummyPoolExecutor():
 
 @pytest.mark.parametrize(
     "func, base_fn, expected_fn, expected_exc, ok_unless_exception",
-    [(f_ok, f"{READY_PREFIX}_test", f"{DONE_PREFIX}_test", None, False),],
+    [
+        (f_ok, f"{READY_PREFIX}_test", f"{DONE_PREFIX}_test", None, False),
+    ],
 )
 def test_process_new_files(
     func, base_fn, expected_fn, expected_exc, ok_unless_exception
@@ -209,7 +211,7 @@ def test_process_new_files(
 
 
 def proc_func(fn):
-    Path(fn).rename(str(fn).replace('ready_', 'done_'))
+    Path(fn).rename(str(fn).replace("ready_", "done_"))
 
 
 @pytest.mark.parametrize(

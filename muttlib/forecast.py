@@ -84,13 +84,13 @@ from inspect import isclass, signature
 
 import numpy as np
 import pandas as pd
-from fbprophet import Prophet
+from prophet import Prophet
 from sklearn.base import BaseEstimator
 
 
 class SkProphet(Prophet):
 
-    DS = 'ds'
+    DS = "ds"
 
     def __init__(
         self,
@@ -137,7 +137,7 @@ class SkProphet(Prophet):
 
     def fit(
         self, X, y=None, copy=True, **fit_params
-    ):  # pylint: disable=arguments-differ
+    ):  # pylint: disable=arguments-differ,arguments-renamed
         """Scikit learn's like fit on the Prophet model.
 
         Parameters
@@ -174,12 +174,14 @@ class SkProphet(Prophet):
             X = X.rename({self.sk_date_column: self.DS}, axis=1)
         if y is not None:
             if isinstance(y, str) and y in X.columns:
-                X = X.rename({y: 'y'}, axis=1)
+                X = X.rename({y: "y"}, axis=1)
             else:
-                X['y'] = self._as_np_vector(y)
+                X["y"] = self._as_np_vector(y)
         return super().fit(X, **fit_params)
 
-    def predict(self, X, copy=True):  # pylint: disable=arguments-differ
+    def predict(
+        self, X, copy=True
+    ):  # pylint: disable=arguments-differ,arguments-renamed
         """Scikit learn's predict (returns predicted values).
 
         Parameters
@@ -206,17 +208,17 @@ class SkProphet(Prophet):
     def get_params(self, deep=True):
         """Scikit learn's get_params (returns the estimator's params)."""
         prophet_attrs = [
-            attr for attr in signature(Prophet.__init__).parameters if attr != 'self'
+            attr for attr in signature(Prophet.__init__).parameters if attr != "self"
         ]
         sk_attrs = [
-            attr for attr in signature(self.__init__).parameters if attr != 'self'
+            attr for attr in signature(self.__init__).parameters if attr != "self"
         ]
         prophet_params = {a: getattr(self, a, None) for a in prophet_attrs}
         sk_params = {a: getattr(self, a, None) for a in sk_attrs}
         if deep:
             sk_params = deepcopy(sk_params)
             prophet_params = deepcopy(prophet_params)
-        sk_params['prophet_kwargs'].update(prophet_params)
+        sk_params["prophet_kwargs"].update(prophet_params)
         return sk_params
 
     def set_params(self, **params):
@@ -227,13 +229,13 @@ class SkProphet(Prophet):
         - Lastly, if not provided in neither way but currently set, the value is not erased.
         """
         sk_kws = [
-            attr for attr in signature(self.__init__).parameters if attr != 'self'
+            attr for attr in signature(self.__init__).parameters if attr != "self"
         ]
-        current_prophet_kws = getattr(self, 'prophet_kwargs', {})
+        current_prophet_kws = getattr(self, "prophet_kwargs", {})
         explicit_prophet_kws = {}
         args_passed_prophet_kws = {}
         for attr, value in params.items():
-            if attr == 'prophet_kwargs':
+            if attr == "prophet_kwargs":
                 explicit_prophet_kws = value
             elif attr not in sk_kws:
                 args_passed_prophet_kws[attr] = value
@@ -244,7 +246,7 @@ class SkProphet(Prophet):
         prophet_kws.update(args_passed_prophet_kws)
         for attr, value in prophet_kws.items():
             setattr(self, attr, value)
-        setattr(self, 'prophet_kwargs', prophet_kws)
+        setattr(self, "prophet_kwargs", prophet_kws)
         self._set_my_extra_regressors()
         return self
 
@@ -261,10 +263,10 @@ class SkProphet(Prophet):
                 self.add_regressor(**regressor)
             else:
                 raise TypeError(
-                    'Invalid extra_regressor in SkProphet.'
-                    'Extra regressors must be strings or dicts with '
-                    '{name: *column_name*, prior_scale: _, standardize: _, '
-                    'mode: _}'
+                    "Invalid extra_regressor in SkProphet."
+                    "Extra regressors must be strings or dicts with "
+                    "{name: *column_name*, prior_scale: _, standardize: _, "
+                    "mode: _}"
                 )
 
     def _as_np_vector(self, y):
@@ -297,11 +299,11 @@ class SkProphet(Prophet):
         interpreter.
         """
         return (
-            f'{self.__class__.__name__}('
+            f"{self.__class__.__name__}("
             f'sk_date_column="{self.sk_date_column}", '
-            f'sk_yhat_only={self.sk_yhat_only}, '
-            f'sk_extra_regressors={self.extra_regressors}'
-            f'prophet_kwargs={self.prophet_kwargs})'
+            f"sk_yhat_only={self.sk_yhat_only}, "
+            f"sk_extra_regressors={self.extra_regressors}"
+            f"prophet_kwargs={self.prophet_kwargs})"
         )
 
     __str__ = __repr__
@@ -309,7 +311,7 @@ class SkProphet(Prophet):
 
 class StepsSelectorEstimator(BaseEstimator):
     def __init__(
-        self, estimator_class, amount_of_steps, estimator_kwargs=None, sort_col='date'
+        self, estimator_class, amount_of_steps, estimator_kwargs=None, sort_col="date"
     ):
         """An estimator that only uses a certain amount of rows on fit.
 
@@ -373,18 +375,18 @@ class StepsSelectorEstimator(BaseEstimator):
         if deep:
             kwargs = deepcopy(kwargs)
         return {
-            'estimator_class': self.estimator_class,
-            'amount_of_steps': self.amount_of_steps,
-            'sort_col': self.sort_col,
-            'estimator_kwargs': kwargs,
+            "estimator_class": self.estimator_class,
+            "amount_of_steps": self.amount_of_steps,
+            "sort_col": self.sort_col,
+            "estimator_kwargs": kwargs,
         }
 
     def set_params(self, **params):
         """Sets the estimator's params to \*\*params."""  # pylint: disable=anomalous-backslash-in-string
-        self.estimator_class = Classer.from_obj(params['estimator_class'])
-        self.amount_of_steps = params['amount_of_steps']
-        self.sort_col = params['sort_col']
-        self.estimator_kwargs = params['estimator_kwargs']
+        self.estimator_class = Classer.from_obj(params["estimator_class"])
+        self.amount_of_steps = params["amount_of_steps"]
+        self.sort_col = params["sort_col"]
+        self.estimator_kwargs = params["estimator_kwargs"]
         self._estimator = self.estimator_class.new(**self.estimator_kwargs)
         return self
 
@@ -393,10 +395,10 @@ class StepsSelectorEstimator(BaseEstimator):
         interpreter.
         """
         return (
-            f'{self.__class__.__name__}('
-            f'estimator_class={Classer.from_obj(self.estimator_class)}, '
-            f'amount_of_steps={self.amount_of_steps}, '
-            f'estimator_kwargs={self.estimator_kwargs})'
+            f"{self.__class__.__name__}("
+            f"estimator_class={Classer.from_obj(self.estimator_class)}, "
+            f"amount_of_steps={self.amount_of_steps}, "
+            f"estimator_kwargs={self.estimator_kwargs})"
         )
 
     __str__ = __repr__
@@ -440,6 +442,6 @@ class Classer:
         """Text representation of the object to look it nicely in the
         interpreter.
         """
-        return f'{self.__class__.__name__}({self._class.__name__})'
+        return f"{self.__class__.__name__}({self._class.__name__})"
 
     __str__ = __repr__

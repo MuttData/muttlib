@@ -13,7 +13,7 @@ except ModuleNotFoundError:
     logger.debug("No Teradata support.")
 
 
-TERADATA_DB_TYPE = 'teradata'
+TERADATA_DB_TYPE = "teradata"
 
 
 class TeradataClient(BaseClient):
@@ -111,14 +111,14 @@ class TeradataClient(BaseClient):
         df: pd.DataFrame
             Dataframe with data to be inserted.
         """
-        full_table = f'{self.database}.{self.table}'
+        full_table = f"{self.database}.{self.table}"
         logger.info("Going to insert data into %s...", full_table)
 
         connection = self._connect()
         with closing(connection.cursor()) as cursor:
-            cols_placeholder = ('?, ' * len(df.columns))[:-2]  # remove trailing comma
+            cols_placeholder = ("?, " * len(df.columns))[:-2]  # remove trailing comma
             # Note: teradata insert doesn't guarantee that row order is kept
             records = tuple(df.values.tolist())
-            sql_insert = f'INSERT INTO {full_table} ({cols_placeholder})'
+            sql_insert = f"INSERT INTO {full_table} ({cols_placeholder})"
             cursor.execute(sql_insert, records)
         logger.info("Inserted %s records into %s", len(df), full_table)

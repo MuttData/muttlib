@@ -19,7 +19,7 @@ def parse_sql_statement_decorator(func):
     def wrapper(self, *args, **kwargs):
         args = list(args)  # type: ignore
         sql = utils.path_or_string(args[0])
-        format_params = kwargs.get('params', None)
+        format_params = kwargs.get("params", None)
         if format_params:
             try:
                 sql = sql.format(**format_params)
@@ -48,9 +48,9 @@ def format_drivername(dialect: str, driver: Optional[str] = None):
         str: Formatted schema generated.
     """
     parts = [dialect]
-    if driver is not None and driver != '':
+    if driver is not None and driver != "":
         parts += [driver]
-    return '+'.join(parts)
+    return "+".join(parts)
 
 
 class BaseClient(abc.ABC):
@@ -103,9 +103,9 @@ class BaseClient(abc.ABC):
 
     def __getattr__(self, attr):
         if attr in self._conn_url_delegated:
-            if attr == 'dialect':
+            if attr == "dialect":
                 return self.conn_url.get_backend_name()
-            elif attr == 'driver':
+            elif attr == "driver":
                 return self.conn_url.get_driver_name()
             else:
                 _cls = URL
@@ -120,12 +120,12 @@ class BaseClient(abc.ABC):
         if attr in self._conn_url_delegated:
             _cls = URL
             target = self.conn_url
-            if attr in ('dialect', 'driver'):
-                if attr == 'dialect':
+            if attr in ("dialect", "driver"):
+                if attr == "dialect":
                     value = format_drivername(value, self.driver)
-                elif attr == 'driver':
+                elif attr == "driver":
                     value = format_drivername(self.dialect, value)
-                attr = 'drivername'
+                attr = "drivername"
         else:
             _cls = object
             target = self
@@ -143,7 +143,7 @@ class BaseClient(abc.ABC):
     @staticmethod
     def _cursor_columns(cursor):
         # TODO: This can be moved out of the class
-        if hasattr(cursor, 'keys'):
+        if hasattr(cursor, "keys"):
             return cursor.keys()
         else:
             return [c[0] for c in cursor.description]
@@ -175,7 +175,7 @@ class BaseClient(abc.ABC):
             return df
 
     def insert_from_frame(
-        self, df, table, if_exists='append', index=False, connection=None, **kwargs
+        self, df, table, if_exists="append", index=False, connection=None, **kwargs
     ):
         """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
@@ -226,7 +226,7 @@ class EngineBaseClient(BaseClient):
         return self._engine
 
     def insert_from_frame(
-        self, df, table, if_exists='append', index=False, connection=None, **kwargs
+        self, df, table, if_exists="append", index=False, connection=None, **kwargs
     ):
         """Insert from a Pandas dataframe."""
         # TODO: Validate types here?
