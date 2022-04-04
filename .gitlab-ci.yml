@@ -32,7 +32,7 @@ stages:
 test:
   stage: test_stage
   script:
-    - pip install nox
+    - pip install nox-poetry
     - nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
   only:
     refs:
@@ -42,7 +42,7 @@ test:
 lint:
   stage: test_stage
   script:
-    - pip install nox
+    - pip install nox-poetry
     - nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
   only:
     refs:
@@ -66,7 +66,7 @@ docstr-cov:
 bandit:
   stage: test_stage
   script:
-    - pip install nox
+    - pip install nox-poetry
     - nox --envdir $NOX_ENV_DIR --sessions bandit
   only:
     refs:
