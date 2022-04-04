@@ -36,7 +36,7 @@ connectors = {
 
 def get_client(creds):
     """Get a db client from a credentials dict."""
-    db_type = creds.pop("db_type")
+    db_type = creds.pop('db_type')
     return db_type, connectors[db_type](**creds)
 
 

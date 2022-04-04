@@ -16,7 +16,7 @@ try:
 except ModuleNotFoundError:
     logger.debug("No Hive support.")
 
-HIVE_DB_TYPE = "hive"
+HIVE_DB_TYPE = 'hive'
 
 
 class HiveClient(BaseClient):
@@ -51,8 +51,8 @@ class HiveClient(BaseClient):
         self,
         host,
         port=10_000,
-        auth="NOSASL",
-        database="default",
+        auth='NOSASL',
+        database='default',
         username=None,
         password=None,
     ):
@@ -153,7 +153,7 @@ class HiveClient(BaseClient):
         if not logs:
             return progress
         log = logs[offset]
-        m = re.search(r"\((\d+).*?(\d+)\)", log)
+        m = re.search(r'\((\d+).*?(\d+)\)', log)
         if m:
             progress, total = m.groups()
             progress = int(progress) / int(total)

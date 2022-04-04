@@ -12,13 +12,13 @@ try:
 except ModuleNotFoundError:
     logger.debug("No Oracle support.")
 
-ORACLE_DB_TYPE = "oracle"
+ORACLE_DB_TYPE = 'oracle'
 
 
 class OracleClient(EngineBaseClient):
     """Create Oracle DB client."""
 
-    default_dialect = "oracle"
+    default_dialect = 'oracle'
 
     def __init__(self, schema=None, **kwargs):
         super().__init__(**kwargs)
@@ -26,14 +26,14 @@ class OracleClient(EngineBaseClient):
 
     @property
     def conn_str(self):
-        dsn = cx_Oracle.makedsn(
+        dsn = cx_Oracle.makedsn(  # pylint: disable=I1101
             self.host, self.port, service_name=self.database
-        )  # pylint: disable=I1101
-        db_uri = f"{self.dialect}://{self.username}:{self.password}@{dsn}"
+        )
+        db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
         return db_uri
 
     def _connect(self):
-        connect_args = {"encoding": "UTF-8", "nencoding": "UTF-8"}
+        connect_args = {'encoding': 'UTF-8', 'nencoding': 'UTF-8'}
         conn = self.get_engine(connect_args=connect_args).connect()
         if self.schema is not None:
             conn.connection.current_schema = self.schema
@@ -59,7 +59,7 @@ class OracleClient(EngineBaseClient):
         if fix_clobs:
             dtyp = {
                 c: VARCHAR(df[c].str.len().max())
-                for c in df.columns[df.dtypes == "object"].tolist()
+                for c in df.columns[df.dtypes == 'object'].tolist()
             }
         else:
             dtyp = df.dtypes

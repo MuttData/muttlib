@@ -10,7 +10,7 @@ try:
 except ModuleNotFoundError:
     logger.debug("No Mongo support.")
 
-MONGO_DB_TYPE = "mongo"
+MONGO_DB_TYPE = 'mongo'
 
 
 class MongoClient:
@@ -55,15 +55,15 @@ class MongoClient:
         self.replica_set = replica_set
 
     def _build_conn_uri(self):
-        uri = "mongodb://"
+        uri = 'mongodb://'
         if self.username is not None:
             uri += f'{self.username}{":"+self.password if self.password else ""}@'
         if self.seeds is None:
             uri += f'{self.host}{":"+self.port if self.port else ""}'
         else:
             uri += ",".join(self.seeds)
-        uri += f"/{self.database}"
-        uri += f"?replicaSet={self.replica_set}" if self.replica_set is not None else ""
+        uri += f'/{self.database}'
+        uri += f'?replicaSet={self.replica_set}' if self.replica_set is not None else ''
         return uri
 
     def _connect(self, custom_uri=None):
@@ -76,7 +76,7 @@ class MongoClient:
         if db is None:
             db = self._connect()
         collection = db[collection]
-        find_func = getattr(collection, "find")  # noqa
+        find_func = getattr(collection, 'find')  # noqa
         res = find_func(query, fields)
         if (type(limit) == int) and (limit > 0):
             res = res.limit(limit)
@@ -87,7 +87,7 @@ class MongoClient:
         cursor = self._find(collection, query=query, fields=fields, limit=limit)
         df = json_normalize(cursor)
         if no_id and not df.empty:
-            del df["_id"]
+            del df['_id']
         return df
 
     def insert(self, collection, query=None, db=None):

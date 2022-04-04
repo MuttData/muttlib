@@ -16,7 +16,7 @@ except ModuleNotFoundError:
     logger.debug("No BigQuery support.")
 
 
-BIGQUERY_DB_TYPE = "bigquery"
+BIGQUERY_DB_TYPE = 'bigquery'
 
 
 class BigQueryClient(BaseClient):
@@ -214,5 +214,5 @@ class BigQueryClient(BaseClient):
         try:
             connection.get_table(table)  # Make an API request.
         except exceptions.NotFound:
-            self.execute(sql, params={"table_id": table}, connection=connection)
+            self.execute(sql, params={'table_id': table}, connection=connection)
             logger.info(f"Created {table}")

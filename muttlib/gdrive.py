@@ -19,14 +19,14 @@ import httplib2
 import requests
 from oauth2client.service_account import ServiceAccountCredentials
 
-logger = logging.getLogger(f"gdrive.{__name__}")
+logger = logging.getLogger(f'gdrive.{__name__}')
 
 
 class GDriveMimeType(enum.Enum):
     """MimeTypes for Google Drive."""
 
-    FOLDER = "application/vnd.google-apps.folder"
-    SPREADSHEET = "application/vnd.google-apps.spreadsheet"
+    FOLDER = 'application/vnd.google-apps.folder'
+    SPREADSHEET = 'application/vnd.google-apps.spreadsheet'
 
 
 class GDriveURL(enum.Enum):
@@ -37,8 +37,8 @@ class GDriveURL(enum.Enum):
 
 
 SCOPE = [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive",
+    'https://spreadsheets.google.com/feeds',
+    'https://www.googleapis.com/auth/drive',
 ]
 
 
@@ -59,7 +59,7 @@ class DriveClient:
         self.session = session
 
         if auth_file is None:
-            auth_file = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+            auth_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
 
         if auth_file is not None:
             self.auth = ServiceAccountCredentials.from_json_keyfile_name(
@@ -70,14 +70,14 @@ class DriveClient:
     def login(self):
         """Authorize client."""
         if not self.auth.access_token or (
-            hasattr(self.auth, "access_token_expired")
+            hasattr(self.auth, 'access_token_expired')
             and self.auth.access_token_expired
         ):
             http = httplib2.Http()
             self.auth.refresh(http)
 
         self.session.headers.update(
-            {"Authorization": f"Bearer {self.auth.access_token}"}
+            {'Authorization': f'Bearer {self.auth.access_token}'}
         )
 
     def request(
@@ -110,13 +110,13 @@ class DriveClient:
             Headers for the request
         """
         if method.upper() not in [
-            "DELETE",
-            "GET",
-            "HEAD",
-            "OPTIONS",
-            "PATCH",
-            "POST",
-            "PUT",
+            'DELETE',
+            'GET',
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'POST',
+            'PUT',
         ]:
             raise ValueError(f"Invalid HTTP method: {method}")
         response = getattr(self.session, method)(
@@ -124,7 +124,7 @@ class DriveClient:
         )
         if not response.ok:
             try:
-                logger.error(response.json()["error"]["errors"])
+                logger.error(response.json()['error']['errors'])
             except KeyError:
                 pass
             response.raise_for_status()
@@ -166,13 +166,13 @@ class DriveClient:
         """
         response_items = []
         if method.upper() not in [
-            "DELETE",
-            "GET",
-            "HEAD",
-            "OPTIONS",
-            "PATCH",
-            "POST",
-            "PUT",
+            'DELETE',
+            'GET',
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'POST',
+            'PUT',
         ]:
             raise ValueError(f"Invalid HTTP method: {method}")
         response = getattr(self.session, method)(
@@ -181,9 +181,9 @@ class DriveClient:
 
         response_items.extend(response.get(key))
 
-        page_token = response.get("nextPageToken", None)
+        page_token = response.get('nextPageToken', None)
         while page_token is not None:
-            params["pageToken"] = page_token
+            params['pageToken'] = page_token
             response = getattr(self.session, method)(
                 endpoint,
                 json=json,
@@ -193,7 +193,7 @@ class DriveClient:
                 headers=headers,
             ).json()
             response_items.extend(response.get(key))
-            page_token = response.get("nextPageToken", None)
+            page_token = response.get('nextPageToken', None)
 
         return response_items
 
@@ -262,12 +262,12 @@ class DriveFolder(DriveNode):
         self.shared_drives = shared_drives
 
         r = self.drive_client.request(
-            "get",
+            'get',
             f"{GDriveURL.FILES.value}/{gid}",
-            params={"supportsAllDrives": self.shared_drives},
+            params={'supportsAllDrives': self.shared_drives},
         ).json()
 
-        super().__init__(gid, r.get("name"), parent)
+        super().__init__(gid, r.get('name'), parent)
 
         if path:
             self.path = path / self.name
@@ -280,9 +280,9 @@ class DriveFolder(DriveNode):
     def __truediv__(self, other):
         """Pathlib-like tree downwards navigation."""
         folders = set(
-            x.get("id")
+            x.get('id')
             for x in self._children
-            if x.get("mimeType") == GDriveMimeType.FOLDER.value
+            if x.get('mimeType') == GDriveMimeType.FOLDER.value
         )
         if other not in folders:
             raise ValueError("other node not in this node or not a folder")
@@ -298,18 +298,18 @@ class DriveFolder(DriveNode):
     def _init_node(self):
         """Init the folder with it's children."""
         children = self.drive_client.full_request(
-            "get",
+            'get',
             GDriveURL.FILES.value,
-            "files",
+            'files',
             params={
-                "q": f"trashed=False and ('{self.gid}' in parents)",
-                "corpora": "allDrives" if self.shared_drives else "user",
-                "includeItemsFromAllDrives": self.shared_drives,
-                "supportsAllDrives": self.shared_drives,
+                'q': f"trashed=False and ('{self.gid}' in parents)",
+                'corpora': 'allDrives' if self.shared_drives else 'user',
+                'includeItemsFromAllDrives': self.shared_drives,
+                'supportsAllDrives': self.shared_drives,
             },
         )
 
-        if str(self.path) in ("/", "root"):
+        if str(self.path) in ('/', 'root'):
             # adding files shared with me to root if
             # - they have no parent
             # - shared drive folders
@@ -318,32 +318,32 @@ class DriveFolder(DriveNode):
             possible_parents = set()
 
             files_shared_with_me = self.drive_client.full_request(
-                "get",
+                'get',
                 GDriveURL.FILES.value,
-                "files",
-                params={"q": "trashed=False and sharedWithMe=True"},
+                'files',
+                params={'q': "trashed=False and sharedWithMe=True"},
             )
 
             other_files.extend(files_shared_with_me)
 
             if self.shared_drives:
                 files_from_shared_drives = self.drive_client.full_request(
-                    "get",
+                    'get',
                     GDriveURL.FILES.value,
-                    "files",
+                    'files',
                     params={
-                        "corpora": "allDrives",
-                        "includeItemsFromAllDrives": "true",
-                        "supportsAllDrives": "true",
-                        "q": "trashed=False",
+                        'corpora': 'allDrives',
+                        'includeItemsFromAllDrives': 'true',
+                        'supportsAllDrives': 'true',
+                        'q': 'trashed=False',
                     },
                 )
 
                 other_drives = set(
                     [
-                        drive.get("id")
+                        drive.get('id')
                         for drive in self.drive_client.full_request(
-                            "get", GDriveURL.DRIVES.value, "drives"
+                            'get', GDriveURL.DRIVES.value, 'drives'
                         )
                     ]
                 )
@@ -354,15 +354,15 @@ class DriveFolder(DriveNode):
 
             for other_file in other_files:
                 r = self.drive_client.request(
-                    "get",
+                    'get',
                     f"{GDriveURL.FILES.value}/{other_file.get('id')}",
                     params={
-                        "fields": "parents,id",
-                        "supportsAllDrives": self.shared_drives,
+                        'fields': "parents,id",
+                        'supportsAllDrives': self.shared_drives,
                     },
                 ).json()
 
-                parents = r.get("parents")
+                parents = r.get('parents')
                 if (
                     parents is None
                     # or self.gid in parents
@@ -378,9 +378,9 @@ class DriveFolder(DriveNode):
             for _child in self._children:
                 logger.info(
                     "%s (%s)\t\t%s",
-                    _child.get("name"),
-                    _child.get("id"),
-                    _child.get("mimeType"),
+                    _child.get('name'),
+                    _child.get('id'),
+                    _child.get('mimeType'),
                 )
         return self._children
 
@@ -410,10 +410,10 @@ class DriveFolder(DriveNode):
             mimetype = mimetype.value
 
         r = self.drive_client.request(
-            "post",
+            'post',
             GDriveURL.FILES.value,
-            json={"parents": [self.gid], "name": filename, "mimeType": mimetype},
-            params={"supportsAllDrives": self.shared_drives},
+            json={'parents': [self.gid], 'name': filename, 'mimeType': mimetype},
+            params={'supportsAllDrives': self.shared_drives},
         )
         self._children.append(r.json())
         return r.json()
@@ -456,14 +456,14 @@ class DriveFolder(DriveNode):
             Whether the permission granting should transfer ownership
         """
         valid_roles = (
-            "owner",
-            "organizer",
-            "fileOrganizer",
-            "writer",
-            "commenter",
-            "reader",
+            'owner',
+            'organizer',
+            'fileOrganizer',
+            'writer',
+            'commenter',
+            'reader',
         )
-        valid_permtypes = ("user", "group", "domain", "anyone")
+        valid_permtypes = ('user', 'group', 'domain', 'anyone')
 
         if role not in valid_roles:
             raise ValueError(f"Unexpected role {role}. Valid roles are: {valid_roles}")
@@ -480,21 +480,21 @@ class DriveFolder(DriveNode):
         body = dict(emailAddress=email, role=role, type=permtype)
 
         return self.drive_client.request(
-            "post", endpoint, json=body, params=params
+            'post', endpoint, json=body, params=params
         ).json()
 
     def rm(self, gid):
         """Delete a node within this folder."""
         self.drive_client.request(
-            "delete",
+            'delete',
             f"{GDriveURL.FILES.value}/{gid}",
-            params={"supportsAllDrives": self.shared_drives},
+            params={'supportsAllDrives': self.shared_drives},
         )
-        self._children = [x for x in self._children if x.get("id") != gid]
+        self._children = [x for x in self._children if x.get('id') != gid]
         return
 
 
-def GDrive(creds_file, gid="root", verbose=False, shared_drives=False, session=None):
+def GDrive(creds_file, gid='root', verbose=False, shared_drives=False, session=None):
     """Entrypoint util to get a filesystem from root."""
     d = DriveClient(creds_file, session=session)
     return DriveFolder(gid, d, verbose=verbose, shared_drives=shared_drives)

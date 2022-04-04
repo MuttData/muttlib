@@ -14,7 +14,7 @@ homepage = "https://gitlab.com/mutt_data/muttlib/"
 
 [tool.black]
 line-length = 88
-skip-string-normalization = false
+skip-string-normalization = true
 multi_line_output = 3
 workers = 1
 

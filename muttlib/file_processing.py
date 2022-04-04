@@ -209,8 +209,8 @@ def get_new_files(in_dir, only_ready=False, ready_prefix=READY_PREFIX):
         Paths matching the ready prefix.
     """
 
-    filter_prefix = ready_prefix if only_ready else ""
-    fns = glob.glob(os.path.join(in_dir, filter_prefix + "*"))
+    filter_prefix = ready_prefix if only_ready else ''
+    fns = glob.glob(os.path.join(in_dir, filter_prefix + '*'))
     return fns
 
 
