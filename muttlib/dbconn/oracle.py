@@ -26,9 +26,9 @@ class OracleClient(EngineBaseClient):
 
     @property
     def conn_str(self):
-        dsn = cx_Oracle.makedsn(  # pylint: disable=I1101
+        dsn = cx_Oracle.makedsn(
             self.host, self.port, service_name=self.database
-        )
+        )  # pylint: disable=I1101
         db_uri = f"{self.dialect}://{self.username}:{self.password}@{dsn}"
         return db_uri
 
