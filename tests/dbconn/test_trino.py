@@ -10,9 +10,9 @@ def test_TrinoClient():
         username="username",
     )
     engine = client.get_engine()
-    assert str(engine.url) == "trino://username:password@host:443/database"
+    assert str(engine.url) == 'trino://username:password@host:443/database'
 
-    client.database = "test_db"
+    client.database = 'test_db'
     client._engine = None
     engine = client.get_engine()
-    assert str(engine.url) == "trino://username:password@host:443/test_db"
+    assert str(engine.url) == 'trino://username:password@host:443/test_db'

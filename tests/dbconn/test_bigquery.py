@@ -114,7 +114,7 @@ def test_insert_from_frame_create_first_true(dummy_db_credentials):
         "google.cloud.bigquery.client.Client.load_table_from_dataframe"
     ) as bq_load:
 
-        df = pd.DataFrame({"col1": [1], "col2": [3.0]})
+        df = pd.DataFrame({'col1': [1], 'col2': [3.0]})
 
         bq_cli = BigQueryClient(**dummy_db_credentials)
         bq_cli.credentials = True
@@ -159,24 +159,24 @@ def test_insert_from_frame_create_first_true_get_table_not_found(
     bq_cli.credentials = True
 
     with patch("google.cloud.bigquery.client.Client") as connection, patch.object(
-        bq_cli, "execute"
+        bq_cli, 'execute'
     ) as execute_mock:
 
         bq_cli.connection = connection
-        connection.get_table.side_effect = exceptions.NotFound("Not Found")
+        connection.get_table.side_effect = exceptions.NotFound('Not Found')
 
         q = "CREATE TABLE {table_id}"
-        params = {"table_id": "test"}
+        params = {'table_id': 'test'}
 
         bq_cli.insert_from_frame(
             df,
-            table=params["table_id"],
+            table=params['table_id'],
             create_first=True,
             create_sql=q.format(**params),
             connection=connection,
         )
 
-        connection.get_table.assert_called_once_with(params["table_id"])
+        connection.get_table.assert_called_once_with(params['table_id'])
 
         execute_mock.assert_called_once_with(
             q.format(**params),

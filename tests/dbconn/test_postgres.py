@@ -10,16 +10,16 @@ def test_PgClient():
         username="username",
     )
     engine = client.get_engine()
-    assert str(engine.url) == "postgresql://username:password@host:5555/database"
+    assert str(engine.url) == 'postgresql://username:password@host:5555/database'
 
-    client.database = "test_db"
+    client.database = 'test_db'
     client._engine = None
     engine = client.get_engine()
-    assert str(engine.url) == "postgresql://username:password@host:5555/test_db"
+    assert str(engine.url) == 'postgresql://username:password@host:5555/test_db'
 
-    client.driver = "psycopg2"
+    client.driver = 'psycopg2'
     client._engine = None
     engine = client.get_engine()
     assert (
-        str(engine.url) == "postgresql+psycopg2://username:password@host:5555/test_db"
+        str(engine.url) == 'postgresql+psycopg2://username:password@host:5555/test_db'
     )

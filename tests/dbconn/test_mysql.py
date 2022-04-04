@@ -12,7 +12,7 @@ def test_url():
         username="username",
     )
     engine = client.get_engine()
-    assert str(engine.url) == "mysql+pymysql://username:password@host:5544/database"
+    assert str(engine.url) == 'mysql+pymysql://username:password@host:5544/database'
 
 
 def test_insert_from_frame_connects():
@@ -33,6 +33,6 @@ def test_insert_from_frame_connects():
         df.to_sql.assert_called_once_with(
             table,
             create_engine.return_value.connect.return_value.__enter__.return_value,
-            if_exists="append",
+            if_exists='append',
             index=False,
         )

@@ -22,10 +22,10 @@ def engine_baseClient():
 
 
 def test_base_insert_from_frame_connection_not_none(engine_baseClient):
-    df = pd.DataFrame({"col1": ["1"], "col2": ["3.0"]})
+    df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine, patch.object(
-        df, "to_sql"
+        df, 'to_sql'
     ) as mock_to_sql:
 
         table = "test_table"
@@ -41,7 +41,7 @@ def test_base_insert_from_frame_connection_not_none(engine_baseClient):
         mock_to_sql.assert_called_once_with(
             table,
             engine,
-            if_exists="append",
+            if_exists='append',
             index=False,
         )
 
@@ -75,11 +75,11 @@ def test_base_to_frame_data_none(engine_baseClient):
 
 def test_base_setattr_getattr(engine_baseClient):
 
-    engine_baseClient.__setattr__("driver", "pymysql")
-    assert engine_baseClient.__getattr__("driver") == "pymysql"
+    engine_baseClient.__setattr__('driver', "pymysql")
+    assert engine_baseClient.__getattr__('driver') == "pymysql"
 
-    engine_baseClient.__setattr__("dialect", "mysql")
-    assert engine_baseClient.__getattr__("dialect") == "mysql"
+    engine_baseClient.__setattr__('dialect', "mysql")
+    assert engine_baseClient.__getattr__('dialect') == "mysql"
 
 
 @patch("muttlib.dbconn.base.BaseClient.__abstractmethods__", set())
@@ -106,14 +106,14 @@ def test_base_insert_from_frame_if_exists_replace_fail_rise_not_implemented_meth
             dialect="mysql",
         )
 
-        df = pd.DataFrame({"col1": ["1"], "col2": ["3.0"]})
+        df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test_table"
 
         with pytest.raises(NotImplementedError):
-            base_cli.insert_from_frame(df, table, if_exists="replace")
+            base_cli.insert_from_frame(df, table, if_exists='replace')
 
         with pytest.raises(NotImplementedError):
-            base_cli.insert_from_frame(df, table, if_exists="fail")
+            base_cli.insert_from_frame(df, table, if_exists='fail')
 
 
 @patch("muttlib.dbconn.base.BaseClient.__abstractmethods__", set())
@@ -125,7 +125,7 @@ def test_base_insert_from_frame_index_true_rise_not_implemented_method():
             dialect="mysql",
         )
 
-        df = pd.DataFrame({"col1": ["1"], "col2": ["3.0"]})
+        df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test_table"
 
         with pytest.raises(NotImplementedError):
@@ -143,9 +143,9 @@ def test_base_insert_from_frame_chunk():
 
         base_cli._connect = create_engine.get_engine()
 
-        df = pd.DataFrame({"col1": ["1"], "col2": ["3.0"]})
+        df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test"
 
-        with patch.object(base_cli, "execute") as execute_mock:
+        with patch.object(base_cli, 'execute') as execute_mock:
             base_cli.insert_from_frame(df, table, connection=None)
             execute_mock.assert_called_once()

@@ -10,4 +10,4 @@ def test_SqlServerClient():
             username="username",
         )
     except ValueError as e:
-        assert str(e) == "Database argument is not optional!"
+        assert str(e) == 'Database argument is not optional!'

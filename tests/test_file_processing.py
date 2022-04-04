@@ -211,7 +211,7 @@ def test_process_new_files(
 
 
 def proc_func(fn):
-    Path(fn).rename(str(fn).replace("ready_", "done_"))
+    Path(fn).rename(str(fn).replace('ready_', 'done_'))
 
 
 @pytest.mark.parametrize(
