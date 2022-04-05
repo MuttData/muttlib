@@ -21,6 +21,7 @@ before_script:
   - apt-get install -y libkrb5-dev libsasl2-dev python3-dev
   - pip install -U pip
   - pip install poetry
+  - poetry config virtualenvs.create false
 
 stages:
   - validate
