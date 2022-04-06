@@ -1,4 +1,4 @@
-image: python:3.9
+image: python:3.8.5
 
 variables:
   POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
@@ -18,10 +18,9 @@ cache:
 
 before_script:
   - apt-get update
-  - apt-get install -y libkrb5-dev libsasl2-dev python3-dev
+  - apt upgrade -y
+  - apt-get install -y libkrb5-dev libsasl2-dev python3-dev libblas-dev liblapack-dev g++ gfortran cmake swig
   - pip install -U pip
-  - pip install poetry
-  - poetry config virtualenvs.create false
 
 stages:
   - validate
@@ -33,7 +32,7 @@ stages:
 test:
   stage: test_stage
   script:
-    - pip install nox-poetry
+    - pip install nox
     - nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
   only:
     refs:
@@ -43,7 +42,7 @@ test:
 lint:
   stage: test_stage
   script:
-    - pip install nox-poetry
+    - pip install nox
     - nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
   only:
     refs:
@@ -53,8 +52,8 @@ lint:
 docstr-cov:
   stage: test_stage
   script:
-    - poetry install
-    - poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
+    - pip install interrogate
+    - interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
   artifacts:
     paths:
       - docs_coverage.svg
@@ -67,7 +66,7 @@ docstr-cov:
 bandit:
   stage: test_stage
   script:
-    - pip install nox-poetry
+    - pip install nox
     - nox --envdir $NOX_ENV_DIR --sessions bandit
   only:
     refs:
