@@ -86,7 +86,12 @@ def test_to_frame_via_hdfs_and_no_hdfs_client_fails():
 
 def test_to_frame_via_hdfs_and_no_cache_dir_fails():
     with patch("ibis.backends.impala") as impala:
-        ibis_cli = IbisClient("host", hdfs_host="", hdfs_port="", hdfs_username="",)
+        ibis_cli = IbisClient(
+            "host",
+            hdfs_host="",
+            hdfs_port="",
+            hdfs_username="",
+        )
         q = "SELECT *"
         with pytest.raises(ValueError, match=r".*dir.*"):
             ibis_cli.to_frame(q, via_hdfs=True)

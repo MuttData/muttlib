@@ -257,7 +257,7 @@ class TestSkProphet(TestCase):
             {
                 'ds': [datetime(2019, 1, 1) + timedelta(days=i) for i in range(n)],
                 'x': list(range(n)),
-                'y': [i + x_i ** 2 for i, x_i in enumerate(range(n))],
+                'y': [i + x_i**2 for i, x_i in enumerate(range(n))],
             }
         )
         return X
