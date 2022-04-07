@@ -53,7 +53,6 @@ follow_imports = "skip"
 [tool.poetry.dependencies]
 python = ">=3.7,<3.10"
 Deprecated = "^1.2.13"
-Jinja2 = "^3.0.3"
 pandas = ">=1.0.0"
 progressbar2 = "^3.55.0"
 PyYAML = "^6.0"
@@ -94,13 +93,14 @@ pytest-mpl = { version = "0.12", optional = true }
 betamax = { version = "^0.8.1", optional = true }
 betamax-serializers = { version = "^0.2.1", optional = true }
 holidays = { version = ">=0.10.2", optional = true }
-fbprophet = { version = "^0.7.1", optional = true }
 pystan = { version = "2.19.1.1", optional = true }
 gspread-pandas = { version = "^2.3.0", optional = true }
 wrapt = "1.11.2"
 types-requests = "^2.27.7"
 types-PyMySQL = "^1.0.11"
 bandit = { version = "^1.7.2", optional = true }
+prophet = { version = "^1.0.1", optional = true }
+Jinja2 = "~3.0"
 
 [tool.poetry.extras]
 pyarrow = [ "pyarrow",]
@@ -118,9 +118,9 @@ bigquery = [ "google-cloud-bigquery",]
 ibis = [ "ibis-framework", "pyarrow",]
 gdrive = [ "oauth2client", "requests",]
 test = [ "bandit", "freezegun", "interrogate", "nox", "pytest", "pytest-xdist", "pytest-cov", "pytest-html", "pytest-mpl", "betamax", "betamax-serializers", "pyarrow", "holidays",]
-forecast = [ "fbprophet", "pystan", "holidays",]
+forecast = [ "prophet", "pystan", "holidays",]
 gsheets = [ "gspread_pandas",]
-all = [ "bandit", "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "fbprophet", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
+all = [ "bandit", "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "prophet", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
 
 [tool.poetry.dev-dependencies]
 bump2version = "^1.0.1"
@@ -132,7 +132,7 @@ betamax = "^0.8.1"
 betamax-serializers = "^0.2.1"
 pre-commit = "2.2.0"
 interrogate = "^1.5.0"
-black = "19.10b0"
+black = "^22.3.0"
 pylint = "^2.6.0"
 nox = "^2021.10.1"
 mypy = ">=0.810"
