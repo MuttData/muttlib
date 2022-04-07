@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
   - Updated dependencies
   - Deprecate support for python3.7
-  - Renamed dependencie `fbprophet` -> `prophet`
+  - Renamed dependency `fbprophet` -> `prophet`
+  - Updated lint according to new libraries standards
+
 ## [1.4.15] - 2022-03-08
 
 ### Fixed
