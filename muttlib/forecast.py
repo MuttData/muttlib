@@ -84,7 +84,7 @@ from inspect import isclass, signature
 
 import numpy as np
 import pandas as pd
-from prophet import Prophet
+from fbprophet import Prophet
 from sklearn.base import BaseEstimator
 
 
@@ -137,7 +137,7 @@ class SkProphet(Prophet):
 
     def fit(
         self, X, y=None, copy=True, **fit_params
-    ):  # pylint: disable=arguments-differ,arguments-renamed
+    ):  # pylint: disable=arguments-differ
         """Scikit learn's like fit on the Prophet model.
 
         Parameters
@@ -179,9 +179,7 @@ class SkProphet(Prophet):
                 X['y'] = self._as_np_vector(y)
         return super().fit(X, **fit_params)
 
-    def predict(
-        self, X, copy=True
-    ):  # pylint: disable=arguments-differ,arguments-renamed
+    def predict(self, X, copy=True):  # pylint: disable=arguments-differ
         """Scikit learn's predict (returns predicted values).
 
         Parameters

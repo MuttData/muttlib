@@ -38,7 +38,7 @@ def get_second_df_diff_deviations_functions(params=None):
 @pytest.fixture()
 def sample_df():
     base_date = np.datetime64('2020-01-01')
-    n_rows = 100**2
+    n_rows = 100 ** 2
     with utils.numpy_temp_seed():
         df = pd.DataFrame(
             {

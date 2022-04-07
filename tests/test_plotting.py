@@ -155,7 +155,8 @@ def sample_data_yhat_df():
 
 
 def perturb_ts(df, col, scale=1):
-    """Add noise to ts"""
+    """Add noise to ts
+    """
     mean = df[col].mean() * scale
     df[col] += np.random.default_rng(42).uniform(
         low=-mean / 2, high=mean / 2, size=len(df)

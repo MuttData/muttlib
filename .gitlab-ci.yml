@@ -1,4 +1,4 @@
-image: python:3.8.5
+image: python:3.7
 
 variables:
   POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
@@ -18,9 +18,8 @@ cache:
 
 before_script:
   - apt-get update
-  - apt upgrade -y
-  - apt-get install -y libkrb5-dev libsasl2-dev python3-dev libblas-dev liblapack-dev g++ gfortran cmake swig
-  - pip install -U pip
+  - apt-get install -y libkrb5-dev libsasl2-dev
+  - pip install poetry
 
 stages:
   - validate
@@ -32,8 +31,15 @@ stages:
 test:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
+  - poetry install -vvv
+  - poetry run python -c 'from muttlib import dbconn, utils'
+  - poetry install -E forecast -vvv
+  - poetry run python -c 'from muttlib import forecast'
+  - poetry install -E gsheets -vvv
+  - poetry run python -c 'from muttlib import gsheetsconn'
+  - poetry install -E gdrive -vvv
+  - poetry run python -c 'from muttlib import gdrive'
+  - poetry run nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
   only:
     refs:
       - merge_requests
@@ -42,8 +48,8 @@ test:
 lint:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
+    - poetry install -vvv
+    - poetry run nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
   only:
     refs:
       - merge_requests
@@ -52,8 +58,8 @@ lint:
 docstr-cov:
   stage: test_stage
   script:
-    - pip install interrogate
-    - interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
+    - poetry install
+    - poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
   artifacts:
     paths:
       - docs_coverage.svg
@@ -66,8 +72,8 @@ docstr-cov:
 bandit:
   stage: test_stage
   script:
-    - pip install nox
-    - nox --envdir $NOX_ENV_DIR --sessions bandit
+    - poetry install
+    - poetry run nox --envdir $NOX_ENV_DIR --sessions bandit
   only:
     refs:
       - merge_requests
@@ -76,14 +82,14 @@ bandit:
 pages:
   stage: deploy_stage
   script:
-    - poetry install -E all
-    - cd docs
-    - poetry run make html -e SPHINXOPTS=-W
-    - cd ..
-    - mv docs/build/html/ public/
+  - poetry install -E all
+  - cd docs
+  - poetry run make html -e SPHINXOPTS=-W
+  - cd ..
+  - mv docs/build/html/ public/
   artifacts:
     paths:
-      - public
+    - public
   only:
     refs:
       - master
@@ -112,7 +118,7 @@ tag_release_version:
     reports:
       dotenv: variables.env
   before_script:
-    - ""
+    - ''
   only:
     refs:
       - master
@@ -124,12 +130,12 @@ release:
     - job: tag_release_version
       artifacts: true
   release:
-    tag_name: "$TAG"
-    description: "./CHANGELOG.md"
+    tag_name: '$TAG'
+    description: './CHANGELOG.md'
   script:
     - echo 'running release job for $TAG'
   before_script:
-    - ""
+    - ''
   only:
     refs:
       - master

@@ -11,9 +11,7 @@ def sqlite_client():
 
 
 def test_url_sqlite():
-    client = SqliteClient(
-        database="database.db",
-    )
+    client = SqliteClient(database="database.db",)
     engine = client.get_engine()
     assert str(engine.url) == 'sqlite:///database.db'
 

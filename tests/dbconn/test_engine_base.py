@@ -39,10 +39,7 @@ def test_base_insert_from_frame_connection_not_none(engine_baseClient):
         )
 
         mock_to_sql.assert_called_once_with(
-            table,
-            engine,
-            if_exists='append',
-            index=False,
+            table, engine, if_exists='append', index=False,
         )
 
 
@@ -87,9 +84,7 @@ def test_base_to_frame_rise_not_implemented_method():
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        base_cli = BaseClient(
-            dialect="mysql",
-        )
+        base_cli = BaseClient(dialect="mysql",)
 
         q = "SELECT *"
 
@@ -102,9 +97,7 @@ def test_base_insert_from_frame_if_exists_replace_fail_rise_not_implemented_meth
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        base_cli = BaseClient(
-            dialect="mysql",
-        )
+        base_cli = BaseClient(dialect="mysql",)
 
         df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test_table"
@@ -121,9 +114,7 @@ def test_base_insert_from_frame_index_true_rise_not_implemented_method():
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        base_cli = BaseClient(
-            dialect="mysql",
-        )
+        base_cli = BaseClient(dialect="mysql",)
 
         df = pd.DataFrame({'col1': ['1'], 'col2': ['3.0']})
         table = "test_table"
@@ -137,9 +128,7 @@ def test_base_insert_from_frame_chunk():
 
     with patch("muttlib.dbconn.base.create_engine") as create_engine:
 
-        base_cli = BaseClient(
-            dialect="mysql",
-        )
+        base_cli = BaseClient(dialect="mysql",)
 
         base_cli._connect = create_engine.get_engine()
 
