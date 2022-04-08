@@ -72,7 +72,9 @@ def read_private_key(
 
     try:
         pk_file = load_pem_private_key(
-            file, password=passphrase.encode(), backend=default_backend(),
+            file,
+            password=passphrase.encode(),
+            backend=default_backend(),
         )
         private_key = pk_file.private_bytes(
             encoding=pk_encoding_type,

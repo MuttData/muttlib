@@ -136,8 +136,8 @@ class SkProphet(Prophet):
         self._set_my_extra_regressors()
 
     def fit(
-        self, X, y=None, copy=True, **fit_params
-    ):  # pylint: disable=arguments-differ
+        self, df, y=None, copy=True, **fit_params  # pylint: disable=arguments-differ
+    ):
         """Scikit learn's like fit on the Prophet model.
 
         Parameters
@@ -166,6 +166,7 @@ class SkProphet(Prophet):
         fit_params: keyword arguments
             Keyword arguments to forward to Prophet's fit.
         """
+        X = df
         if not isinstance(X, pd.DataFrame):
             raise TypeError('Arg "X" passed can only be of pandas.DataFrame type.')
         if copy:
@@ -179,7 +180,7 @@ class SkProphet(Prophet):
                 X['y'] = self._as_np_vector(y)
         return super().fit(X, **fit_params)
 
-    def predict(self, X, copy=True):  # pylint: disable=arguments-differ
+    def predict(self, df, copy=True):  # pylint: disable=arguments-differ
         """Scikit learn's predict (returns predicted values).
 
         Parameters
@@ -194,6 +195,7 @@ class SkProphet(Prophet):
             If False is provided, the input data will be copied and the copy
             modified if required.
         """
+        X = df
         if copy:
             X = X.copy()
         if self.sk_date_column != self.DS and self.sk_date_column in X.columns:

@@ -242,7 +242,7 @@ class IbisClient:
             except Exception as e:
                 logger.error(e)
                 if i < self._max_retries:
-                    backoff_time = min(self._max_backoff, 2 ** i)
+                    backoff_time = min(self._max_backoff, 2**i)
                     logger.debug(
                         f"SQL create/insert has failed {i} times. Retrying in "
                         f"{backoff_time} seconds."
@@ -280,7 +280,7 @@ class IbisClient:
                 # Check if parquets were downloaded to the local tmp table dir
                 break
             elif i < self._max_retries:
-                backoff_time = min(self._max_backoff, 2 ** i)
+                backoff_time = min(self._max_backoff, 2**i)
                 logger.debug(
                     f"HDFS parquet-get has failed {i} times. Retrying in "
                     f"{backoff_time} seconds."
