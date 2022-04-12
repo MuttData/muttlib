@@ -100,7 +100,8 @@ types-requests = "^2.27.7"
 types-PyMySQL = "^1.0.11"
 bandit = { version = "^1.7.2", optional = true }
 prophet = { version = "^1.0.1", optional = true }
-Jinja2 = "~3.0"
+Jinja2 = ">=2.11.3,<3.1.0"
+MarkupSafe = ">=0.2.3,<2.1.0"
 
 [tool.poetry.extras]
 pyarrow = [ "pyarrow",]
