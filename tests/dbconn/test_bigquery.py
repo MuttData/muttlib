@@ -179,5 +179,7 @@ def test_insert_from_frame_create_first_true_get_table_not_found(
         connection.get_table.assert_called_once_with(params['table_id'])
 
         execute_mock.assert_called_once_with(
-            q.format(**params), params=params, connection=connection,
+            q.format(**params),
+            params=params,
+            connection=connection,
         )

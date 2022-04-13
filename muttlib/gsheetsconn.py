@@ -9,7 +9,7 @@ See the README.md for more details on how to acquire one.
 A full round trip of how this module operates scan be seen as follows:
 
 > import pandas as pd
-> ​from muttlib import gsheetsconn
+> from muttlib import gsheetsconn
 >
 > GOOGLE_SHEETS_SECRETS_JSON_FP = "/some/local/dir/path/to/json/file.json"
 > # A spreadhseet id is part of the url used in your browser
@@ -17,7 +17,7 @@ A full round trip of how this module operates scan be seen as follows:
 > GSHEETS_WORKSHEET_NAME = 'test'
 >
 > gsheets_client = GSheetsClient(GOOGLE_SHEETS_SECRETS_JSON_FP)
->​
+>
 > # Construct random data from integers
 > keys = list('ABC')
 > numrows = 100
@@ -26,12 +26,12 @@ A full round trip of how this module operates scan be seen as follows:
 >     pd.np.random.randint(0, 15, sizimport pandas as pd
 > # And letters
 > df['letters'] = pd.util.testing.rands_array(str_length, numrows)
-​>
+>
 > # Test push working gsheets conn
 > spreadsheet_id, worksheet = (GSHEETS_SPREAD_ID, GSHEETS_WORKSHEET_NAME)
-​>
+>
 > gsheets_client.insert_from_frame(df, spreadsheet_id, index=True, worksheet=worksheet)
->​
+>
 > return_df = gsheets_client.to_frame(spreadsheet_id, worksheet=worksheet)
 
 Google Sheets Credentials
@@ -72,7 +72,7 @@ from typing import Any, Dict, List
 
 from gspread_pandas import Spread, conf as gconf
 
-logger = logging.getLogger(f'gsheetsconn.{__name__}')  # NOQA
+logger = logging.getLogger(f"gsheetsconn.{__name__}")  # NOQA
 
 try:
     import gspread_pandas  # noqa: F401 # pylint: disable=unused-import
@@ -160,7 +160,7 @@ class GSheetsClient:
         num = 0
         for c in col:
             if c in ascii_letters:
-                num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+                num = num * 26 + (ord(c.upper()) - ord("A")) + 1
         return num
 
     def _is_valid_cell_loc(self, val):
@@ -218,7 +218,7 @@ class GSheetsClient:
             first_cell_loc = first_cell_loc.upper()
             self._is_valid_cell_loc(first_cell_loc)
             index_col, first_row = tuple(
-                filter(None, re.split(r'([aA-zZ]+)', first_cell_loc))
+                filter(None, re.split(r"([aA-zZ]+)", first_cell_loc))
             )
             first_row = int(first_row)
 
@@ -248,10 +248,10 @@ class GSheetsClient:
         spreadsheet,
         index=False,
         header=True,
-        first_cell_loc='A1',
+        first_cell_loc="A1",
         worksheet=None,
         preclean_sheet=True,
-        null_fill_value='',
+        null_fill_value="",
         freeze_headers=True,
         **kwargs,
     ):
