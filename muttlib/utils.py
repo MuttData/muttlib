@@ -28,7 +28,10 @@ import matplotlib.pyplot as plt  # NOQA
 logger = logging.getLogger(f'utils.{__name__}')
 
 DEFAULT_JINJA_ENV_ARGS = dict(
-    autoescape=True, line_statement_prefix="%", trim_blocks=True, lstrip_blocks=True,
+    autoescape=True,
+    line_statement_prefix="%",
+    trim_blocks=True,
+    lstrip_blocks=True,
 )
 
 NULL_COUNT_CLAUSE = """SUM( CASE WHEN {col} IS NULL
@@ -485,7 +488,7 @@ def get_cloudera_sample_cut(sample_lines_ratio=None):
     if sample_lines_ratio is None:
         sample_lines_ratio = 1.0
     # Generate the value for sample selection.
-    sampling_cut = int(2 ** 64 * sample_lines_ratio / 2.0) - 1
+    sampling_cut = int(2**64 * sample_lines_ratio / 2.0) - 1
     return sampling_cut
 
 
@@ -547,7 +550,8 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 
 def df_optimize_float_types(
-    df, type_mappings: Dict[str, str] = None,
+    df,
+    type_mappings: Dict[str, str] = None,
 ):
     """Cast dataframe columns to more memory friendly types.
 
