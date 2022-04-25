@@ -53,7 +53,7 @@ follow_imports = "skip"
 [tool.poetry.dependencies]
 python = ">=3.8,<3.10"
 Deprecated = "^1.2.13"
-Jinja2 = "3.0.1"
+Jinja2 = ">=2.11.3,<3.1.0"
 pandas = ">=1.4.1"
 progressbar2 = "^3.55.0"
 PyYAML = "^5.4.1"
