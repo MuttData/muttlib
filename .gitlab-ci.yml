@@ -4,6 +4,7 @@ variables:
   POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
   NOX_ENV_DIR: "$CI_PROJECT_DIR/.nox"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  MIN_LINE_RATE: "0.2"
 
 cache:
   paths:
@@ -74,6 +75,20 @@ bandit:
   script:
     - poetry install
     - poetry run nox --envdir $NOX_ENV_DIR --sessions bandit
+  only:
+    refs:
+      - merge_requests
+      - master
+
+typing:
+  stage: test_stage
+  script:
+    - poetry install
+    - poetry run mypy ./muttlib --cobertura-xml-report ./
+    - line_rate=$(cat cobertura.xml | grep -oP '(?<=line-rate\W{2})(\d.\d+)(?=\W\s\w+)')
+    - python -c "import sys; exit(float(sys.argv[1]) <= float(sys.argv[2]))" $line_rate $MIN_LINE_RATE
+    - exit_status=$?
+    - exit $exit_status
   only:
     refs:
       - merge_requests
