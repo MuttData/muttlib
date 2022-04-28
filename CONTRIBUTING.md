@@ -251,7 +251,7 @@ RFC stands for **R**equest **f**or **C**omments. It means you consider the issue
 
 All commits pushed to branches in pull requests will trigger CI jobs that install `muttlib` in a gitlab-provided docker-env and all the extras, run all tests and check for linting. Look at [.gitlab-ci.yml](https://gitlab.com/mutt_data/muttlib/-/blob/master/.gitlab-ci.yml) for more details on this and as well as the official [Gitlab's docs](https://docs.gitlab.com/ce/ci/README.html). Note that only PRs that pass the CI will be allowed to merge.
 
-We use `mypy` to generate a codebase type checking [coverage report](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-cobertura-xml-report) and check for a minimum allowable value for line-rate metric. In case you would line to increase this target value, please change value of the enviroment variable set in the [.gitlab-ci.yml](https://gitlab.com/mutt_data/muttlib/-/blob/master/.gitlab-ci.yml#L7) file as `MIN_LINE_RATE`.
+We use `mypy` to generate a codebase type checking [coverage report](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-cobertura-xml-report) and check for a minimum allowable value for line-rate metric. In case you would line to increase this target value, please change value of the enviroment variable set in the [.gitlab-ci.yml file](https://gitlab.com/mutt_data/muttlib/-/blob/master/.gitlab-ci.yml#L7) as `MIN_LINE_RATE`.
 
 `NOTE:` If your commit message contains [ci skip] or [skip ci], without capitalization, the job will be skipped i.e. no CI job will be spawned for that push.
 
