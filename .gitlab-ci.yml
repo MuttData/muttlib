@@ -87,7 +87,7 @@ typing:
     - poetry run mypy ./muttlib --cobertura-xml-report ./
     - line_rate=$(cat cobertura.xml | grep -oP '(?<=line-rate\W{2})(\d.\d+)(?=\W\s\w+)')
     - echo $line_rate
-    - python -c "import sys; exit(not float(sys.argv[1]) > float(sys.argv[2]))" $line_rate $MIN_LINE_RATE
+    - python -c "import sys; exit(float(sys.argv[1]) <= float(sys.argv[2]))" $line_rate $MIN_LINE_RATE
     - exit_status=$?
     - exit $exit_status
   only:
