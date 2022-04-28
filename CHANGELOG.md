@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.17] - 2022-04-13
 
 ### Added
-  - Type hinting to CI
+  - CI step to validate the codebase's type hinting coverage is above a minimum threshold
 
 ## [1.4.16] - 2022-04-12
 
