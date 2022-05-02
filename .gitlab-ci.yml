@@ -41,7 +41,7 @@ test:
   - poetry install -E gdrive -vvv
   - poetry run python -c 'from muttlib import gdrive'
   - poetry run nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
-  coverage: ^TOTAL.+?(\d+\%)$
+  coverage: /^TOTAL.+?(\d+\%)$/
   only:
     refs:
       - merge_requests
