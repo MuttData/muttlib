@@ -6,10 +6,12 @@ import nox_poetry as nox
 def tests(session):
     """Run all tests."""
     session.run_always("poetry", "install", "-E", "all", "-vv", external=True)
-    cmd = ["poetry", "run", "pytest", "-n", "auto", "--mpl"]
+    cmd = ["poetry", "run", "coverage", "run", "pytest", "-n", "auto", "--mpl"]
     if session.posargs:
         cmd.extend(session.posargs)
     session.run(*cmd)
+    session.run("coverage", "report")
+    session.run("coverage", "xml")
 
 
 @nox.session(reuse_venv=True, python=["3.7", "3.8"])
