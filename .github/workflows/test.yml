@@ -5,7 +5,7 @@ env:
   NOX_ENV_DIR: "$CI_PROJECT_DIR/.nox"
 
 jobs:
-  test:
+  run_tests:
     runs-on: python:3.8
     steps:
     - name: Update base image
