@@ -1,0 +1,115 @@
+name: test
+on: [pull_request, push]
+
+env:
+  NOX_ENV_DIR: "$CI_PROJECT_DIR/.nox"
+
+jobs:
+  test:
+    runs-on: python:3.8
+    steps:
+    - name: Update base image
+      run: >
+        apt update -y
+        apt install -y libkrb5-dev libsasl2-dev
+        pip install poetry
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: poetry install -vvv
+    - name: Test base imports
+      run: poetry run python -c 'from muttlib import dbconn, utils'
+    - name: Test forecast extra
+      run: >
+        poetry install -E forecast -vvv
+        poetry run python -c 'from muttlib import forecast'
+    - name: Test gsheetsconn
+      run: >
+        poetry install -E gsheets -vvv
+        poetry run python -c 'from muttlib import gsheetsconn'
+    - name: Test gdrive
+      run: >
+        poetry install -E gdrive -vvv
+        poetry run python -c 'from muttlib import gdrive'
+    - name: Run nox
+      run: poetry run nox --envdir $NOX_ENV_DIR --sessions tests -- -n 2
+
+  lint:
+    runs-on: python:3.8
+    steps:
+    - name: Update base image
+      run: >
+        apt update -y
+        apt install -y libkrb5-dev libsasl2-dev
+        pip install poetry
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: poetry install -vvv
+    - name: Run nox
+      run: poetry run nox --envdir $NOX_ENV_DIR --sessions precommit_hooks
+
+  docstr-cov:
+    runs-on: python:3.8
+    steps:
+    - name: Update base image
+      run: >
+        apt update -y
+        apt install -y libkrb5-dev libsasl2-dev
+        pip install poetry
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: poetry install -vvv
+    - name: Run interrogate
+      run: poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
+
+  bandit:
+    runs-on: python:3.8
+    steps:
+    - name: Update base image
+      run: >
+        apt update -y
+        apt install -y libkrb5-dev libsasl2-dev
+        pip install poetry
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: poetry install -vvv
+    - name: Run nox
+      run: poetry run nox --envdir $NOX_ENV_DIR --sessions bandit
+
+  typing:
+    runs-on: python:3.8
+    steps:
+    - name: Update base image
+      run: >
+        apt update -y
+        apt install -y libkrb5-dev libsasl2-dev
+        pip install poetry
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: poetry install -vvv
+    - name: Run mypy and check lines
+      run: >
+        poetry run mypy ./muttlib --cobertura-xml-report ./
+        line_rate=$(cat cobertura.xml | grep -oP '(?<=line-rate\W{2})(\d.\d+)(?=\W\s\w+)')
+        python -c "import sys; exit(float(sys.argv[1]) <= float(sys.argv[2]))" $line_rate $MIN_LINE_RATE
+        exit_status=$?
+        exit $exit_status
