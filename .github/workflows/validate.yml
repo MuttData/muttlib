@@ -7,15 +7,11 @@ jobs:
     runs-on: python:3.8
     steps:
     - name: Update base image
-      run: >
-        apt update -y
+      run: |
+        apt update
         apt install -y libkrb5-dev libsasl2-dev
         pip install poetry
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
     - name: Install dependencies
       run: pip install packaging
     - name: Fetch source ref
@@ -23,7 +19,7 @@ jobs:
     - name: Fetch target ref
       run: git fetch origin $GITHUB_BASE_REF
     - name: Check version
-      run: >
+      run: |
         lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
         python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
         exit_status=$?
@@ -35,20 +31,16 @@ jobs:
     runs-on: python:3.8
     steps:
     - name: Update base image
-      run: >
-        apt update -y
+      run: |
+        apt update
         apt install -y libkrb5-dev libsasl2-dev
         pip install poetry
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
     - name: Fetch source ref
       run: git fetch origin $GITHUB_HEAD_REF
     - name: Fetch target ref
       run: git fetch origin $GITHUB_BASE_REF
     - name: Check changed lines
-      run: >
+      run: |
         added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -- CHANGELOG.md | awk '{print $1}')
         if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
