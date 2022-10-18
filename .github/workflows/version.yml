@@ -4,15 +4,13 @@ on: [pull_request, push]
 jobs:
   test:
     runs-on: [self-hosted]
+    container: python:3.8.15
     steps:
-    - uses: actions/setup-python@v4
-      with:
-        python-version: "3.8"
       - name: Update base image
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry
+          pip install poetry==1.2.2
       - uses: actions/checkout@v2
       - name: Set tag output
         run: echo "::set-output name=tag_name::v$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"

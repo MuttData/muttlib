@@ -10,7 +10,7 @@ jobs:
       run: |
         apt update
         apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry
+        pip install poetry==1.2.2
     - uses: actions/checkout@v2
     - name: Install package
       run: poetry install -vvv
@@ -40,7 +40,7 @@ jobs:
       run: |
         apt update
         apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry
+        pip install poetry==1.2.2
     - uses: actions/checkout@v2
     - name: Install package
       run: poetry install -vvv
@@ -55,7 +55,7 @@ jobs:
       run: |
         apt update
         apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry
+        pip install poetry==1.2.2
     - uses: actions/checkout@v2
     - name: Install package
       run: poetry install -vvv
@@ -70,7 +70,7 @@ jobs:
       run: |
         apt update
         apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry
+        pip install poetry==1.2.2
     - uses: actions/checkout@v2
     - name: Install package
       run: poetry install -vvv
@@ -85,7 +85,7 @@ jobs:
       run: |
         apt update
         apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry
+        pip install poetry==1.2.2
     - uses: actions/checkout@v2
     - name: Install package
       run: poetry install -vvv
