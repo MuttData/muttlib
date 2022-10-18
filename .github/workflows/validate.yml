@@ -4,7 +4,8 @@ on: [pull_request]
 jobs:
   check_version:
     if: github.base_ref == 'master'
-    runs-on: python:3.8
+    runs-on: [self-hosted]
+    container: python:3.8.15
     steps:
     - name: Update base image
       run: |
@@ -28,7 +29,8 @@ jobs:
 
   check_changelog:
     if: github.base_ref == 'master'
-    runs-on: python:3.8
+    runs-on: [self-hosted]
+    container: python:3.8.15
     steps:
     - name: Update base image
       run: |
