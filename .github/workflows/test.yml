@@ -33,7 +33,7 @@ jobs:
         poetry run python -c 'from muttlib import gdrive'
     - name: Run nox
       run: |
-        poetry run nox --envdir $GITHUB_WORKSPACE/.nox --sessions tests -- -n 2
+        poetry run nox --envdir $GITHUB_WORKSPACE/.nox --sessions tests
 
   lint:
     runs-on: [self-hosted]
