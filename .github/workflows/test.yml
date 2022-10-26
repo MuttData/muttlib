@@ -3,7 +3,7 @@ on: [pull_request, push]
 
 jobs:
   run_tests:
-    runs-on: [self-hosted]
+    runs-on: self-hosted
     steps:
     - name: Set up Python 3.8
       uses: actions/setup-python@v4
