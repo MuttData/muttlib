@@ -35,11 +35,9 @@ jobs:
 
   lint:
     runs-on: [self-hosted]
+    container:
+      image: python:3.8
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
     - name: Update base image
       run: |
         apt update
@@ -53,11 +51,9 @@ jobs:
 
   docstr-cov:
     runs-on: [self-hosted]
+    container:
+      image: python:3.8
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
     - name: Update base image
       run: |
         apt update
@@ -71,11 +67,9 @@ jobs:
 
   bandit:
     runs-on: [self-hosted]
+    container:
+      image: python:3.8
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
     - name: Update base image
       run: |
         apt update
@@ -89,11 +83,9 @@ jobs:
 
   typing:
     runs-on: [self-hosted]
+    container:
+      image: python:3.8
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
     - name: Update base image
       run: |
         apt update

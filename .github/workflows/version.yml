@@ -4,11 +4,9 @@ on: [pull_request, push]
 jobs:
   test:
     runs-on: [self-hosted]
+    container:
+      image: python:3.8
     steps:
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
       - name: Update base image
         run: |
           apt update
