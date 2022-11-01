@@ -9,8 +9,8 @@ jobs:
     steps:
     - name: Update base image
       run: |
-        sudo apt update
-        sudo apt install -qy libkrb5-dev libsasl2-dev
+        apt update
+        apt install -qy libkrb5-dev libsasl2-dev
         pip install poetry==1.2.2
     - uses: actions/checkout@v2
     - name: Install package
