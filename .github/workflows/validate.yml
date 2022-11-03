@@ -22,7 +22,7 @@ jobs:
       run: git fetch origin $GITHUB_BASE_REF
     - name: Check version
       run: |
-        lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
+        lib_ver=$(git diff origin/$GITHUB_HEAD_REF origin/$GITHUB_BASE_REF -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
         python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
         exit_status=$?
         if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
@@ -46,5 +46,5 @@ jobs:
       run: git fetch origin $GITHUB_BASE_REF
     - name: Check changed lines
       run: |
-        added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -- CHANGELOG.md | awk '{print $1}')
+        added_lines=$(git diff --numstat origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF -- CHANGELOG.md | awk '{print $1}')
         if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
