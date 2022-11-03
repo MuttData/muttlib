@@ -23,6 +23,7 @@ jobs:
     - name: Check version
       run: |
         lib_ver=$(git diff origin/$GITHUB_HEAD_REF origin/$GITHUB_BASE_REF -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
+        echo "lib_ver=$lib_ver"
         python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
         exit_status=$?
         if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
