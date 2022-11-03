@@ -14,6 +14,7 @@ jobs:
           pip install poetry==1.2.2
       - uses: actions/checkout@v2
       - name: Set tag output
+        id: set-tag
         run: echo "::set-output name=tag_name::v$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"
       - name: Create Tag
         uses: actions/github-script@v3
