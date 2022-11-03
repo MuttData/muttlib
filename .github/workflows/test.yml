@@ -1,6 +1,9 @@
 name: test
 on: [pull_request, push]
 
+env:
+  MIN_LINE_RATE: 0.2
+
 jobs:
   run_tests:
     runs-on: self-hosted
