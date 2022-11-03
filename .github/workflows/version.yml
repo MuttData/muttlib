@@ -1,8 +1,8 @@
 name: linters
-on: [pull_request, push]
+on: [pull_request]
 
 jobs:
-  test:
+  bump_version:
     runs-on: [self-hosted]
     container:
       image: python:3.8
