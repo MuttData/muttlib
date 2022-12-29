@@ -126,11 +126,14 @@ class BaseClient(abc.ABC):
                 elif attr == 'driver':
                     value = format_drivername(self.dialect, value)
                 attr = 'drivername'
+            self.conn_url = self.conn_url.set(**{attr: value})
+
+            return self.conn_url
         else:
             _cls = object
             target = self
 
-        return _cls.__setattr__(target, attr, value)
+            return _cls.__setattr__(target, attr, value)
 
     @property
     def conn_str(self):
