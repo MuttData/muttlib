@@ -522,7 +522,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
     """
 
     if isinstance(data, pd.DataFrame):
-        obj_cols = data.select_dtypes(include=[np.object]).columns
+        obj_cols = data.select_dtypes(include=[np.object_]).columns
         for col in obj_cols:
             data[col] = (
                 data[col]
@@ -534,7 +534,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
         return data
-    elif isinstance(data, pd.Series) and data.dtype == np.object:
+    elif isinstance(data, pd.Series) and data.dtype == np.object_:
         data = (
             data.str.lower()
             .str.lower()
