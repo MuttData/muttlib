@@ -14,7 +14,7 @@ from numbers import Number
 from functools import wraps
 from datetime import date, datetime
 from collections import OrderedDict, deque
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Optional
 
 import jinja2
 import numpy as np
@@ -551,7 +551,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
 
 def df_optimize_float_types(
     df,
-    type_mappings: Dict[str, str] = None,
+    type_mappings: Optional[Dict[str, str]] = None,
 ):
     """Cast dataframe columns to more memory friendly types.
 
@@ -595,7 +595,7 @@ def df_replace_empty_strs_null(df):
     return df
 
 
-def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
+def df_drop_nulls(df, max_null_prop=0.2, protected_cols: Optional[List[str]] = None):
     """Drop null columns in df, for null share over a certain threshold.
 
     Warnings
@@ -626,7 +626,7 @@ def df_drop_nulls(df, max_null_prop=0.2, protected_cols: List[str] = None):
     return df
 
 
-def df_drop_std(df, min_std_dev=1.5e-2, protected_cols: List[str] = None):
+def df_drop_std(df, min_std_dev=1.5e-2, protected_cols: Optional[List[str]] = None):
     """Drop low variance cols.
 
     Warnings
@@ -651,7 +651,7 @@ def df_drop_corr(
     df,
     target_col,
     max_corr=0.3,
-    protected_cols: List[str] = None,
+    protected_cols: Optional[List[str]] = None,
     frac=0.2,
     random_state=None,
 ):
@@ -680,7 +680,7 @@ def df_drop_corr(
     return df
 
 
-def df_get_typed_cols(df, col_type='cat', protected_cols: List[str] = None):
+def df_get_typed_cols(df, col_type='cat', protected_cols: Optional[List[str]] = None):
     """Get typed columns, excluding protected cols if passed."""
     assert col_type in ('cat', 'num', 'date', 'bool', 'timedelta')
     if protected_cols is None:
@@ -702,8 +702,8 @@ def df_get_typed_cols(df, col_type='cat', protected_cols: List[str] = None):
 
 def df_encode_categorical_dummies(
     df,
-    cat_cols: List[str] = None,
-    skip_cols: List[str] = None,
+    cat_cols: Optional[List[str]] = None,
+    skip_cols: Optional[List[str]] = None,
     top=25,
     other_val='OTHER',
 ):
@@ -1052,9 +1052,9 @@ def ab_split(id_obj: str, salt: str, control_group_size: float):
 def col_sample_display(
     df: pd.DataFrame,
     col: str,
-    quantile: float = None,
-    top_val: float = None,
-    num_sample: float = 300,
+    quantile: Optional[float] = None,
+    top_val: Optional[float] = None,
+    num_sample: Optional[float] = 300,
 ):
     """Fast printing/visualization of sample data for given column.
 
@@ -1180,7 +1180,7 @@ def sum_count_time_series(
     numerical_series: List,
     resample_frequency: str = 'D',
     aggregation_operations=('sum', 'count'),
-    filter_query: str = None,  # to select a subset of the whole database only
+    filter_query: Optional[str] = None,  # to select a subset of the whole database only
 ):
     """Get a time series grouping in a a certain time-window.
 

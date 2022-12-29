@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from snowflake.sqlalchemy import URL
 from cryptography.hazmat.backends import default_backend
@@ -94,9 +95,9 @@ class SnowflakeClient(EngineBaseClient):
 
     def __init__(
         self,
-        account: str = None,
-        warehouse: str = None,
-        schema: str = None,
+        account: Optional[str] = None,
+        warehouse: Optional[str] = None,
+        schema: Optional[str] = None,
         role: str = "",
         password: str = "",
         **kwargs,
