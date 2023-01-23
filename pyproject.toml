@@ -94,7 +94,6 @@ betamax-serializers = { version = "^0.2.1", optional = true }
 holidays = { version = ">=0.10.2", optional = true }
 pystan = { version = "2.19.1.1", optional = true }
 gspread-pandas = { version = "^2.3.0", optional = true }
-wrapt = "1.11.2"
 types-requests = "^2.27.7"
 types-PyMySQL = "^1.0.11"
 bandit = { version = "^1.7.2", optional = true }
