@@ -6,9 +6,9 @@ from typing import Optional
 from contextlib import closing
 
 import pandas as pd
-from sqlalchemy import create_engine, __version__ as sqlalchemy_version
-from sqlalchemy.engine.url import URL
 from packaging import version
+from sqlalchemy.engine.url import URL
+from sqlalchemy import __version__ as sqlalchemy_version, create_engine
 
 import muttlib.utils as utils
 
