@@ -6,8 +6,9 @@ from typing import Optional
 from contextlib import closing
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, __version__ as sqlalchemy_version
 from sqlalchemy.engine.url import URL
+from packaging import version
 
 import muttlib.utils as utils
 
@@ -126,14 +127,15 @@ class BaseClient(abc.ABC):
                 elif attr == 'driver':
                     value = format_drivername(self.dialect, value)
                 attr = 'drivername'
-            self.conn_url = self.conn_url.set(**{attr: value})
 
-            return self.conn_url
+            if version.parse(sqlalchemy_version) >= version.parse("1.4"):
+                self.conn_url = self.conn_url.set(**{attr: value})
+                return self.conn_url
         else:
             _cls = object
             target = self
 
-            return _cls.__setattr__(target, attr, value)
+        return _cls.__setattr__(target, attr, value)
 
     @property
     def conn_str(self):
