@@ -73,7 +73,7 @@ pymssql = { version = "^2.2.2", optional = true }
 pymongo = { version = "^3.12.1", optional = true }
 snowflake-connector-python = { version = "^2.7.1", optional = true }
 cryptography = { version = "3.4.7", optional = true }
-snowflake-sqlalchemy = { version = ">=1.2.4, <=1.4.4", optional = true }
+snowflake-sqlalchemy = { version = ">=1.2.4, <=1.4.4, !=1.2.5", optional = true } # https://github.com/snowflakedb/snowflake-sqlalchemy/issues/234
 teradatasql = { version = "17.0.0.8", optional = true }
 sqlalchemy-redshift = { version = "0.8.6", optional = true }
 pyparsing = { version = "<3", optional = true }
