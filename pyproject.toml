@@ -51,7 +51,7 @@ ignore_missing_imports = true
 follow_imports = "skip"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.10"
+python = ">=3.8,<3.12"
 Deprecated = "^1.2.13"
 pandas = ">=1.0.0"
 progressbar2 = "^3.55.0"
