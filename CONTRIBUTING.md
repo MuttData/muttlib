@@ -124,7 +124,7 @@ We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.htm
 - Class dosctrings explaining what it is
 - Method/functions to explain what it does and what it's parameters are
 
-As an additional tool, `muttlib` incorporates [interrogate](https://interrogate.readthedocs.io/en/latest/#) to analyze the docstring coverage. `interrogate` is a dependency installed with `[dev]` option. To run the coverage, use the following command:
+As an additional tool, `muttlib` incorporates [interrogate](https://interrogate.readthedocs.io/en/latest/#) to analyze the docstring coverage. `interrogate` is a dependency installed with `dev` dependency group (`poetry install --with dev`). To run the coverage, use the following command:
 
 ```bash
 poetry run interrogate muttlib -c pyproject.toml
@@ -148,7 +148,7 @@ To run the default test suite run this:
 poetry run pytest
 ```
 
-Note that some tests may depend on external dependencies not installed with `[dev]` if you want to run the full set of tests use `[all]` instead, running this:
+Note that some tests may depend on external dependencies not installed with `--with dev` if you want to run the full set of tests use `[all]` instead, running this:
 
 ```bash
 poetry install -E all
