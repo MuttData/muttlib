@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Feature
 
 - Support python 3.10.
+- Upgrade `google-cloud-bigquery` to latest `v2.x.y`.
+
+### Chore
+
+- Upgrade `mypy` to 1.1.1,
+- Use poetry 1.3.2.
+-
 
 ## [1.4.20] - 2023-04-05
 
