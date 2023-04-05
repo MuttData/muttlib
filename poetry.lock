@@ -3265,40 +3265,6 @@ files = [
 ]
 
 [[package]]
-name = "pystan"
-version = "2.19.1.1"
-description = "Python interface to Stan, a package for Bayesian inference"
-category = "main"
-optional = true
-python-versions = "*"
-files = [
-    {file = "pystan-2.19.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:4a0820df5fcd13c7a4cae75d59809adee72d1135a604dc2b5f068d4ac8ca349e"},
-    {file = "pystan-2.19.1.1-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:2baa4106ddc7fb90712bd0e5ab8693ce130b001c6166839247511326edc6d0ba"},
-    {file = "pystan-2.19.1.1-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:6c4bbbb0a59144135d9821f2b9c308bfdf70aa61befdc7dc435f4c86bfb4457e"},
-    {file = "pystan-2.19.1.1-cp35-cp35m-macosx_10_6_intel.whl", hash = "sha256:1127522641533a6ccb7684d4008d06c092cbe6f3ee7d44679a87937ee39093ab"},
-    {file = "pystan-2.19.1.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:43fdd98561f0cba0637f1fa343ed7d5adc885d04a655ab6302dbfd08f016105d"},
-    {file = "pystan-2.19.1.1-cp35-cp35m-win32.whl", hash = "sha256:e6580cec2f5ed1bdb44eab83d54fe87b11e673ed65d6c2064d8d9f76265ce049"},
-    {file = "pystan-2.19.1.1-cp35-cp35m-win_amd64.whl", hash = "sha256:c87bd98db2b5c67fa08177de04c98b46d1fcd68ae53dbe55ffc5187868068002"},
-    {file = "pystan-2.19.1.1-cp36-cp36m-macosx_10_6_intel.whl", hash = "sha256:e9fbbf10dfc0ef8e7343ee4a3e17fd5c214fb12fc42615673e14908949b410e4"},
-    {file = "pystan-2.19.1.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:5020ac3ca3a840f428f090fc5fe75412e2a7948ac7e3de59f4bbfd7a4539c0ef"},
-    {file = "pystan-2.19.1.1-cp36-cp36m-win32.whl", hash = "sha256:61340356889547e29e2e6db7ef28f821b91e73fee80a888e81a794a24a249987"},
-    {file = "pystan-2.19.1.1-cp36-cp36m-win_amd64.whl", hash = "sha256:bc1193f52bc6c6419dd753bcb0b6958b24fe588dc3da3c7f70bd23dcbda6ec2a"},
-    {file = "pystan-2.19.1.1-cp37-cp37m-macosx_10_6_intel.whl", hash = "sha256:5b67008f5780c7cf0f3fbad5bc54bc9919efc9655d63e0314dc013e85c7a0f14"},
-    {file = "pystan-2.19.1.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:2b44502aaa8866e0bcc81df1537e7e08b74aaf4cc9d4bf43e7c8b168f3568ca6"},
-    {file = "pystan-2.19.1.1-cp37-cp37m-win32.whl", hash = "sha256:b2ef9031dfbd65757828e2441cb9a76c9217fb5bb93817fee2550722e7a785b3"},
-    {file = "pystan-2.19.1.1-cp37-cp37m-win_amd64.whl", hash = "sha256:3622520b2e55d2ce70a3027d9910b6197a8bc2ef59e01967be9c4e607a48a9c1"},
-    {file = "pystan-2.19.1.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:837a62976b32e4fd2bd48fee3b419c651e19747280e440d5934bea3822b22115"},
-    {file = "pystan-2.19.1.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:e8e0924c318a0ea67260167a74f040078a4ce0d3fd4a7d566aa76f7752a85fab"},
-    {file = "pystan-2.19.1.1-cp38-cp38-win32.whl", hash = "sha256:f16c399da3d9d72e9661b131c23d51a59c789416598885714813fcb552234c83"},
-    {file = "pystan-2.19.1.1-cp38-cp38-win_amd64.whl", hash = "sha256:9d8c2ae05d1dca854a55b2ae9276af5866e473fb8264d03d5267abadb3c602da"},
-    {file = "pystan-2.19.1.1.tar.gz", hash = "sha256:fa8bad8dbc0da22bbe6f36af56c9abbfcf10f92df8ce627d59a36bd8d25eb038"},
-]
-
-[package.dependencies]
-Cython = ">=0.22,<0.25.1 || >0.25.1"
-numpy = ">=1.7"
-
-[[package]]
 name = "pytest"
 version = "6.2.5"
 description = "pytest: simple powerful testing with Python"
@@ -4511,9 +4477,9 @@ files = [
 ]
 
 [extras]
-all = ["bandit", "betamax", "betamax-serializers", "cryptography", "cx-Oracle", "freezegun", "google-cloud-bigquery", "gspread-pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "prophet", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "PyHive", "pymongo", "pymssql", "PyMySQL", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift"]
+all = ["bandit", "betamax", "betamax-serializers", "cryptography", "cx-Oracle", "freezegun", "google-cloud-bigquery", "gspread-pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "prophet", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "PyHive", "pymongo", "pymssql", "PyMySQL", "pyparsing", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift"]
 bigquery = ["google-cloud-bigquery"]
-forecast = ["prophet", "pystan", "holidays"]
+forecast = ["prophet", "holidays"]
 gdrive = ["oauth2client", "requests"]
 gsheets = ["gspread-pandas"]
 hive = ["PyHive", "thrift"]
@@ -4533,4 +4499,4 @@ trino = ["sqlalchemy-trino"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "3280b6b3cf5595bfe9d7ee59c2e55fa299f6aeec439594d678e140c0337a2c79"
+content-hash = "b861af4fa5e314d85b698ea3cf2325b1e767f0a144e3badd2df398f9d839c679"
