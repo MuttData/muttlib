@@ -68,7 +68,7 @@ import re
 import logging
 from pathlib import Path
 from string import ascii_letters
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from gspread_pandas import Spread, conf as gconf
 
@@ -88,11 +88,11 @@ class GSheetsClient:
 
     def __init__(
         self,
-        conf_filepath: Path = None,
-        user: str = None,
-        auth_scope: List[str] = None,
+        conf_filepath: Optional[Path] = None,
+        user: Optional[str] = None,
+        auth_scope: Optional[List[str]] = None,
         auth_creds: Any = None,
-        conf: Dict = None,
+        conf: Optional[Dict] = None,
     ) -> None:
 
         self.conf_filepath = conf_filepath or Path()

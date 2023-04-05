@@ -3,19 +3,19 @@ on:
   pull_request:
     types:
       - closed
-    branches: [main]
+    branches: [master]
 
 jobs:
   bump_version:
     runs-on: [self-hosted]
     container:
-      image: python:3.8
+      image: python:3.10
     steps:
       - name: Update base image
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==1.2.2
+          pip install poetry==1.3.2
       - uses: actions/checkout@v2
       - name: Set tag output
         id: set-tag
@@ -23,19 +23,19 @@ jobs:
       - name: Create Tag
         uses: actions/github-script@v3
         env:
-           TAG: ${{ steps.set-tag.outputs.tag_name }}
+          TAG: ${{ steps.set-tag.outputs.tag_name }}
         with:
-           github-token: ${{ github.token }}
-           script: |
-             github.git.createRef({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-              ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
-               sha: context.sha
-             })
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+             ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
+              sha: context.sha
+            })
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-           tag: ${{ steps.set-tag.outputs.tag_name }}
-           bodyFile: './CHANGELOG.md'
-           token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.set-tag.outputs.tag_name }}
+          bodyFile: "./CHANGELOG.md"
+          token: ${{ secrets.GITHUB_TOKEN }}

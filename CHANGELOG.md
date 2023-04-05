@@ -5,198 +5,244 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.20] - 2022-11-03
+## [1.4.21] - 2023-04-05
+
+### Feature
+
+- Support python 3.10.
+- Upgrade `google-cloud-bigquery` to latest `v2.x.y`.
+
+### Chore
+
+- Upgrade `mypy` to 1.1.1,
+- Use poetry 1.3.2.
+-
+
+## [1.4.20] - 2023-04-05
+
 ### Changed
+
 - Migrated GitLab CI/CD to Github Actions
 
 ## [1.4.19] - 2022-08-24
+
 ### Fixed
+
 - Several security vulnerabilities reported by dependabot
 
 ## [1.4.18] - 2022-05-02
 
 ### Fixed
-  - Fix CI not logging coverage due to [breaking changes in GitLab](https://about.gitlab.com/blog/2022/04/18/gitlab-releases-15-breaking-changes/#test-coverage-project-cicd-setting).
+
+- Fix CI not logging coverage due to [breaking changes in GitLab](https://about.gitlab.com/blog/2022/04/18/gitlab-releases-15-breaking-changes/#test-coverage-project-cicd-setting).
 
 ## [1.4.17.post1] - 2022-04-28
 
 ### Fixed
-  - Fix CI issue due to duplicated explicit target names in `CONTRIBUTING.md` file.
+
+- Fix CI issue due to duplicated explicit target names in `CONTRIBUTING.md` file.
 
 ## [1.4.17] - 2022-04-28
 
 ### Added
-  - CI step to validate the codebase's type hinting coverage is above a minimum threshold
+
+- CI step to validate the codebase's type hinting coverage is above a minimum threshold
 
 ## [1.4.16] - 2022-04-12
 
 ### Fixed
-  - Some dependencies versions issues
+
+- Some dependencies versions issues
 
 ## [1.4.15] - 2022-03-08
 
 ### Fixed
-  - Docs not available links.
+
+- Docs not available links.
 
 ## [1.4.14] - 2022-02-21
 
 ### Changed
-  - Added sphinx autosummary to docs generation.
+
+- Added sphinx autosummary to docs generation.
 
 ## [1.4.13] - 2022-01-18
 
 ### Changed
-  - Migrated to poetry
+
+- Migrated to poetry
 
 ## [1.4.12post1] - 2021-12-09
 
 ### Fixed
-  - Fixed identation bug on docstrings generation
+
+- Fixed identation bug on docstrings generation
 
 ## [1.4.12] - 2021-12-09
 
 ### Added
-  - Added DataFrame changes warning to docstrings
+
+- Added DataFrame changes warning to docstrings
+
 ## [1.4.11] - 2021-12-07
 
 ### Changed
-  - Update copyright year in docs
-  - Fix CI issue
+
+- Update copyright year in docs
+- Fix CI issue
 
 ## [1.4.10.post1] - 2021-12-06
 
 ### Fixed
-   - Pin trino version to 0.4.1
+
+- Pin trino version to 0.4.1
 
 ## [1.4.10] - 2021-11-29
 
 ### Changed
-  - Changed nox session of precommit-hooks to be more descriptive
+
+- Changed nox session of precommit-hooks to be more descriptive
 
 ## [1.4.9.post1] - 2021-11-29
 
 ### Added
-  - Added isort 5 to pre-commit hooks
+
+- Added isort 5 to pre-commit hooks
 
 ### Fixed
-  - Pin gspread version to 4.0.1 due to API changes in a new version of gspread (gspread_pandas dependency)
+
+- Pin gspread version to 4.0.1 due to API changes in a new version of gspread (gspread_pandas dependency)
 
 ## [1.4.8] - 2021-11-25
 
 ### Changed
 
-  - Pinned bandit version.
+- Pinned bandit version.
 
 ## [1.4.7] - 2021-11-19
 
 ### Added
-  - Added docstring coverage badge to `README.md`
+
+- Added docstring coverage badge to `README.md`
 
 ## [1.4.6] - 2021-11-16
 
 ### Changed
-  - `numpy` and `pyarrow` version
+
+- `numpy` and `pyarrow` version
 
 ## [1.4.5] - 2021-11-15
 
 ### Fix
-  - Fix CI/CD issues.
+
+- Fix CI/CD issues.
 
 ## [1.4.4] - 2021-11-13
 
 ### Fix
-  - Typos on README
+
+- Typos on README
 
 ## [1.4.3] - 2021-11-12
 
 ### Added
-  -  Added Black badge to `README.md`
+
+- Added Black badge to `README.md`
 
 ## [1.4.2] - 2021-11-11
 
 ### Fix
-  -  Fix CI linter issues.
+
+- Fix CI linter issues.
 
 ## [1.4.1] - 2021-11-11
 
 ### Fix
-  -  Fix CI issues.
+
+- Fix CI issues.
 
 ## [1.4.0] - 2021-10-22
 
 ### Added
-  -  dbconn Redshift client
+
+- dbconn Redshift client
 
 ## [1.3.0] - 2021-10-19
 
 ### Added
-  -  dbconn Trino client
+
+- dbconn Trino client
 
 ## [1.2.1] - 2021-08-20
 
 ### Fix
-  -  `dbconn.snowflake` client Handle empty role
+
+- `dbconn.snowflake` client Handle empty role
 
 ## [1.2.0] - 2021-08-19
 
 ### Added
-  -  dbconn Snowflake client
+
+- dbconn Snowflake client
 
 ## [1.1.6] - 2021-08-18
 
 ### Fixed
-  - Fix HDFS connection in ibis module/library.
-  - Set version 1.4.0 to `ibis-framework[impala]`
+
+- Fix HDFS connection in ibis module/library.
+- Set version 1.4.0 to `ibis-framework[impala]`
 
 ### Deleted
-  - Delete `ibis-framework` and `impyla` libs.
+
+- Delete `ibis-framework` and `impyla` libs.
 
 ## [1.1.5] - 2021-07-11
 
 ### Fixed
-  -  Let GsheetClient pass credentials as str.
+
+- Let GsheetClient pass credentials as str.
 
 ## [1.1.4] - 2021-06-11
 
 ### Fixed
 
-  - [[Issue #150](https://gitlab.com/mutt_data/muttlib/-/issues/150)] Fix missing doc section for `plotting` module
+- [[Issue #150](https://gitlab.com/mutt_data/muttlib/-/issues/150)] Fix missing doc section for `plotting` module
 
 ## [1.1.3] - 2021-05-31
 
 ### Fixed
 
-  - Pinned `pystan` version for `fbprophet` to build correctly
+- Pinned `pystan` version for `fbprophet` to build correctly
 
 ## [1.1.2] - 2021-03-19
 
 ### Fixed
 
-  - Fixed `TeradataClient` docstring to pass CI pipeline.
+- Fixed `TeradataClient` docstring to pass CI pipeline.
 
 ## [1.1.1] - 2021-03-18
 
 ### Added
 
-  - `interrogate` to check docstring coverage.
-  - Use of `interrogate` in CONTRIBUTING.md#docstrings section.
+- `interrogate` to check docstring coverage.
+- Use of `interrogate` in CONTRIBUTING.md#docstrings section.
 
 ### Changed
 
-  - Pinned SQLAlchemy version.
+- Pinned SQLAlchemy version.
 
 ## [1.1.0] - 2021-03-16
 
 ### Added
 
-  - TeradataClient
+- TeradataClient
 
 ## [1.0.8] - 2021-03-11
 
 ### Added
 
-  - Tests to `EngineBaseClient`.
-  - Tests to `SqliteClient`.
+- Tests to `EngineBaseClient`.
+- Tests to `SqliteClient`.
 
 ## [1.0.7] - 2021-03-05
 
@@ -260,7 +306,7 @@ Fix module dosctring formatting in `forecast.py`.
 
 Pin Numpy version to fix a bug with PyArrow (https://github.com/Azure/MachineLearningNotebooks/issues/1314).
 
-Nit on `utils`  to make mypy happy.
+Nit on `utils` to make mypy happy.
 
 ## [0.33.1] - 2021-01-27
 
@@ -269,6 +315,7 @@ Nit on `utils`  to make mypy happy.
 ## [0.34.0] - 2021-01-26
 
 Deprecate from `utils` module:
+
 - `read_yaml`
 - `non_empty_dirs`
 - `dict_to_namedtuple`
@@ -301,21 +348,27 @@ Refactored `BigQueryClient` client to support external clients as arguments and 
 Also complying with BaseClient interface.
 
 ## [0.31.0] - 2021-01-19
+
 `ipynb_const` module deprecation. It will be removed from `muttlib` in version 1.0.0.
 
 ## [0.30.0] - 2021-01-19
+
 `gcd` module deprecation. It will be removed from `muttlib` in version 1.0.0.
 
 ## [0.29.1] - 2020-12-29
+
 Update README with PyPi install instructions.
 
 ## [0.29.0] - 2020-12-29
+
 DBConn base classes refactor.
 
 ## [0.28.4] - 2020-12-29
+
 Test that changelog has been modified in pipeline. This avoids merging MRs that have not updated the changelog.
 
 ## [0.28.3] - 2020-12-28
+
 Pinned `pandas` version and upgraded `pyarrow` to version 2.0.0.
 
 ## [0.28.2] - 2020-12-22
@@ -329,6 +382,7 @@ Closes #121 - Fix detached pipelines.
 ## [0.28.0] - 2020-12-10
 
 Modify string filter `format_in_clause`, now supporting string values.
+
 - Add tests to `utils` module.
 
 ## [0.27.10] - 2020-12-02
