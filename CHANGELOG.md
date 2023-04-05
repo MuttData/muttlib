@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Release GitHub Action now runs only on merged pull requests
+- Release CI workflow now runs only on merged pull requests.
 
 ## [1.4.21] - 2023-04-05
 
