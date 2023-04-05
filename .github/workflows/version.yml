@@ -1,5 +1,9 @@
-name: linters
-on: [pull_request]
+name: version
+on:
+  pull_request:
+    types:
+      - closed
+    branches: [main]
 
 jobs:
   bump_version:
