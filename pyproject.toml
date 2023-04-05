@@ -123,9 +123,9 @@ bigquery = [ "google-cloud-bigquery",]
 ibis = [ "ibis-framework", "pyarrow",]
 gdrive = [ "oauth2client", "requests",]
 test = [ "bandit", "freezegun", "interrogate", "nox", "pytest", "pytest-xdist", "pytest-cov", "pytest-html", "pytest-mpl", "betamax", "betamax-serializers", "pyarrow", "holidays",]
-forecast = [ "prophet", "pystan", "holidays",]
+forecast = [ "prophet", "holidays",]
 gsheets = [ "gspread_pandas",]
-all = [ "bandit", "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "prophet", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pystan", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
+all = [ "bandit", "betamax", "betamax-serializers", "cryptography", "cx_Oracle", "freezegun", "google-cloud-bigquery", "gspread_pandas", "holidays", "holidays", "ibis-framework", "interrogate", "nox", "oauth2client", "prophet", "psycopg2-binary", "psycopg2-binary", "pyarrow", "pyarrow", "pyarrow", "pyhive", "pymongo", "pymssql", "pymysql", "pyparsing", "pytest", "pytest-cov", "pytest-html", "pytest-mpl", "pytest-xdist", "requests", "snowflake-connector-python", "snowflake-sqlalchemy", "sqlalchemy-redshift", "sqlalchemy-trino", "teradatasql", "thrift",]
 
 [tool.pytest.ini_options]
 minversion = "4.0.2"
