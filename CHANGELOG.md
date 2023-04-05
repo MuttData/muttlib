@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.20] - 2022-11-03
 ### Changed
-- Migrated GitLab CI/CD to Github Action
+- Migrated GitLab CI/CD to Github Actions
 
 ## [1.4.19] - 2022-08-24
 ### Fixed
