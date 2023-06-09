@@ -1054,7 +1054,7 @@ def col_sample_display(
     col: str,
     quantile: Optional[float] = None,
     top_val: Optional[float] = None,
-    num_sample: Optional[float] = 300,
+    num_sample: float = 300,
 ):
     """Fast printing/visualization of sample data for given column.
 

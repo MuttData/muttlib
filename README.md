@@ -21,15 +21,18 @@ Current modules:
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [Credits](#contributing)
-- [License](#license)
+- [muttlib 🐶📚](#muttlib-)
+  - [Description](#description)
+  - [Table of Contents](#table-of-contents)
+    - [Installing from PyPi](#installing-from-pypi)
+    - [Installing custom branches from the repos](#installing-custom-branches-from-the-repos)
+  - [Usage](#usage)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ### Installing from PyPi
 
-_Note:_ since version `1.4.13`, `muttlib` is packaged and developed using [poetry](https://python-poetry.org).
+_Note:_ `muttlib` is packaged and developed using [poetry](https://python-poetry.org) v1.3.2.
 
 Base lib:
 ```bash
@@ -59,7 +62,7 @@ poetry add muttlib -E mongo
 poetry add muttlib -E ibis
 ```
 
-_Note:_ the `ibis` extra requires installing binary packages. Check [CONTRIBUTING.md](https://gitlab.com/mutt_data/muttlib/-/blob/master/CONTRIBUTING.md#prerequisites) for the full list.
+_Note:_ the `ibis` extra requires installing binary packages. Check [CONTRIBUTING.md](https://github.com/MuttData/muttlib/blob/master/CONTRIBUTING.md#prerequisites) for the full list.
 
 ### Installing custom branches from the repos
 
@@ -82,4 +85,4 @@ See the [documentation](https://mutt_data.gitlab.io/muttlib/) to get started wit
 We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](https://mutt_data.gitlab.io/muttlib/contributing.html).
 
 ## License
-`muttlib` is licensed under the [Apache License 2.0](https://gitlab.com/mutt_data/muttlib/-/blob/master/LICENCE).
+`muttlib` is licensed under the [Apache License 2.0](https://github.com/MuttData/muttlib/blob/master/LICENCE).

@@ -6,46 +6,46 @@ jobs:
     if: github.base_ref == 'master'
     runs-on: [self-hosted]
     container:
-      image: python:3.8
+      image: python:3.10
     steps:
-    - name: Update base image
-      run: |
-        apt update
-        apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry==1.2.2
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: pip install packaging
-    - name: Fetch source ref
-      run: git fetch origin $GITHUB_HEAD_REF
-    - name: Fetch target ref
-      run: git fetch origin $GITHUB_BASE_REF
-    - name: Check version
-      run: |
-        lib_ver=$(git diff origin/$GITHUB_HEAD_REF origin/$GITHUB_BASE_REF -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
-        echo "lib_ver=$lib_ver"
-        python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
-        exit_status=$?
-        if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
-        exit $exit_status
+      - name: Update base image
+        run: |
+          apt update
+          apt install -y libkrb5-dev libsasl2-dev
+          pip install poetry==1.3.2
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: pip install packaging
+      - name: Fetch source ref
+        run: git fetch origin $GITHUB_HEAD_REF
+      - name: Fetch target ref
+        run: git fetch origin $GITHUB_BASE_REF
+      - name: Check version
+        run: |
+          lib_ver=$(git diff origin/$GITHUB_HEAD_REF origin/$GITHUB_BASE_REF -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
+          echo "lib_ver=$lib_ver"
+          python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+          exit_status=$?
+          if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
+          exit $exit_status
 
   check_changelog:
     if: github.base_ref == 'master'
     runs-on: [self-hosted]
     container:
-      image: python:3.8
+      image: python:3.10
     steps:
-    - name: Update base image
-      run: |
-        apt update
-        apt install -y libkrb5-dev libsasl2-dev
-        pip install poetry==1.2.2
-    - uses: actions/checkout@v2
-    - name: Fetch source ref
-      run: git fetch origin $GITHUB_HEAD_REF
-    - name: Fetch target ref
-      run: git fetch origin $GITHUB_BASE_REF
-    - name: Check changed lines
-      run: |
-        added_lines=$(git diff --numstat origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF -- CHANGELOG.md | awk '{print $1}')
-        if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+      - name: Update base image
+        run: |
+          apt update
+          apt install -y libkrb5-dev libsasl2-dev
+          pip install poetry==1.3.2
+      - uses: actions/checkout@v2
+      - name: Fetch source ref
+        run: git fetch origin $GITHUB_HEAD_REF
+      - name: Fetch target ref
+        run: git fetch origin $GITHUB_BASE_REF
+      - name: Check changed lines
+        run: |
+          added_lines=$(git diff --numstat origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF -- CHANGELOG.md | awk '{print $1}')
+          if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;

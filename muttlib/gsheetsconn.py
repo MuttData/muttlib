@@ -91,7 +91,7 @@ class GSheetsClient:
         conf_filepath: Optional[Path] = None,
         user: Optional[str] = None,
         auth_scope: Optional[List[str]] = None,
-        auth_creds: Optional[Any] = None,
+        auth_creds: Any = None,
         conf: Optional[Dict] = None,
     ) -> None:
 
