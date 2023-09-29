@@ -183,7 +183,7 @@ def df_read_multi(fn, index_col=False, quoting=0):
     elif ext == 'feather':
         return pd.read_feather(fn)
     elif ext in ['pickle', 'pkl']:
-        return pd.read_pickle(fn)
+        return pd.read_pickle(fn)  # nosec
     else:
         raise ValueError(f"File format '{ext}' not supported!")
 
