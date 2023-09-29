@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.23] - 2023-09-29
+
+### Changed
+
+- Github action checkout upgraded to v3 due to deprecation warnings.
+
 ## [1.4.22] - 2023-04-05
 
 ### Fixed
