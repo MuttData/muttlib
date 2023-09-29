@@ -167,7 +167,13 @@ def local_df_cache(
 
 
 def df_read_multi(fn, index_col=False, quoting=0):
-    """Read multiple table disk-formats into a pandas DataFrame."""
+    """
+    Read multiple table disk-formats into a pandas DataFrame.
+
+    If the file has a '.pickle' or '.pkl' extension, keep in mind that
+    unpickling is not secure.
+    https://docs.python.org/3/library/pickle.html
+    """
     ext = Path(fn).suffix[1:]
     if ext == 'csv':
         df = pd.read_csv(fn, index_col=index_col, quoting=quoting)
