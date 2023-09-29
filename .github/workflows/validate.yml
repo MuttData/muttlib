@@ -13,7 +13,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install dependencies
         run: pip install packaging
       - name: Fetch source ref
@@ -40,7 +40,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Fetch source ref
         run: git fetch origin $GITHUB_HEAD_REF
       - name: Fetch target ref

@@ -15,7 +15,7 @@ jobs:
           apt update
           apt install -qy libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install packages and extras
         run: poetry install --extras "forecast gsheets gdrive" --with dev
       - name: Test base imports
@@ -43,7 +43,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev -E "gdrive gsheets forecast"
       - name: Run nox
@@ -59,7 +59,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
       - name: Run interrogate
@@ -75,7 +75,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
       - name: Run nox
@@ -91,7 +91,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
       - name: Run mypy and check lines
