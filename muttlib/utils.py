@@ -171,7 +171,7 @@ def df_read_multi(fn, index_col=False, quoting=0):
     Read multiple table disk-formats into a pandas DataFrame.
 
     If the file has a '.pickle' or '.pkl' extension, keep in mind that
-    unpickling is not secure.
+    unpickling untrusted data is not secure.
     https://docs.python.org/3/library/pickle.html
     """
     ext = Path(fn).suffix[1:]
