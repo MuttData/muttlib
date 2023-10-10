@@ -167,7 +167,13 @@ def local_df_cache(
 
 
 def df_read_multi(fn, index_col=False, quoting=0):
-    """Read multiple table disk-formats into a pandas DataFrame."""
+    """
+    Read multiple table disk-formats into a pandas DataFrame.
+
+    If the file has a '.pickle' or '.pkl' extension, keep in mind that
+    unpickling untrusted data is not secure.
+    https://docs.python.org/3/library/pickle.html
+    """
     ext = Path(fn).suffix[1:]
     if ext == 'csv':
         df = pd.read_csv(fn, index_col=index_col, quoting=quoting)
@@ -183,7 +189,7 @@ def df_read_multi(fn, index_col=False, quoting=0):
     elif ext == 'feather':
         return pd.read_feather(fn)
     elif ext in ['pickle', 'pkl']:
-        return pd.read_pickle(fn)
+        return pd.read_pickle(fn)  # nosec
     else:
         raise ValueError(f"File format '{ext}' not supported!")
 
@@ -522,7 +528,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
     """
 
     if isinstance(data, pd.DataFrame):
-        obj_cols = data.select_dtypes(include=[np.object]).columns
+        obj_cols = data.select_dtypes(include=[np.object_]).columns
         for col in obj_cols:
             data[col] = (
                 data[col]
@@ -534,7 +540,7 @@ def str_normalize_pandas(data, str_replace_kws=None):
             if str_replace_kws:
                 data[col] = data[col].str.replace(**str_replace_kws)
         return data
-    elif isinstance(data, pd.Series) and data.dtype == np.object:
+    elif isinstance(data, pd.Series) and data.dtype == np.object_:
         data = (
             data.str.lower()
             .str.lower()
