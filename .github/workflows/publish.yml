@@ -34,8 +34,9 @@ jobs:
       - name: Build package
         run: poetry build
 
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      # TODO: uncomment
+      # - name: Publish package distributions to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
 
   # testpypi-publish:
   #   name: Test publish Python 🐍 distribution 📦 to TestPyPI
