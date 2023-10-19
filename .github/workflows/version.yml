@@ -8,7 +8,8 @@ on:
 
 jobs:
   create_github_release:
-    if: ${{ github.event.pull_request.merged == true }}
+    # TODO: temp!!! uncomment when ready
+    # if: ${{ github.event.pull_request.merged == true }}
     runs-on: [self-hosted]
     container:
       image: python:3.10
