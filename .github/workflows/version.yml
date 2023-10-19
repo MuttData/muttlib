@@ -1,15 +1,14 @@
 name: version
 on:
   pull_request:
-    # TODO: temp!!! uncomment when ready
-    # types:
-    #   - closed
+    types:
+      - closed
     branches: [master]
 
 jobs:
   create_github_release:
-    # TODO: temp!!! uncomment when ready
-    # if: ${{ github.event.pull_request.merged == true }}
+    name: Create GitHub Release
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: [self-hosted]
     container:
       image: python:3.10
@@ -27,27 +26,6 @@ jobs:
           version=${{ steps.version.outputs.version }}
           release_notes=$(sed -n "/^## \[$version\]/,/^## /p" ./CHANGELOG.md | sed '1d;$d')
           echo "::set-output name=release_notes::$release_notes"
-
-      # - name: Create Tag
-      #   uses: actions/github-script@v3
-      #   env:
-      #     TAG: ${{ steps.set-tag.outputs.tag_name }}
-      #   with:
-      #     github-token: ${{ github.token }}
-      #     script: |
-      #       github.git.createRef({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
-      #         sha: context.sha
-      #       })
-      # - name: Create release
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     tag: ${{ steps.set-tag.outputs.tag_name }}
-      #     # TODO: should not include whole changelog
-      #     bodyFile: "./CHANGELOG.md"
-      #     token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release
         uses: softprops/action-gh-release@v1
