@@ -9,7 +9,7 @@ env:
   POETRY_VERSION: 1.6.1
 
 jobs:
-  bump_version:
+  create_github_release:
     if: github.event.pull_request.merged == true
     runs-on: [self-hosted]
     container:
