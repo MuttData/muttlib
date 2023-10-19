@@ -1,4 +1,5 @@
 name: validate
+
 on: [pull_request]
 
 env:
@@ -16,7 +17,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: pip install packaging
       - name: Fetch source ref
@@ -45,7 +46,7 @@ jobs:
           apt update
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Fetch source ref
         run: git fetch origin $GITHUB_HEAD_REF
       - name: Fetch target ref

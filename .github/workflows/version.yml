@@ -1,45 +1,58 @@
 name: version
 on:
   pull_request:
-    types:
-      - closed
+    # TODO: temp!!! uncomment when ready
+    # types:
+    #   - closed
     branches: [master]
-
-env:
-  POETRY_VERSION: 1.6.1
 
 jobs:
   create_github_release:
-    if: github.event.pull_request.merged == true
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: [self-hosted]
     container:
       image: python:3.10
     steps:
-      - name: Update base image
+      - uses: actions/checkout@v4
+
+      - name: Get muttlib version
+        id: version
         run: |
-          apt update
-          apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v3
-      - name: Set tag output
-        id: set-tag
-        run: echo "::set-output name=tag_name::v$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"
-      - name: Create Tag
-        uses: actions/github-script@v3
-        env:
-          TAG: ${{ steps.set-tag.outputs.tag_name }}
+          echo "::set-output name=version::$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"
+
+      - name: Extract release notes
+        id: release_notes
+        run: |
+          version=${{ steps.version.outputs.version }}
+          release_notes=$(sed -n "/^## \[$version\]/,/^## /p" ./CHANGELOG.md | sed '1d;$d')
+          echo "::set-output name=release_notes::$release_notes"
+
+      # - name: Create Tag
+      #   uses: actions/github-script@v3
+      #   env:
+      #     TAG: ${{ steps.set-tag.outputs.tag_name }}
+      #   with:
+      #     github-token: ${{ github.token }}
+      #     script: |
+      #       github.git.createRef({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
+      #         sha: context.sha
+      #       })
+      # - name: Create release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     tag: ${{ steps.set-tag.outputs.tag_name }}
+      #     # TODO: should not include whole changelog
+      #     bodyFile: "./CHANGELOG.md"
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          github-token: ${{ github.token }}
-          script: |
-            github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-             ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
-              sha: context.sha
-            })
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.set-tag.outputs.tag_name }}
-          bodyFile: "./CHANGELOG.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body: ${{ steps.release_notes.outputs.release_notes }}
+          draft: false
+          prerelease: false
