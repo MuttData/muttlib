@@ -26,7 +26,8 @@ jobs:
       - name: Check version
         run: |
           lib_ver=$(git diff origin/$GITHUB_HEAD_REF origin/$GITHUB_BASE_REF -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
-          IFS=' ' read -r ver_new ver_old <<< "$lib_ver"
+          ver_new=$(echo $lib_ver | cut -f1 -d' ')
+          ver_old=$(echo $lib_ver | cut -f2 -d' ')
           echo "new version: $ver_new (vs) old version: $ver_old"
           python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $ver_new $ver_old
           exit_status=$?
