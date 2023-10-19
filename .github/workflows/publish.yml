@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}}
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
 
       - name: Install dependencies
         run: poetry install
@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}}
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
 
       - name: Install dependencies
         run: poetry install
