@@ -3,11 +3,12 @@ on: push
 
 env:
   PYTHON_VERSION: 3.10.10
+  POETRY_VERSION: 1.6.1
 
 jobs:
   pypi-publish:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Upload release to PyPI
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -15,7 +16,20 @@ jobs:
     permissions:
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-      # retrieve your distributions here
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}}
+
+      - name: Install dependencies
+        run: poetry install
+      - name: Build package
+        run: poetry build
+
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
@@ -35,7 +49,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install Poetry
-        run: pipx install poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}}
 
       - name: Install dependencies
         run: poetry install
@@ -45,6 +59,7 @@ jobs:
       - name: Publish distribution 📦 to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          skip-existing: true
           repository-url: https://test.pypi.org/legacy/
           # TODO: best practice is to use Trusted Publishing (https://docs.pypi.org/trusted-publishers/adding-a-publisher/)
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
