@@ -76,7 +76,7 @@ On Fedora/CentOS:
 
 #### Poetry
 
-`muttlib` is packaged and developed using [poetry](https://python-poetry.org). Follow [these steps](https://python-poetry.org/docs/#installation) to install it and get familiar with the [quickstart](https://python-poetry.org/docs/basic-usage/). Make sure to install version `1.3.2` or higher.
+`muttlib` is packaged and developed using [poetry](https://python-poetry.org). Follow [these steps](https://python-poetry.org/docs/#installation) to install it and get familiar with the [quickstart](https://python-poetry.org/docs/basic-usage/). Make sure to install the version currently specified at the start of the lockfile (e.g. `1.6.1`).
 
 ### Installation
 

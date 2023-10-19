@@ -2,7 +2,6 @@
 
 [![pypi version](https://img.shields.io/pypi/v/muttlib?color=blue)](https://pypi.org/project/muttlib/)[![pipeline status](https://gitlab.com/mutt_data/muttlib/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![coverage report](https://gitlab.com/mutt_data/muttlib/badges/master/coverage.svg)](https://gitlab.com/mutt_data/muttlib/-/commits/master)[![docstring report](https://gitlab.com/mutt_data/muttlib/-/jobs/artifacts/master/raw/docs_coverage.svg?job=docstr-cov)](https://interrogate.readthedocs.io/en/latest/)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-
 ## Description
 
 Library with helper code to start a data-related project.
@@ -30,11 +29,12 @@ Current modules:
   - [Contributing](#contributing)
   - [License](#license)
 
-### Installing from PyPi
+### Installing from PyPI
 
-_Note:_ `muttlib` is packaged and developed using [poetry](https://python-poetry.org) v1.3.2.
+_Note:_ `muttlib` is packaged and developed using [poetry](https://python-poetry.org).
 
 Base lib:
+
 ```bash
 poetry add muttlib
 ```
@@ -42,16 +42,19 @@ poetry add muttlib
 Check below for available extras.
 
 Parquet and Feather support:
+
 ```bash
 poetry add muttlib -E pyarrow
 ```
 
 Forecast:
+
 ```bash
 poetry add muttlib -E forecast
 ```
 
 Misc DB support for dbconn:
+
 ```bash
 poetry add muttlib -E oracle
 poetry add muttlib -E hive
@@ -67,11 +70,13 @@ _Note:_ the `ibis` extra requires installing binary packages. Check [CONTRIBUTIN
 ### Installing custom branches from the repos
 
 From GitHub mirror:
+
 ```bash
 poetry add -e git+https://github.com/MuttData/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
 
 From Gitlab main repo:
+
 ```bash
 poetry add -e git+https://gitlab.com/mutt_data/muttlib.git@AWESOME_FEATURE_BRANCH#egg=muttlib
 ```
@@ -85,4 +90,5 @@ See the [documentation](https://mutt_data.gitlab.io/muttlib/) to get started wit
 We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](https://mutt_data.gitlab.io/muttlib/contributing.html).
 
 ## License
+
 `muttlib` is licensed under the [Apache License 2.0](https://github.com/MuttData/muttlib/blob/master/LICENCE).
