@@ -19,7 +19,7 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pipx install poetry==$POETRY_VERSION
+          pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v3
       - name: Set tag output
         id: set-tag

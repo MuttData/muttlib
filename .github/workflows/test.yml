@@ -15,7 +15,7 @@ jobs:
         run: |
           apt update
           apt install -qy libkrb5-dev libsasl2-dev
-          pipx install poetry==$POETRY_VERSION
+          pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v3
       - name: Install packages and extras
         run: poetry install --extras "forecast gsheets gdrive" --with dev
@@ -43,7 +43,7 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pipx install poetry==$POETRY_VERSION
+          pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev -E "gdrive gsheets forecast"
@@ -59,7 +59,7 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pipx install poetry==$POETRY_VERSION
+          pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
@@ -75,7 +75,7 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pipx install poetry==$POETRY_VERSION
+          pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
@@ -91,7 +91,7 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pipx install poetry==$POETRY_VERSION
+          pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
