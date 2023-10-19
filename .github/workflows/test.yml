@@ -2,8 +2,8 @@ name: test
 on: [push]
 
 env:
-  MIN_LINE_RATE: 0.2
   POETRY_VERSION: 1.6.1
+  MIN_LINE_RATE: 0.2
 
 jobs:
   run_tests:
@@ -15,8 +15,8 @@ jobs:
         run: |
           apt update
           apt install -qy libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Install packages and extras
         run: poetry install --extras "forecast gsheets gdrive" --with dev
       - name: Test base imports
@@ -30,7 +30,7 @@ jobs:
       - name: Test gdrive
         run: |
           poetry run python -c 'from muttlib import gdrive'
-      - name: Run nox
+      - name: Run tests with nox
         run: |
           poetry run nox --envdir $GITHUB_WORKSPACE/.nox --sessions tests
 
@@ -43,11 +43,11 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev -E "gdrive gsheets forecast"
-      - name: Run nox
+      - name: Run pre-commit hooks with nox
         run: poetry run nox --envdir $GITHUB_WORKSPACE/.nox --sessions precommit_hooks
 
   docstr-cov:
@@ -59,8 +59,8 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
       - name: Run interrogate
@@ -75,8 +75,8 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
       - name: Run nox
@@ -91,8 +91,8 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Install package
         run: poetry install -vvv --with dev
       - name: Run mypy and check lines

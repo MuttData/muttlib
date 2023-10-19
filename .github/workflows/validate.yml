@@ -15,8 +15,8 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Install dependencies
         run: pip install packaging
       - name: Fetch source ref
@@ -42,8 +42,8 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v2
+          pipx install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Fetch source ref
         run: git fetch origin $GITHUB_HEAD_REF
       - name: Fetch target ref
@@ -51,4 +51,4 @@ jobs:
       - name: Check changed lines
         run: |
           added_lines=$(git diff --numstat origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF -- CHANGELOG.md | awk '{print $1}')
-          if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+          if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has NOT been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
