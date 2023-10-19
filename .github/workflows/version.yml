@@ -5,8 +5,11 @@ on:
       - closed
     branches: [master]
 
+env:
+  POETRY_VERSION: 1.6.1
+
 jobs:
-  bump_version:
+  create_github_release:
     if: github.event.pull_request.merged == true
     runs-on: [self-hosted]
     container:
@@ -16,8 +19,8 @@ jobs:
         run: |
           apt update
           apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==1.3.2
-      - uses: actions/checkout@v2
+          pip install poetry==$POETRY_VERSION
+      - uses: actions/checkout@v3
       - name: Set tag output
         id: set-tag
         run: echo "::set-output name=tag_name::v$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"

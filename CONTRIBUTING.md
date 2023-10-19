@@ -76,7 +76,7 @@ On Fedora/CentOS:
 
 #### Poetry
 
-`muttlib` is packaged and developed using [poetry](https://python-poetry.org). Follow [these steps](https://python-poetry.org/docs/#installation) to install it and get familiar with the [quickstart](https://python-poetry.org/docs/basic-usage/). Make sure to install version `1.3.2` or higher.
+`muttlib` is packaged and developed using [poetry](https://python-poetry.org). Follow [these steps](https://python-poetry.org/docs/#installation) to install it and get familiar with the [quickstart](https://python-poetry.org/docs/basic-usage/). Make sure to install the version currently specified at the start of the lockfile (e.g. `1.6.1`).
 
 ### Installation
 
@@ -188,7 +188,7 @@ Alternatively you can see the docs for the `master` branch [here.](https://mutt_
 
 ## Versioning
 
-`muttlib` uses [SemVer](https://semver.org). To keep things easy, we've included [bump2version](https://github.com/c4urself/bump2version/) as a dev dependency. You can use `poetry run bump2version minor` to increase the minor number.
+`muttlib` uses [SemVer](https://semver.org). To keep things easy, we've included [bump2version](https://github.com/c4urself/bump2version/) as a dev dependency. For example, you can use `poetry run bump2version minor` to increase the minor number.
 
 Please remember to bump the version when submitting your PR!
 
