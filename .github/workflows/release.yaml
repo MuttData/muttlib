@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ci/release
 
 env:
   PYTHON_VERSION: 3.10.10
@@ -49,9 +48,8 @@ jobs:
       - name: Build package
         run: poetry build
 
-      # TODO: temp
-      # - name: Publish package distributions to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v1
@@ -59,7 +57,5 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
           body_path: release_notes.txt
-          # TODO
-          # draft: false
-          draft: true
+          draft: false
           prerelease: false
