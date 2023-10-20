@@ -46,7 +46,7 @@ jobs:
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v4
-      - name: Install package
+      - name: Install dependencies
         run: poetry install -vvv --with dev -E "gdrive gsheets forecast"
       - name: Run pre-commit hooks with nox
         run: poetry run nox --envdir $GITHUB_WORKSPACE/.nox --sessions precommit_hooks
@@ -62,7 +62,7 @@ jobs:
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v4
-      - name: Install package
+      - name: Install dependencies
         run: poetry install -vvv --with dev
       - name: Run interrogate
         run: poetry run interrogate muttlib -c pyproject.toml -vv --generate-badge docs_coverage.svg --badge-style flat
@@ -78,7 +78,7 @@ jobs:
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v4
-      - name: Install package
+      - name: Install dependencies
         run: poetry install -vvv --with dev
       - name: Run nox
         run: poetry run nox --envdir $GITHUB_WORKSPACE/.nox --sessions bandit
@@ -94,7 +94,7 @@ jobs:
           apt install -y libkrb5-dev libsasl2-dev
           pip install poetry==$POETRY_VERSION
       - uses: actions/checkout@v4
-      - name: Install package
+      - name: Install dependencies
         run: poetry install -vvv --with dev
       - name: Run mypy and check lines
         run: |
