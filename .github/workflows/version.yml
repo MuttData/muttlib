@@ -21,21 +21,21 @@ jobs:
       - name: Get muttlib version
         id: version
         run: |
-          grep current_version .bumpversion.cfg | cut -d= -f2 | xargs >>$GITHUB_OUTPUT
+          echo "::set-output name=version::$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"
 
       - name: Extract release notes from changelog
         id: release_notes
         run: |
           version=${{ steps.version.outputs.version }}
           release_notes=$(sed -n "/^## \[$version\]/,/^## /p" ./CHANGELOG.md | sed '1d;$d')
-          echo "$release_notes" >>$GITHUB_OUTPUT
+          echo "::set-output name=release_notes::$release_notes"
+          echo $release_notes > release_notes.txt
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
-          body: |
-            ${{ steps.release_notes.outputs.release_notes }}
+          body_path: release_notes.txt
           draft: false
           prerelease: false
