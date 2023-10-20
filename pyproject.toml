@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "muttlib"
-version = "1.4.25"
+version = "1.4.26"
 description = "Collection of helper modules by Mutt Data."
 readme = "README.md"
 license = "Apache-2.0"
