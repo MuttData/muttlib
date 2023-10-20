@@ -1,7 +1,9 @@
 name: validate
+
 on: [pull_request]
 
 env:
+  PYTHON_VERSION: 3.10.10
   POETRY_VERSION: 1.6.1
 
 jobs:
@@ -11,18 +13,15 @@ jobs:
     container:
       image: python:3.10
     steps:
-      - name: Update base image
-        run: |
-          apt update
-          apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v3
-      - name: Install dependencies
+      - uses: actions/checkout@v4
+      - name: Install packaging to compare versions
         run: pip install packaging
+
       - name: Fetch source ref
         run: git fetch origin $GITHUB_HEAD_REF
       - name: Fetch target ref
         run: git fetch origin $GITHUB_BASE_REF
+
       - name: Check version
         run: |
           lib_ver=$(git diff origin/$GITHUB_HEAD_REF origin/$GITHUB_BASE_REF -- .bumpversion.cfg | grep "current_version" | cut -d = -f 2 | xargs)
@@ -40,17 +39,33 @@ jobs:
     container:
       image: python:3.10
     steps:
-      - name: Update base image
-        run: |
-          apt update
-          apt install -y libkrb5-dev libsasl2-dev
-          pip install poetry==$POETRY_VERSION
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Fetch source ref
         run: git fetch origin $GITHUB_HEAD_REF
       - name: Fetch target ref
         run: git fetch origin $GITHUB_BASE_REF
+
       - name: Check changed lines
         run: |
           added_lines=$(git diff --numstat origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF -- CHANGELOG.md | awk '{print $1}')
           if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has NOT been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+
+  build:
+    name: Validate building package 📦
+    if: ${{ github.base_ref == 'master' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: poetry install
+      - name: Build package
+        run: poetry build
