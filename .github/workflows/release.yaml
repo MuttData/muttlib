@@ -1,0 +1,65 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - master
+      - ci/release
+
+env:
+  PYTHON_VERSION: 3.10.10
+  POETRY_VERSION: 1.6.1
+
+jobs:
+  publish_and_release:
+    name: Publish Python 🐍 distribution 📦 to PyPI and create GitHub Release
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/muttlib
+    permissions:
+      id-token: write # Mandatory for trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Poetry
+        run: |
+          pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Get muttlib version
+        id: version
+        run: |
+          echo "::set-output name=version::$(grep current_version .bumpversion.cfg | cut -d= -f2 | xargs)"
+
+      - name: Extract release notes from changelog
+        id: release_notes
+        run: |
+          version=${{ steps.version.outputs.version }}
+          release_notes=$(sed -n "/^## \[$version\]/,/^## /p" ./CHANGELOG.md | sed '1d;$d')
+          echo "::set-output name=release_notes::$release_notes"
+          echo "$release_notes" > release_notes.txt
+          cat release_notes.txt
+
+      - name: Install dependencies
+        run: poetry install
+      - name: Build package
+        run: poetry build
+
+      # TODO: temp
+      # - name: Publish package distributions to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body_path: release_notes.txt
+          # TODO
+          # draft: false
+          draft: true
+          prerelease: false
