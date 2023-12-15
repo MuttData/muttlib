@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      # TODO: temp
       - ci/debug
 
 env:
@@ -25,6 +26,7 @@ jobs:
       url: https://pypi.org/p/muttlib
     permissions:
       id-token: write # Mandatory for trusted publishing
+      contents: write # Necessary for creating GitHub Release?
     steps:
       - uses: actions/checkout@v4
 
@@ -58,5 +60,6 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
           body_path: release_notes.txt
-          draft: false
+          # draft: false
+          draft: true  # TODO: temp
           prerelease: false
